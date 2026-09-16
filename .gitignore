@@ -6,6 +6,9 @@
 # Generated output (tools/*.py and the Ghidra scripts regenerate it)
 /work/
 /port/decomp/
+/port/cga/xmap.json
+/port/cga/game_diffs.txt
+/port/cga/call_swaps.txt
 
 # Build output and copied binaries
 build*/

@@ -18,9 +18,11 @@
 #define DS_cars_left          DS_g_lives
 #define DS_knob_target_y      (DS_knob_target_x + 2)      /* 0A83 */
 #define DS_car_knob_y0        (DS_car_knob_xy + 2)        /* 26B1 neutral row */
-#define DS_sinq_jt_lateral    0x205F                      /* jump table: 0x41C9 0x416F 0x417A 0x4185 0x4190 0x41BC */
-#define DS_sinq_jt_grip       0x206B                      /* jump table: 0x40BD 0x4044 0x404C 0x4057 0x4062 0x40B0 */
-#define DS_road_record        0x2B70                      /* [flag, curve, pitch, object] */
+#define DS_sinq_jt_lateral    EGA_CGA(0x205F, 0x2032)     /* jump table: 0x41C9 0x416F 0x417A 0x4185 0x4190 0x41BC */
+#define DS_sinq_jt_grip       EGA_CGA(0x206B, 0x203E)     /* jump table: 0x40BD 0x4044 0x404C 0x4057 0x4062 0x40B0 */
+#define DS_road_record        EGA_CGA(0x2B70, 0x2B40)     /* [flag, curve, pitch, object] */
+/* Code addresses stored in the DGROUP jump tables: the TDCGA ISR is the TDEGA one moved down by 0xC8. */
+#define SIM_CS(a)             ((u16)((a) - EGA_CGA(0, 0xC8)))
 
 typedef struct { u16 ax, bx, cx, dx, si, di, bp; } Reg;
 
@@ -458,7 +460,8 @@ static Label sim_motion(Reg *r)
     if (!((s8)HI(r->cx) > 0)) r->cx = (u16)-r->cx;
     r->bx = setlo(r->bx, HI(r->cx));
     u8 f = LO(r->cx);
-    sinq_interp(r, DS_sinq_jt_grip, 0x40BD, 0x4044, 0x404C, 0x4057, 0x4062, 0x40B0, &f);
+    sinq_interp(r, DS_sinq_jt_grip, SIM_CS(0x40BD), SIM_CS(0x4044), SIM_CS(0x404C), SIM_CS(0x4057),
+                SIM_CS(0x4062), SIM_CS(0x40B0), &f);
     r->cx = setlo(r->cx, f);
     /* 0x40BD */
     r->ax = sethi(r->ax, DSB(DS_speed_hi));
@@ -535,7 +538,8 @@ static Label sim_advance_unit(Reg *r)
         }
         r->bx &= 0x00FF;
         u8 f = LO(r->dx);
-        sinq_interp(r, DS_sinq_jt_lateral, 0x41C9, 0x416F, 0x417A, 0x4185, 0x4190, 0x41BC, &f);
+        sinq_interp(r, DS_sinq_jt_lateral, SIM_CS(0x41C9), SIM_CS(0x416F), SIM_CS(0x417A), SIM_CS(0x4185),
+                    SIM_CS(0x4190), SIM_CS(0x41BC), &f);
         r->dx = setlo(r->dx, f);
         /* 0x41C9 */
         r->ax &= 0x00FF;
@@ -633,7 +637,7 @@ static Label sim_spawn_object(Reg *r)
         if (LO(r->ax) < LO(r->dx)) return L_UNIT_NEXT;
         r->dx = r->cx;
         /* std; rep movsw: 16 words DS:0945.. -> DS:094D.. (backwards), 5th entry dropped */
-        for (r->si = 0x0963, r->di = 0x096B, r->cx = 0x10; r->cx != 0; r->cx--) {
+        for (r->si = EGA_CGA(0x0963, 0x094B), r->di = EGA_CGA(0x096B, 0x0953), r->cx = 0x10; r->cx != 0; r->cx--) {
             DSW(r->di) = DSW(r->si);
             r->si = (u16)(r->si - 2);
             r->di = (u16)(r->di - 2);
@@ -659,7 +663,7 @@ static Label sim_spawn_object(Reg *r)
         r->ax = rand8();
         if (LO(r->ax) < LO(r->dx)) return L_UNIT_NEXT;
         r->dx = r->cx;
-        for (r->si = 0x098B, r->di = 0x0993, r->cx = 0x10; r->cx != 0; r->cx--) {
+        for (r->si = EGA_CGA(0x098B, 0x0973), r->di = EGA_CGA(0x0993, 0x097B), r->cx = 0x10; r->cx != 0; r->cx--) {
             DSW(r->di) = DSW(r->si);
             r->si = (u16)(r->si - 2);
             r->di = (u16)(r->di - 2);
@@ -807,7 +811,7 @@ static Label sim_cop_fsm(Reg *r)
     r->di = r->ax;
 
     switch (DSW(DS_cop_state_jump_table + r->di)) {
-    case 0x43A4:                                           /* 1 chase */
+    case SIM_CS(0x43A4):                                           /* 1 chase */
         r->ax = DSW(DS_cop_speed);
         cop_adv(r);
         r->ax = (u16)(r->ax + 2);
@@ -834,7 +838,7 @@ static Label sim_cop_fsm(Reg *r)
         }
         break;
 
-    case 0x4414:                                           /* 2 pass the blocking car */
+    case SIM_CS(0x4414):                                           /* 2 pass the blocking car */
         r->ax = setlo(r->ax, DSB(DS_cop_timer));
         if (DSB(DS_oncoming_count) != 0) break;
         r->ax = setlo(r->ax, (u8)(LO(r->ax) + 2));
@@ -856,7 +860,7 @@ static Label sim_cop_fsm(Reg *r)
         }
         break;
 
-    case 0x4467:                                           /* 3 pass the player */
+    case SIM_CS(0x4467):                                           /* 3 pass the player */
         r->ax = setlo(r->ax, (u8)(DSB(DS_cop_timer) + 1));
         DSB(DS_cop_timer) = LO(r->ax);
         r->ax = (u16)(s16)(s8)LO(r->ax);
@@ -875,7 +879,7 @@ static Label sim_cop_fsm(Reg *r)
         }
         break;
 
-    case 0x44A8:                                           /* 4, 5 lead and stop (Q8) */
+    case SIM_CS(0x44A8):                                           /* 4, 5 lead and stop (Q8) */
         if (DSB(DS_cop_timer) != 0) {
             DSB(DS_cop_timer)--;
         } else {
@@ -909,7 +913,7 @@ static Label sim_cop_fsm(Reg *r)
         }
         break;
 
-    case 0x4526:                                           /* 6 stopped, ticket */
+    case SIM_CS(0x4526):                                           /* 6 stopped, ticket */
         if (DSB(DS_cop_timer) != 0) {
             DSB(DS_cop_timer)--;
             break;
@@ -919,7 +923,7 @@ static Label sim_cop_fsm(Reg *r)
         cop_adv(r);
         break;
 
-    case 0x451B:                                           /* 7 trap armed: nothing */
+    case SIM_CS(0x451B):                                           /* 7 trap armed: nothing */
         return L_CLEANUP;
 
     default:
@@ -979,7 +983,7 @@ static Label sim_object_cleanup(Reg *r)
             DSB(DS_samedir_count) = LO(r->cx);
             if (LO(r->cx) != 0) {
                 /* Q1: rep movsw with CX = n*8 words (n*16 bytes) across DS:096D..0A14 as one byte array */
-                r->si = 0x0975;
+                r->si = EGA_CGA(0x0975, 0x095D);
                 r->cx &= 0x00FF;
                 r->cx = (u16)(r->cx << 3);
                 for (; r->cx != 0; r->cx--) {

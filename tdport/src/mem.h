@@ -1,21 +1,21 @@
 #pragma once
 /* Real-mode memory model.
  *
- * The unpacked TDEGA.EXE load image is placed at segment LOAD_SEG (0x1000, same as the Ghidra
- * project), with its MZ relocations applied, so:
+ * The unpacked TDEGA.EXE (TDCGA.EXE in CGA builds) load image is placed at segment LOAD_SEG (0x1000,
+ * same as the Ghidra project), with its MZ relocations applied, so:
  *   image offset X      = linear 0x10000 + X   (code; the asm keeps state at CS:xxxx)
- *   DS:xxxx (DGROUP)    = segment 0x1C9A, i.e. image offset 0xC9A0 + xxxx
+ *   DS:xxxx (DGROUP)    = segment 0x1C9A, i.e. image offset 0xC9A0 + xxxx   (TDCGA: 0x1A8A, 0xA8A0)
  * All data tables, strings, the font, palettes and road data are read from there. Heap segments
- * (archives, off-screen buffers) are allocated above DGROUP. EGA video memory (segment 0xA000) is
- * NOT in mem[]: graphics code treats plane segment 0xA000 as the screen, exactly like the original.
+ * (archives, off-screen buffers) are allocated above DGROUP. Video memory (EGA segment 0xA000, CGA
+ * 0xB800) is NOT in mem[]: graphics code treats that segment as the screen, exactly like the original.
  */
 #include "types.h"
 
 #define MEM_SIZE    0x110000u
 #define LOAD_SEG    0x1000
 #define CODE_SEG    LOAD_SEG
-#define DGROUP      (LOAD_SEG + 0x0C9A)
-#define VRAM_SEG    0xA000
+#define DGROUP      (LOAD_SEG + EGA_CGA(0x0C9A, 0x0A8A))
+#define VRAM_SEG    EGA_CGA(0xA000, 0xB800)
 #define HEAP_BOTTOM 0x2D00   /* first segment above the 64 KB DGROUP (stack/BSS included) */
 #define HEAP_TOP    0xA000   /* DOS memory ends where video memory begins */
 
@@ -83,7 +83,10 @@ static inline u16 idiv16_8(s16 ax, s8 divisor)
     return (u16)((u8)(s8)(ax % divisor) << 8 | (u8)(s8)q);
 }
 
-/* Loads TDEGA.EXE (EXEPACK-packed or already unpacked), relocates it to LOAD_SEG and checks that it
+/* Name of the original executable this build ports. */
+#define TD_EXE_NAME EGA_CGA("TDEGA.EXE", "TDCGA.EXE")
+
+/* Loads TD_EXE_NAME (EXEPACK-packed or already unpacked), relocates it to LOAD_SEG and checks that it
  * is the expected build. Returns false and fills err on failure. */
 bool mem_load_exe(const char *path, char *err, size_t errlen);
 

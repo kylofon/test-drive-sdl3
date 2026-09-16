@@ -211,7 +211,7 @@ static void project_road(const ProjCfg *c)
         u16 wp = DSW(DS_walk_ptr);
         u8 b = DSB(wp);
         if (DSB(DS_g_stageEvent) != 0 && !((s16)wp < (s16)DSW(DS_stage_end_pos))) b = 0;
-        u16 rec = (u16)(0x2B70 + ((u16)b << 2));                  /* road record table DS:2B70 */
+        u16 rec = (u16)(EGA_CGA(0x2B70, 0x2B40) + ((u16)b << 2)); /* road record table DS:2B70 */
         DSB(DS_cur_curve) = DSB(rec + 1);
         u8 obj = DSB(rec + 3);
         DSW(DS_walk_ptr) = c->mirror ? (u16)(wp - 1) : (u16)(wp + 1);

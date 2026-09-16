@@ -118,18 +118,31 @@ int game_main(void)
     timer_init();
 
     /* PORT: copy_protection_check() (0x8DC7) dropped, treated as 0.
-     * PORT: argv[1] "herc" (Hercules, DS:008A) and the TD.EXE launcher password (DS:00DE) checks dropped. */
+     * PORT: the TD.EXE launcher password (DS:00DE) check dropped (TDCGA has none).
+     * PORT: argv[1] "herc" is the build variant: TD_HERC builds act as "tdcga herc", others as no argument. */
+#if TD_HERC
+    gfx_herc_init();                                    /* TDCGA 0x0036 */
+    DSW(DS_herc_mode) = 1;
+#endif
     mem_init();
     gfx_init_ega();
-    gfx_set_palette(DS_pal_game);                       /* 0x00CC */
+#if !TD_CGA
+    gfx_set_palette(DS_pal_game);                       /* 0x00CC (TDCGA: no palette) */
+#endif
     input_set_mode(4);
     timer_install_menu();
-    FarPtr snd = load_raw_archive(DSTR(0x45), 0x26D1);  /* "tdsnd.snd" */
+    FarPtr snd = load_raw_archive(DSTR(0x45), EGA_CGA(0x26D1, 0x153D));  /* "tdsnd.snd" */
     far_wr(DGROUP, DS_g_songGas,     res_find(snd, DSTR(0x4F)));   /* sng1 */
     far_wr(DGROUP, DS_g_songIntro,   res_find(snd, DSTR(0x54)));   /* sng2 */
     far_wr(DGROUP, DS_g_songCarSel,  res_find(snd, DSTR(0x59)));   /* sng4 */
     far_wr(DGROUP, DS_g_songHiScore, res_find(snd, DSTR(0x5E)));   /* sng3 */
-    far_wr(DGROUP, DS_page_buf_desc, gfx_create_buffer(0x28, 200, 0x0F));
+#if TD_CGA
+    {   /* TDCGA 0x00C0: xroada.cmp is loaded once here, into the DGROUP buffer DS:73AA */
+        u16 len;
+        far_wr(DGROUP, DS_g_xroadA, load_packed_near(DSTR(0x63), 0x73AA, &len));
+    }
+#endif
+    far_wr(DGROUP, DS_page_buf_desc, gfx_create_buffer(EGA_CGA(0x28, 0x50), 200, 0x0F));
     DSL(DS_g_totalScore) = 0;
     DSW(DS_g_selectedCar) = 0xFFFF;
     DSW(DS_demo_mode) = 0;
@@ -167,11 +180,15 @@ dos:
     /* PORT: copy_protection_check() here (non-zero would quit) dropped. */
     gfx_clear_screen(0);
     gfx_select_target(gfx_screen_desc());
-    gfx_set_text_colours(0x0F, 1);
-    draw_text_centered(DSTR(0x63), 100);                 /* " BACK TO DOS (Y or other key) ? " */
+    gfx_set_text_colours(EGA_CGA(0x0F, 2), 1);
+    draw_text_centered(DSTR(EGA_CGA(0x63, 0x6E)), 100);  /* " BACK TO DOS (Y or other key) ? " */
     if (toupper_c(getkey_wait()) != 'Y') goto intro;
 
-    /* PORT: DS:008A (Hercules) is never set, so always the EGA shutdown. */
+#if TD_CGA
+    if (DSW(DS_herc_mode)) gfx_herc_shutdown();        /* TDCGA 0x0225: set only in TD_HERC builds */
+    else
+#endif
+    /* PORT: in the EGA build DS:008A (Hercules) is never set, so always the EGA shutdown. */
     gfx_shutdown();
     timer_restore();
     return 0;
@@ -181,7 +198,7 @@ dos:
 void load_cars_txt(void)
 {
     FlowText f;
-    if (!flow_text_open(&f, DSTR(0xF5)))                 /* "CARS.TXT", mode "r" */
+    if (!flow_text_open(&f, DSTR(EGA_CGA(0xF5, 0x101)))) /* "CARS.TXT", mode "r" */
         fatal("CARS.TXT open error");                    /* PORT: the original does not check fopen */
     DSW(DS_g_numCars) = 0;
     u16 off = 0;
@@ -204,12 +221,12 @@ int play_again_menu(void)
         int sel = 0;
         for (;;) {
             u16 a, b;
-            if (sel == 0) { a = 0x00; b = 0x0F; }
-            else          { a = 0x0F; b = 0x00; }
+            if (sel == 0) { a = 0x00; b = EGA_CGA(0x0F, 3); }
+            else          { a = EGA_CGA(0x0F, 3); b = 0x00; }
             gfx_set_text_colours(a, b);
-            draw_text_centered(DSTR(0x8C), 0x5A);
+            draw_text_centered(DSTR(EGA_CGA(0x8C, 0x98)), 0x5A);
             gfx_set_text_colours(b, a);
-            draw_text_centered(DSTR(0xAC), 100);
+            draw_text_centered(DSTR(EGA_CGA(0xAC, 0xB8)), 100);
             set_deadline(12000);
             int k = menu_key();
             if (k == 0x0D) { DSW(DS_demo_mode) = 0; return sel; }
@@ -226,10 +243,10 @@ int run_intro(void)
 {
     gfx_clear_screen(0);
     snd_play_oneshot(far_rd(DGROUP, DS_g_songIntro));
-    far_wr(DGROUP, DS_g_introArchive, load_archive(DSTR(0xFE), 2000));       /* ACCOLADE.PES */
+    far_wr(DGROUP, DS_g_introArchive, load_archive(DSTR(EGA_CGA(0xFE, 0x10A)), EGA_CGA(2000, 1000)));   /* ACCOLADE.PES (.CMP) */
     int r = intro_accolade();
     if (r == -1) {
-        far_wr(DGROUP, DS_g_introArchive, load_archive(DSTR(0x10B), 2000));  /* TESTDRV.PES */
+        far_wr(DGROUP, DS_g_introArchive, load_archive(DSTR(EGA_CGA(0x10B, 0x117)), EGA_CGA(2000, 1000))); /* TESTDRV.PES (.CMP) */
         r = intro_testdrive_car();
     }
     if (r == -1) r = intro_testdrive_logo();
@@ -245,9 +262,9 @@ int intro_accolade(void)
     int k;
     gfx_select_target(flow_page_desc());
     gfx_clear_clip(0);
-    blit_copy_own(res_find(a, DSTR(0x1CD)));             /* "acc " */
-    blit_copy_own(res_find(a, DSTR(0x1D2)));             /* "pres" */
-    blit_copy_own(res_find(a, DSTR(0x1D7)));             /* "copy" */
+    blit_copy_own(res_find(a, DSTR(EGA_CGA(0x1CD, 0x1D9))));             /* "acc " */
+    blit_copy_own(res_find(a, DSTR(EGA_CGA(0x1D2, 0x1DE))));             /* "pres" */
+    blit_copy_own(res_find(a, DSTR(EGA_CGA(0x1D7, 0x1E3))));             /* "copy" */
     gfx_select_target(gfx_screen_desc());
     for (int i = 0; i < 8; i++) {
         set_deadline(1);
@@ -255,7 +272,7 @@ int intro_accolade(void)
         k = menu_key();
         if (k != -1) return k;
     }
-    FarPtr bull = res_find(a, DSTR(0x1DC));              /* "bull" */
+    FarPtr bull = res_find(a, DSTR(EGA_CGA(0x1DC, 0x1E8)));              /* "bull" */
     s16 y    = (s16)rd16(bull.seg, (u16)(bull.off + 0x0A));
     s16 xend = (s16)rd16(bull.seg, (u16)(bull.off + 0x08));
     for (s16 x = 0; x < xend; x = (s16)(x + 2)) {
@@ -274,12 +291,12 @@ int intro_testdrive_car(void)
     FarPtr a = far_rd(DGROUP, DS_g_introArchive);
     FarPtr frm[5], rrm[5], wnd[33];
     int k;
-    flow_find_list(a, DSTR(0x11C), frm, 5);
-    flow_find_list(a, DSTR(0x132), rrm, 5);
-    flow_find_list(a, DSTR(0x148), wnd, 33);
+    flow_find_list(a, DSTR(EGA_CGA(0x11C, 0x128)), frm, 5);
+    flow_find_list(a, DSTR(EGA_CGA(0x132, 0x13E)), rrm, 5);
+    flow_find_list(a, DSTR(EGA_CGA(0x148, 0x154)), wnd, 33);
     gfx_select_target(flow_page_desc());
     gfx_clear_clip(0);
-    blit_copy_own(res_find(a, DSTR(0x1E1)));             /* "car " */
+    blit_copy_own(res_find(a, DSTR(EGA_CGA(0x1E1, 0x1ED))));             /* "car " */
     gfx_select_target(gfx_screen_desc());
     for (int i = 0; i < 8; i++) {
         set_deadline(10);
@@ -310,7 +327,7 @@ int intro_testdrive_car(void)
             else moving = 1;
         }
         gfx_select_target(gfx_screen_desc());
-        gfx_set_clip(gfx_screen_desc(), 0, 0x28, 100, 200);
+        gfx_set_clip(gfx_screen_desc(), 0, EGA_CGA(0x28, 0x50), 100, 200);
         s16 w = dist;
         if (dist > 0x20) w = 0x20;
         if (w != 0) gfx_fill_rect((s16)(0x140 - dist), 100, w, 0x50, 0);
@@ -324,7 +341,7 @@ int intro_testdrive_car(void)
 int intro_testdrive_logo(void)
 {
     FarPtr a = far_rd(DGROUP, DS_g_introArchive);
-    FarPtr logo = res_find(a, DSTR(0x1E6));              /* "tdrv" */
+    FarPtr logo = res_find(a, DSTR(EGA_CGA(0x1E6, 0x1F2)));              /* "tdrv" */
     s16 lx = (s16)rd16(logo.seg, (u16)(logo.off + 8));
     s16 ly = (s16)rd16(logo.seg, (u16)(logo.off + 0x0A));
     gfx_select_target(gfx_screen_desc());
@@ -361,10 +378,10 @@ int intro_testdrive_logo(void)
         int k = menu_key();
         if (k != -1) return k;
         if (finished) {
-            blit_copy_own(res_find(a, DSTR(0x1EB)));     /* "fob " */
-            blit_copy_own(res_find(a, DSTR(0x1F0)));     /* "tmar" */
-            gfx_set_text_colours(0x0F, 0);
-            draw_text_centered(DSTR(0x1F5), 0xB4);       /* CTRL - (J)OYSTICK OR CTRL - (K)EYBOARD */
+            blit_copy_own(res_find(a, DSTR(EGA_CGA(0x1EB, 0x1F7))));     /* "fob " */
+            blit_copy_own(res_find(a, DSTR(EGA_CGA(0x1F0, 0x1FC))));     /* "tmar" */
+            gfx_set_text_colours(EGA_CGA(0x0F, 3), 0);
+            draw_text_centered(DSTR(EGA_CGA(0x1F5, 0x201)), 0xB4);       /* CTRL - (J)OYSTICK OR CTRL - (K)EYBOARD */
             set_deadline(1000);
             return menu_key();
         }

@@ -1,6 +1,9 @@
 /* Memory blocks, archives and misc runtime — port of TDEGA 0x6762, 0x78A5, 0x8A5B, 0x8BAF, 0x8CC0, 0x8D8C,
  * 0x94AB, 0x94C7, 0x9A86..0xA111, 0xA280..0xA37E and MSC rand/srand 0xA8FD/0xA90E
- * (port/spec/platform.md §4.7, §2.4; FORMATS.md). */
+ * (port/spec/platform.md §4.7, §2.4; FORMATS.md).
+ * TDCGA has the same routines at other addresses (TDCGA 0x5C55, 0x643F, 0x70FC, 0x731F, 0x755B, 0x7627,
+ * 0x7C6D, 0x7C89, 0x8174..0x8272, 0x87F1/0x8802); its load_archive reads RLE .CMP files itself and there
+ * is no PES unpacker (0x9A86..0xA111). */
 #include "res.h"
 
 #include <stdarg.h>
@@ -12,6 +15,7 @@
 
 /* host_game_path() returns SDL-allocated memory; declared here so this file does not include SDL. */
 
+#if !TD_CGA
 /* ---- DGROUP state of the unpacker without a symbol of its own */
 #define DS_lzw_offset      0x69A2   /* bit offset in the code buffer */
 #define DS_lzw_size        0x69A4   /* bits available in the code buffer */
@@ -27,12 +31,14 @@
 #define DS_huff_nodes      0x748E   /* s16[2] x 257 */
 #define DS_rle_last        0x7892
 #define DS_pack_outptr_seg 0x809E
-#define DS_crt_seed        0x707A   /* u32 MSC rand seed (srand writes 707A, zeroes 707C) */
+#endif
+#define DS_crt_seed        EGA_CGA(0x707A, 0x6F3C)   /* u32 MSC rand seed (srand writes +0, zeroes +2) */
 
 #define CACHE_SLOT_SIZE 16
 #define CACHE_SLOTS     30
 #define BUF_SLOTS       8
 
+#if !TD_CGA
 /* ---- host-side scratch (the original keeps these in the CRT near heap / a DOS handle) */
 static FILE *pack_file;
 static u8 pack_inbuf[0x400];             /* malloc(0x400), DS:7F3E; the cursor equals DS:8096 */
@@ -41,6 +47,7 @@ static u8 lzw_tab[0x438B];               /* malloc(0x438B), DS:6A3C: prefix +0, 
 #define LZW_STACK  0x3000
 static inline u16 lzw_prefix_rd(u16 code) { return (u16)(lzw_tab[code * 2] | lzw_tab[code * 2 + 1] << 8); }
 static inline void lzw_prefix_wr(u16 code, u16 v) { lzw_tab[code * 2] = (u8)v; lzw_tab[code * 2 + 1] = (u8)(v >> 8); }
+#endif
 
 static const char *ds_str(u16 off) { return (const char *)mp(DGROUP, off); }
 
@@ -114,7 +121,7 @@ have_slot:
         DSW((u16)(di + 0x0E)) = 0;
         DSW((u16)(di + 0x0C)) = 0;
         di = (u16)(di - CACHE_SLOT_SIZE);
-        if (di < DS_cache_slots) fatal(ds_str(0x6A5C), fname);     /* "OUT OF MEMORY LOADING %s\n" */
+        if (di < DS_cache_slots) fatal(ds_str(EGA_CGA(0x6A5C, 0x691E)), fname);     /* "OUT OF MEMORY LOADING %s\n" */
         dx = DSW((u16)(di + 0x0E));
     }
     for (u16 bx = 0; bx < 12; bx++) {
@@ -135,9 +142,9 @@ u16 buf_alloc(u16 paras)
     int cx;
     for (cx = BUF_SLOTS; cx > 0; cx--, di += 4)
         if (DSW(di) == 0) break;
-    if (cx == 0) fatal("%s", ds_str(0x6A78));           /* "OUT OF MEMORY BUFFERS" */
+    if (cx == 0) fatal("%s", ds_str(EGA_CGA(0x6A78, 0x693A)));           /* "OUT OF MEMORY BUFFERS" */
     u16 seg = (u16)(DSW(DS_mem_high) - paras);
-    if (seg <= DSW(DS_mem_low)) fatal("%s", ds_str(0x6A8E));   /* "OUT OF BUFFER MEMORY" */
+    if (seg <= DSW(DS_mem_low)) fatal("%s", ds_str(EGA_CGA(0x6A8E, 0x6950)));   /* "OUT OF BUFFER MEMORY" */
     DSW(DS_mem_high) = seg;
     DSW(di) = seg;
     DSW((u16)(di + 2)) = paras;
@@ -151,7 +158,7 @@ void buf_free(u16 seg)
     int cx;
     for (cx = BUF_SLOTS; cx > 0; cx--, di += 4)
         if (DSW(di) == seg) break;
-    if (cx == 0) fatal("%s", ds_str(0x6AA4));           /* "BUFFER NOT FOUND RELEASE ERROR" */
+    if (cx == 0) fatal("%s", ds_str(EGA_CGA(0x6AA4, 0x6966)));           /* "BUFFER NOT FOUND RELEASE ERROR" */
     u16 end = (u16)(DSW((u16)(di + 2)) + seg);
     if (end >= DSW(DS_mem_high)) DSW(DS_mem_high) = end;
     DSW(di) = 0;
@@ -178,16 +185,6 @@ static void archive_relocate(u16 seg, u16 off)
     } while ((s16)--n > 0);
 }
 
-/* 0x8A5B load_archive */
-FarPtr load_archive(const char *fname, u16 reserve)
-{
-    u16 seg = cache_find(fname);
-    if (seg) return far_make(seg, 0);                   /* already relocated */
-    FarPtr a = load_packed_archive(fname, reserve);
-    archive_relocate(a.seg, a.off);
-    return a;
-}
-
 static FILE *open_game_file(const char *fname)
 {
     char *path = host_game_path(fname, false);
@@ -206,6 +203,115 @@ static bool read_into_mem(FILE *f, u16 seg, u16 n)
     size_t got = fread(mem + l, 1, want, f);
     return !(got < want && ferror(f));
 }
+
+#if TD_CGA
+/* TDCGA 0x7285: refill the 256-byte stack buffer; DX = bytes read, SI = 0 */
+static void cmp_refill(FILE *f, u8 *buf, u16 *si, u16 *dx, bool *err)
+{
+    size_t n = fread(buf, 1, 0x100, f);
+    if (n == 0 && ferror(f)) *err = true;
+    *dx = (u16)n;
+    *si = 0;
+}
+
+/* RLE body shared by TDCGA 0x70FC and 0x73EA: 83 vv nn = nn copies of vv, anything else is literal.
+ * Output starts at es:di; false on a read error. */
+static bool cmp_unpack(FILE *f, u16 es, u16 di)
+{
+    u8 buf[0x100] = { 0 };
+    bool rerr = false;
+    u16 si = 0, dx = 0;
+    for (;;) {
+        if ((s16)si >= (s16)dx) {
+            cmp_refill(f, buf, &si, &dx, &rerr);
+            if (rerr) return false;
+            if (dx == 0) return true;                   /* end of file */
+        }
+        u8 al = buf[si++];
+        if (al != 0x83) {
+            u32 l = lin(es, di);
+            if (l < MEM_SIZE) mem[l] = al;
+            if (++di == 0) es = (u16)(es + 0x1000);     /* stosb wrapped: next 64 KB */
+            continue;
+        }
+        if ((s16)si >= (s16)dx) { cmp_refill(f, buf, &si, &dx, &rerr); if (rerr) return false; }
+        al = buf[si++ & 0xFF];                          /* a refill at EOF reads a stale byte, as the original */
+        if ((s16)si >= (s16)dx) { cmp_refill(f, buf, &si, &dx, &rerr); if (rerr) return false; }
+        u8 cl = buf[si++ & 0xFF];
+        if (di >= 0xFDE8) {                             /* keep the run inside this segment */
+            di = (u16)(di - 0x4000);
+            es = (u16)(es + 0x400);
+        }
+        for (u16 cx = cl; cx; cx--, di++) {             /* rep stosb */
+            u32 l = lin(es, di);
+            if (l < MEM_SIZE) mem[l] = al;
+        }
+    }
+}
+
+/* Reads the 4-byte unpacked size of a .CMP file (open, read, close); false on error or an empty read. */
+static bool cmp_read_size(const char *fname, u32 *size)
+{
+    u8 hdr[4] = { 0 };
+    FILE *f = open_game_file(fname);
+    if (!f) return false;
+    size_t n = fread(hdr, 1, 4, f);
+    fclose(f);
+    if (n == 0) return false;                           /* CF or AX == 0 */
+    *size = (u32)hdr[0] | (u32)hdr[1] << 8 | (u32)hdr[2] << 16 | (u32)hdr[3] << 24;
+    return true;
+}
+
+/* TDCGA 0x70FC load_archive: .CMP file = u32 unpacked size (also the archive's first field) followed by an
+ * RLE stream (FORMATS.md). */
+FarPtr load_archive(const char *fname, u16 reserve)
+{
+    u16 seg = cache_find(fname);
+    if (seg) return far_make(seg, 0);                   /* already relocated */
+
+    u32 size;
+    if (!cmp_read_size(fname, &size)) goto err;
+    seg = cache_alloc(fname, (u16)((u16)(size >> 4) + 1), reserve);
+
+    FILE *f = open_game_file(fname);
+    if (!f) goto err;
+    if (fread(mp(seg, 0), 1, 4, f) < 4 && ferror(f)) { fclose(f); goto err; }   /* the size again, into seg:0000 */
+    if (!cmp_unpack(f, seg, 4)) { fclose(f); goto err; }
+    fclose(f);
+    archive_relocate(seg, 0);
+    return far_make(seg, 0);
+err:
+    fatal(ds_str(0x64DE), fname);                       /* "%s FILE ERROR" */
+}
+
+/* TDCGA 0x73EA: like load_archive, but unpacks into DGROUP at ds_buf (no cache slot). *len receives the
+ * low word of the unpacked size. Returns DGROUP:ds_buf. */
+FarPtr load_packed_near(const char *fname, u16 ds_buf, u16 *len)
+{
+    u32 size;
+    if (!cmp_read_size(fname, &size)) goto err;
+    FILE *f = open_game_file(fname);
+    if (!f) goto err;
+    if (fread(mp(DGROUP, ds_buf), 1, 4, f) < 4 && ferror(f)) { fclose(f); goto err; }
+    if (!cmp_unpack(f, DGROUP, (u16)(ds_buf + 4))) { fclose(f); goto err; }
+    fclose(f);
+    archive_relocate(DGROUP, ds_buf);
+    *len = (u16)size;
+    return far_make(DGROUP, ds_buf);
+err:
+    fatal(ds_str(0x660E), fname);                       /* "%s FILE ERROR" */
+}
+#else
+/* 0x8A5B load_archive */
+FarPtr load_archive(const char *fname, u16 reserve)
+{
+    u16 seg = cache_find(fname);
+    if (seg) return far_make(seg, 0);                   /* already relocated */
+    FarPtr a = load_packed_archive(fname, reserve);
+    archive_relocate(a.seg, a.off);
+    return a;
+}
+#endif
 
 /* 0x78A5 load_raw_archive (tdsnd.snd) */
 FarPtr load_raw_archive(const char *fname, u16 reserve)
@@ -240,9 +346,10 @@ FarPtr load_raw_archive(const char *fname, u16 reserve)
     return far_make(seg, 0);
 
 err:
-    fatal(ds_str(0x6510), fname);                       /* "%s FILE ERROR\n" (literal backslash-n) */
+    fatal(ds_str(EGA_CGA(0x6510, 0x64CE)), fname);                       /* "%s FILE ERROR\n" (literal backslash-n) */
 }
 
+#if !TD_CGA
 /* 0x9D64 pack_getc */
 static u16 pack_getc(void)
 {
@@ -485,6 +592,7 @@ FarPtr load_packed_archive(const char *fname, u16 reserve)
         fatal(ds_str(0x6980), (unsigned)(u16)DSL(DS_out_count));   /* "%x UNPACKED SIZE ERROR\n" (low word) */
     return far_make(seg, 0);
 }
+#endif
 
 /* ---------------------------------------------------------------- lookup */
 
@@ -514,7 +622,7 @@ FarPtr res_find(FarPtr arc, char *name4)
         }
         bx = (u16)(bx + 4);
     } while ((s16)--dx >= 0);
-    fatal(ds_str(0x63CE), name4);                       /* "%-4.4s SHAPE OR SOUND NOT FOUND\n" */
+    fatal(ds_str(EGA_CGA(0x63CE, 0x638C)), name4);                       /* "%-4.4s SHAPE OR SOUND NOT FOUND\n" */
 }
 
 /* 0x94C7 res_find_list: 4-char names until a NUL first byte; far pointers to out_seg:out_off[i] */

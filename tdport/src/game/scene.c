@@ -10,7 +10,7 @@
 /* 0x1F4E stage_init_road_ptr — §4.1 */
 void stage_init_road_ptr(void)
 {
-    DSW(DS_road_pos) = (u16)(DSW((u16)(0x6361 + (DSW(DS_g_stage) << 1))) + 0x2D);   /* stage_ptr[] */
+    DSW(DS_road_pos) = (u16)(DSW((u16)(EGA_CGA(0x6361, 0x6331) + (DSW(DS_g_stage) << 1))) + 0x2D);   /* stage_ptr[] */
     DSW(DS_sub_unit) = 0;
     DSW(DS_g_stageTime) = 0;                  /* DS:80A4 tick count */
     DSW(DS_speed_limit_idx) = 0;
@@ -54,7 +54,7 @@ void reset_car_state(void)
     DSB(DS_samedir_count) = 0;
     DSB(DS_grind_timer) = 0;
     for (u16 k = 0; k < 13; k++) DSW((u16)(DS_oncoming_list + 8 * k)) = 0;
-    DSW(DS_note_div_engine) = DSW(0x208F);
+    DSW(DS_note_div_engine) = DSW(EGA_CGA(0x208F, 0x2062));
     DSW(DS_note_div_beep) = 900;
     DSW(DS_note_div_skid) = 0xFFFF;
     DSW(DS_knob_x) = DSW(DS_car_knob_xy);
@@ -93,14 +93,16 @@ void select_road_buffer(void)
     CSW(GFX_CUR_CLIP_Y1) = 0x6F;
     CSW(GFX_CUR_CLIP_Y0) = 0x13;
     CSW(GFX_CUR_CLIP_X0) = 0;
-    CSW(GFX_CUR_CLIP_X1) = 0x28;
+    CSW(GFX_CUR_CLIP_X1) = EGA_CGA(0x28, 0x50);
 }
 
 /* 0x3AF7 present_road_buffer: replace blit of the 3-plane buffer (planes 0-2 only) to VRAM */
 void present_road_buffer(void)
 {
     gfx_select_target(gfx_screen_desc());
-    CSW(GFX_CUR_CLIP_Y1) = 0x6F;
+#if !TD_CGA
+    CSW(GFX_CUR_CLIP_Y1) = 0x6F;                                         /* TDCGA 0x3A41: not set */
+#endif
     blit_copy_clip_own(scene_ds_far(DS_road_buf_sprite));
 }
 
@@ -114,10 +116,10 @@ void draw_buffer_overlays(void)
     if (DSB(DS_g_stageEvent) != 2) return;
     if (DSW(DS_g_stage) != 4) {
         gfx_set_text_colours(3, 0);
-        draw_text_centered((const char *)mp(DGROUP, 0x1FF7), 0x50);    /* " Pulling into the gas station... " */
+        draw_text_centered((const char *)mp(DGROUP, EGA_CGA(0x1FF7, 0x1FCA)), 0x50);    /* " Pulling into the gas station... " */
     } else if (DSB(DS_ending_shown) != 1) {
         gfx_set_text_colours(3, 0);
-        draw_text_centered((const char *)mp(DGROUP, 0x2019), 0x50);    /* " Pulling into the dealership... " */
+        draw_text_centered((const char *)mp(DGROUP, EGA_CGA(0x2019, 0x1FEC)), 0x50);    /* " Pulling into the dealership... " */
     }
 }
 
@@ -125,11 +127,23 @@ void draw_buffer_overlays(void)
 void dealership_ending(void)
 {
     DSB(DS_ending_shown) = 1;
+#if TD_CGA
+    /* TDCGA 0x383B: drawn into the road buffer, with the overlays, then presented */
+    select_road_buffer();
+    blit_copy_clip_own(scene_ds_far(DS_spr_deal));
+    draw_buffer_overlays();
+    present_road_buffer();
+    wait_fire_button();
+    select_road_buffer();
+    blit_copy_own(scene_ds_far(DS_spr_note));
+    present_road_buffer();
+#else
     select_screen();
     blit_copy_clip_own(scene_ds_far(DS_spr_deal));
     blit_and_own(scene_ds_far(DS_spr_mirr));
     wait_fire_button();
     blit_copy_own(scene_ds_far(DS_spr_note));
+#endif
     for (;;) {                                                           /* wait for fire release */
         if (!(input_poll_drive() & 0x10)) break;
         host_pump();                                                     /* PORT: busy-wait pumps the host */
@@ -142,7 +156,9 @@ void crash_windscreen_sequence(void)
 {
     host_frame_begin();                      /* PORT: each of the 7 redraws takes one emulated frame */
     select_road_buffer();
-    gfx_clear_clip(8);
+#if !TD_CGA
+    gfx_clear_clip(8);                       /* TDCGA 0x3878: none */
+#endif
     fill_scenery_above_road();
     draw_road_main();                        /* doubles min_ol_sy a second time (quirk) */
     select_road_buffer();

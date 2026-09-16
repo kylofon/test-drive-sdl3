@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "build.h"
+
 typedef uint8_t  u8;
 typedef int8_t   s8;
 typedef uint16_t u16;

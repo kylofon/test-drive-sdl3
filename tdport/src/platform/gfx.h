@@ -11,18 +11,43 @@
  */
 #include "../mem.h"
 
-#define GFX_SCREEN_DESC_OFF  0x5A7C      /* CS: screen descriptor */
-#define GFX_CUR_OFF          0x5A64      /* CS: live copy of the selected descriptor */
-#define GFX_CUR_CLIP_X0      0x5A70
-#define GFX_CUR_CLIP_X1      0x5A72
-#define GFX_CUR_CLIP_Y0      0x5A74
-#define GFX_CUR_CLIP_Y1      0x5A76
-#define GFX_CUR_STRIDE       0x5A78
+#define GFX_SCREEN_DESC_OFF  EGA_CGA(0x5A7C, 0x5750)      /* CS: screen descriptor */
+#define GFX_CUR_OFF          EGA_CGA(0x5A64, 0x5738)      /* CS: live copy of the selected descriptor */
+#define GFX_CUR_CLIP_X0      EGA_CGA(0x5A70, 0x5744)
+#define GFX_CUR_CLIP_X1      EGA_CGA(0x5A72, 0x5746)
+#define GFX_CUR_CLIP_Y0      EGA_CGA(0x5A74, 0x5748)
+#define GFX_CUR_CLIP_Y1      EGA_CGA(0x5A76, 0x574A)
+#define GFX_CUR_STRIDE       EGA_CGA(0x5A78, 0x574C)
 static inline FarPtr gfx_screen_desc(void) { return far_make(CODE_SEG, GFX_SCREEN_DESC_OFF); }
 
 /* Port setup: EGA planes, descriptor pool/screen descriptor state, host frame source. Call once after
  * mem_load_exe() and host_init(). */
 void gfx_init(void);
+
+#if TD_CGA
+/* TDCGA: the graphics layer is gfx_cga.c (CGA mode 4, 2 bits per pixel, screen at B800h).
+ * main() calls these when started as "tdcga herc" (TD_HERC builds). */
+void gfx_herc_init(void);                                               /* TDCGA 0x7587 */
+void gfx_herc_shutdown(void);                                           /* TDCGA 0x75D7 */
+/* TDCGA differences in the shared API (details: port/cga/graphics.md):
+ *  - a target has one 2bpp bitmap (plane_seg[0]); clip x and byte columns are 4-pixel bytes (screen 0x50);
+ *  - fill_rect / clear_clip / clear_screen take a 16-bit pattern word (one byte per row parity); the u8
+ *    'colour' versions below pass colour * 0x0101, so colour is a 2bpp byte pattern (00/55/AA/FF, or
+ *    e.g. 0x88) rather than a colour index. draw_line / draw_rect_outline 'colour' is the same kind of
+ *    byte. gfx_set_text_colours still takes colour indices 0-3;
+ *  - gfx_create_buffer ignores plane_mask; blit_*_own of the clipped families does not mask header x
+ *    with 0xFFFC, the unclipped ones do;
+ *  - gfx_dissolve and grab_into_sprite_raw work on the current target, not only the screen;
+ *  - gfx_set_palette and gfx_scroll_window do not exist (TDCGA uses blit_copy_clip_raw to scroll). */
+void gfx_fill_rect_pat(s16 x, s16 y, s16 w, s16 h, u16 pattern);        /* TDCGA 0x4857: even rows high byte */
+void gfx_clear_screen_pat(u16 pattern);                                 /* TDCGA 0x4AD8 */
+void gfx_clear_clip_pat(u16 pattern);                                   /* TDCGA 0x62ED: even rows low byte */
+#endif
+#if TD_HERC
+/* Port option: phosphor colour of the emulated monochrome monitor ("green", "amber", "white").
+ * Returns false for an unknown name. May be called before gfx_init(). */
+bool gfx_set_monitor(const char *name);
+#endif
 
 /* Fills xrgb (320x200) from the EGA planes through the current palette; true if VRAM or the palette
  * changed since the last call. Installed with host_set_frame_source(). */

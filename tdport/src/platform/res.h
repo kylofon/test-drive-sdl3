@@ -11,8 +11,12 @@ u16    cache_alloc(const char *fname, u16 paras, u16 reserve); /* 0xA2BE */
 u16    buf_alloc(u16 paras);                                   /* 0xA340 */
 void   buf_free(u16 seg);                                      /* 0xA37E */
 
-FarPtr load_archive(const char *fname, u16 reserve);           /* 0x8A5B packed .PES, relocated */
+FarPtr load_archive(const char *fname, u16 reserve);           /* 0x8A5B packed .PES (TDCGA: RLE .CMP), relocated */
+#if TD_CGA
+FarPtr load_packed_near(const char *fname, u16 ds_buf, u16 *len); /* TDCGA 0x73EA .CMP into DGROUP:ds_buf */
+#else
 FarPtr load_packed_archive(const char *fname, u16 reserve);    /* 0x9A86 */
+#endif
 FarPtr load_raw_archive(const char *fname, u16 reserve);       /* 0x78A5 tdsnd.snd */
 FarPtr res_find(FarPtr arc, char *name4);                      /* 0x6762 (space-pads name4 in place) */
 void   res_find_list(FarPtr arc, const char *names, u16 out_seg, u16 out_off); /* 0x94C7 far ptrs to out */

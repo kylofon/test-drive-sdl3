@@ -139,7 +139,7 @@ void gfx_init(void)
     ega.dirty = true;
     /* CS:528E = 5290, CS:5A60 = far CS:5A7C, CS:5A64 = screen copy, CS:5A7C screen descriptor and the
      * CS:5A94 row table are statically initialised in the image (5A62 is relocated); nothing to do. */
-    host_set_frame_source(gfx_compose);
+    host_set_frame_source(gfx_compose, 320, 200);
 }
 
 static u32 ega_rgb(u8 v)

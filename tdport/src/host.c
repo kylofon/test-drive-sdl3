@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SCREEN_W 320
-#define SCREEN_H 200
 #define AUDIO_RATE 44100
 #define AUDIO_AMPLITUDE 5000
 
@@ -20,7 +18,10 @@ static char *game_dir;
 
 static void (*tick_handler)(void);
 static bool (*frame_source)(u32 *);
-static u32 frame[SCREEN_W * SCREEN_H];
+static u32 frame[HOST_FRAME_MAX_W * HOST_FRAME_MAX_H];
+static int frame_w = 320, frame_h = 200;
+#define VIEW_W(w) (w)                   /* logical presentation: frame width x 3/4 of it (4:3) */
+#define VIEW_H(w) ((w) * 3 / 4)
 
 /* Tick clock: tick n is due at start + n * 11927 / 1193182 s (exact rational arithmetic). */
 static Uint64 clock_start_ns;
@@ -47,16 +48,12 @@ bool host_init(const char *dir, int window_scale)
     }
     game_dir = SDL_strdup(dir);
     if (window_scale < 1) window_scale = 3;
-    if (!SDL_CreateWindowAndRenderer("Test Drive", 320 * window_scale, 240 * window_scale,
+    if (!SDL_CreateWindowAndRenderer("Test Drive (" TD_VARIANT_NAME ")", 320 * window_scale, 240 * window_scale,
                                      SDL_WINDOW_RESIZABLE, &window, &renderer)) {
         fprintf(stderr, "window/renderer failed: %s\n", SDL_GetError());
         return false;
     }
     SDL_SetRenderVSync(renderer, 1);
-    /* 320x200 shown with 4:3 aspect, as on a 200-line EGA monitor. */
-    SDL_SetRenderLogicalPresentation(renderer, 320, 240, SDL_LOGICAL_PRESENTATION_LETTERBOX);
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_W, SCREEN_H);
-    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 
     SDL_AudioSpec spec = { SDL_AUDIO_S16, 1, AUDIO_RATE };
     audio = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
@@ -85,7 +82,17 @@ void host_shutdown(void)
 }
 
 void host_set_tick_handler(void (*handler)(void)) { tick_handler = handler; }
-void host_set_frame_source(bool (*compose)(u32 *)) { frame_source = compose; }
+void host_set_frame_source(bool (*compose)(u32 *), int w, int h)
+{
+    frame_source = compose;
+    frame_w = SDL_clamp(w, 1, HOST_FRAME_MAX_W);
+    frame_h = SDL_clamp(h, 1, HOST_FRAME_MAX_H);
+    /* The frame fills a 4:3 area, as the 200-line (or Hercules 348-line) picture did on its monitor. */
+    SDL_SetRenderLogicalPresentation(renderer, VIEW_W(frame_w), VIEW_H(frame_w), SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    if (texture) SDL_DestroyTexture(texture);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, frame_w, frame_h);
+    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+}
 
 static Uint64 tick_due_ns(Uint64 n)
 {
@@ -118,10 +125,11 @@ static void audio_for_one_tick(void)
 
 static void present(void)
 {
-    SDL_UpdateTexture(texture, NULL, frame, SCREEN_W * 4);
+    if (!texture) return;
+    SDL_UpdateTexture(texture, NULL, frame, frame_w * 4);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    SDL_FRect dst = { 0, 0, 320, 240 };
+    SDL_FRect dst = { 0, 0, (float)VIEW_W(frame_w), (float)VIEW_H(frame_w) };
     SDL_RenderTexture(renderer, texture, NULL, &dst);
     SDL_RenderPresent(renderer);
 }

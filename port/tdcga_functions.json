@@ -1,0 +1,5948 @@
+[
+ {
+  "start": "0010",
+  "end": "023e",
+  "insns": 202,
+  "prologue": true,
+  "calls": [
+   "023e",
+   "02ba",
+   "0375",
+   "0987",
+   "0ffa",
+   "127b",
+   "4ad8",
+   "4bda",
+   "4e53",
+   "4e7d",
+   "4ea5",
+   "5c55",
+   "5cd0",
+   "5e2c",
+   "5e3d",
+   "5e91",
+   "6178",
+   "643f",
+   "72a5",
+   "73ea",
+   "755b",
+   "7587",
+   "75d7",
+   "7662",
+   "7cc9",
+   "7d9b",
+   "897c"
+  ],
+  "callers": [
+   "8400"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0090",
+   "0092",
+   "0096",
+   "73a8",
+   "d4fc",
+   "d4fe"
+  ],
+  "ds_writes": [
+   "0090",
+   "0096",
+   "7386",
+   "7388",
+   "73a4",
+   "73a6",
+   "73a8",
+   "cf8a",
+   "cf8c",
+   "cf98",
+   "cf9a",
+   "d384",
+   "d386",
+   "d4f6",
+   "d4f8",
+   "d4fc",
+   "d4fe"
+  ],
+  "strings": {
+   "0040": "herc",
+   "0045": "tdsnd.snd",
+   "004f": "sng1",
+   "0054": "sng2",
+   "0059": "sng4",
+   "005e": "sng3",
+   "0063": "xroada.cmp",
+   "006e": " BACK TO DOS (Y or other key) ? "
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "023e",
+  "end": "02ba",
+  "insns": 45,
+  "prologue": true,
+  "calls": [
+   "84aa",
+   "854d",
+   "85a5",
+   "89b1"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0094"
+  ],
+  "ds_writes": [
+   "0094"
+  ],
+  "strings": {
+   "0101": "CARS.TXT"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "02ba",
+  "end": "0375",
+  "insns": 64,
+  "prologue": true,
+  "calls": [
+   "4ad8",
+   "6178",
+   "642e",
+   "7cc9",
+   "7d72"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "0090"
+  ],
+  "strings": {
+   "0098": " Play again with the same car ",
+   "00b8": "       Select a new car       "
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "0375",
+  "end": "03ef",
+  "insns": 47,
+  "prologue": true,
+  "calls": [
+   "03ef",
+   "0516",
+   "078d",
+   "4ad8",
+   "7091",
+   "70df",
+   "70fc",
+   "7662"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7386",
+   "7388"
+  ],
+  "ds_writes": [
+   "0124",
+   "0126"
+  ],
+  "strings": {
+   "010a": "ACCOLADE.CMP",
+   "0117": "TESTDRV.CMP"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "03ef",
+  "end": "0516",
+  "insns": 109,
+  "prologue": true,
+  "calls": [
+   "4e7d",
+   "5a54",
+   "5c55",
+   "61cb",
+   "62ed",
+   "634c",
+   "642e",
+   "7d72"
+  ],
+  "callers": [
+   "0375"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0124",
+   "0126",
+   "d384",
+   "d386"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "01d9": "acc ",
+   "01de": "pres",
+   "01e3": "copy",
+   "01e8": "bull"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "0516",
+  "end": "078d",
+  "insns": 217,
+  "prologue": true,
+  "calls": [
+   "4857",
+   "4df6",
+   "4e7d",
+   "5a54",
+   "5c55",
+   "61cb",
+   "62ed",
+   "634c",
+   "642e",
+   "7c89",
+   "7d72"
+  ],
+  "callers": [
+   "0375"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0124",
+   "0126",
+   "d384",
+   "d386"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "0128": "frm1frm2frm3frm4frm5",
+   "013e": "rrm1rrm2rrm3rrm4rrm5",
+   "01ed": "car "
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "078d",
+  "end": "0987",
+  "insns": 188,
+  "prologue": true,
+  "calls": [
+   "4df6",
+   "4e7d",
+   "5a54",
+   "5c55",
+   "6178",
+   "61cb",
+   "642e",
+   "7cc9",
+   "7d72",
+   "a848",
+   "a853"
+  ],
+  "callers": [
+   "0375"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0124",
+   "0126"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "01f2": "tdrv",
+   "01f7": "fob ",
+   "01fc": "tmar",
+   "0201": "CTRL - (J)OYSTICK OR CTRL - (K)EYBOARD"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "0987",
+  "end": "0aad",
+  "insns": 103,
+  "prologue": true,
+  "calls": [
+   "0aad",
+   "0d3f",
+   "4ad8",
+   "5e2c",
+   "642e",
+   "7091",
+   "70df",
+   "7d72",
+   "8802"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0090",
+   "0094",
+   "73a4",
+   "73a6"
+  ],
+  "ds_writes": [
+   "0090",
+   "0092",
+   "73a8"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "0aad",
+  "end": "0d3f",
+  "insns": 266,
+  "prologue": true,
+  "calls": [
+   "4df6",
+   "4e7d",
+   "5a54",
+   "5c55",
+   "61cb",
+   "62ed",
+   "641b",
+   "642e",
+   "70fc",
+   "88f4"
+  ],
+  "callers": [
+   "0987"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7380",
+   "7382",
+   "738c",
+   "738e",
+   "d384",
+   "d386"
+  ],
+  "ds_writes": [
+   "7380",
+   "7382",
+   "738c",
+   "738e"
+  ],
+  "strings": {
+   "0238": "%ssb.cmp",
+   "0241": "car ",
+   "0246": "stat",
+   "024b": "name"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "0d3f",
+  "end": "0fca",
+  "insns": 231,
+  "prologue": true,
+  "calls": [
+   "0fca",
+   "4df6",
+   "4e7d",
+   "5a54",
+   "5a72",
+   "612e",
+   "61cb",
+   "62ed",
+   "641b",
+   "642e",
+   "7c6d",
+   "7c89",
+   "84aa",
+   "85a5",
+   "8602",
+   "88f4"
+  ],
+  "callers": [
+   "0987"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7380",
+   "7382",
+   "738c",
+   "738e",
+   "d384",
+   "d386"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "0250": "%s.ss",
+   "0258": "Animation file open error",
+   "0272": "%d %d\n"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "0fca",
+  "end": "0ffa",
+  "insns": 20,
+  "prologue": true,
+  "calls": [
+   "854d",
+   "89b1"
+  ],
+  "callers": [
+   "0d3f"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "0ffa",
+  "end": "11fd",
+  "insns": 192,
+  "prologue": true,
+  "calls": [
+   "11fd",
+   "1933",
+   "1d60",
+   "4853",
+   "4e7d",
+   "4ea5",
+   "5e91",
+   "612e",
+   "62ed",
+   "634c",
+   "642e",
+   "6599",
+   "70fc",
+   "83ec",
+   "866a",
+   "882e",
+   "88f4",
+   "a76e",
+   "a811"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0090",
+   "738a",
+   "73a8",
+   "cf88",
+   "d384",
+   "d386",
+   "d3aa",
+   "d500"
+  ],
+  "ds_writes": [
+   "7384",
+   "738a",
+   "cf88",
+   "cf8e",
+   "cf90",
+   "cf9c",
+   "cf9e",
+   "d384",
+   "d386",
+   "d3a8",
+   "d3aa",
+   "d4fa",
+   "d4fc",
+   "d4fe",
+   "d500"
+  ],
+  "strings": {
+   "027a": "xroadb.cmp",
+   "0285": "%s.cmp",
+   "028c": "%s.bin"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "11fd",
+  "end": "127b",
+  "insns": 52,
+  "prologue": true,
+  "calls": [
+   "a76e",
+   "a811"
+  ],
+  "callers": [
+   "0ffa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cf88",
+   "d4fa",
+   "d500"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "127b",
+  "end": "1309",
+  "insns": 54,
+  "prologue": true,
+  "calls": [
+   "1309",
+   "1422",
+   "15ce",
+   "1677",
+   "180e"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "73a8"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1309",
+  "end": "1422",
+  "insns": 112,
+  "prologue": true,
+  "calls": [
+   "7627",
+   "7c6d",
+   "84aa",
+   "854d",
+   "85a5",
+   "8945",
+   "89b1"
+  ],
+  "callers": [
+   "127b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "02b4": "SCORES",
+   "02be": "%20c%20c%ld",
+   "02ca": "SCORE file open error"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1422",
+  "end": "15ce",
+  "insns": 177,
+  "prologue": true,
+  "calls": [
+   "4ad8",
+   "4af7",
+   "4e7d",
+   "5c55",
+   "6178",
+   "61cb",
+   "7091",
+   "70df",
+   "70fc",
+   "7a6a",
+   "7cc9",
+   "7cf2",
+   "89cc"
+  ],
+  "callers": [
+   "127b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cf98",
+   "cf9a"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "00b8": "       Select a new car       ",
+   "02e0": "llogo.cmp",
+   "02ea": "You have qualified as one",
+   "0304": "of Test Drive's best drivers.",
+   "0322": "Enter your name:"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "15ce",
+  "end": "1677",
+  "insns": 72,
+  "prologue": true,
+  "calls": [
+   "7627",
+   "7c6d",
+   "84aa",
+   "85a5",
+   "85cb",
+   "88f4"
+  ],
+  "callers": [
+   "127b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "0335": "SCORES",
+   "033c": "%-20.20s%-20.20s%ld\n",
+   "0358": "SCORE file save error"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1677",
+  "end": "180e",
+  "insns": 166,
+  "prologue": true,
+  "calls": [
+   "4ad8",
+   "4af7",
+   "5c55",
+   "5e2c",
+   "6178",
+   "6189",
+   "642e",
+   "70fc",
+   "7cc9",
+   "7d72",
+   "88f4"
+  ],
+  "callers": [
+   "127b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0090",
+   "d4fc",
+   "d4fe"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "036e": "TEST DRIVE'S BEST",
+   "0380": "slogo.cmp",
+   "038a": "%7ld  %-20.20s",
+   "0399": "%7ld  %-20.20s",
+   "03a8": "CTRL - (J)OYSTICK OR CTRL - (K)EYBOARD",
+   "03cf": "Your Score : %ld"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "180e",
+  "end": "1933",
+  "insns": 128,
+  "prologue": true,
+  "calls": [
+   "4ad8",
+   "6178",
+   "642e",
+   "7cc9",
+   "7d72"
+  ],
+  "callers": [
+   "127b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "0040": "herc",
+   "03e0": " Created by: ",
+   "03ee": " Design and Programming ",
+   "0407": " Art: ",
+   "040e": " Sound and Music: ",
+   "0421": "Distinctive Software Inc.",
+   "043b": "Vancouver B.C.",
+   "044a": "Don Mattrick",
+   "0457": "Mike Benna",
+   "0462": "Kevin Pickell",
+   "0470": "Brad Gour",
+   "047a": "Bruce Dawson",
+   "0487": "Amory Wong",
+   "0492": "Rick Friesen",
+   "049f": "John Boechler",
+   "04ad": "Tony Lee",
+   "04b6": "Patrick Payne",
+   "04c4": "Rick Millson"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1933",
+  "end": "1ad6",
+  "insns": 155,
+  "prologue": true,
+  "calls": [
+   "1ad6",
+   "4ad8",
+   "4df6",
+   "4e7d",
+   "5c55",
+   "5cd0",
+   "61cb",
+   "62ed",
+   "634c",
+   "642e",
+   "7091",
+   "70df",
+   "70fc"
+  ],
+  "callers": [
+   "0ffa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cf88",
+   "d384",
+   "d386",
+   "d4f6",
+   "d4f8"
+  ],
+  "ds_writes": [
+   "7384",
+   "cf84"
+  ],
+  "strings": {
+   "075e": "gas.cmp",
+   "0766": "gcar",
+   "076b": "gas "
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1ad6",
+  "end": "1c9a",
+  "insns": 172,
+  "prologue": true,
+  "calls": [
+   "1c9a",
+   "1cc0",
+   "4e7d",
+   "612e",
+   "6178",
+   "62ed",
+   "8802",
+   "88f4"
+  ],
+  "callers": [
+   "1933"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "738a",
+   "d384",
+   "d386",
+   "d3aa",
+   "d500"
+  ],
+  "ds_writes": [
+   "cd82",
+   "d3aa",
+   "d502"
+  ],
+  "strings": {
+   "07e0": "you %2d minutes and %02d seconds.",
+   "0802": "you %2d minute and %02d seconds.",
+   "0823": "you %2d seconds.",
+   "0834": "That kind of time is worth",
+   "084f": "%ld points.",
+   "085b": "Press key or joystick button to continue"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1c9a",
+  "end": "1cc0",
+  "insns": 16,
+  "prologue": true,
+  "calls": [
+   "4af7"
+  ],
+  "callers": [
+   "1ad6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "d502"
+  ],
+  "ds_writes": [
+   "cd82",
+   "d502"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1cc0",
+  "end": "1d54",
+  "insns": 57,
+  "prologue": true,
+  "calls": [
+   "4df6",
+   "4e7d",
+   "5a30",
+   "612e",
+   "642e",
+   "7d72"
+  ],
+  "callers": [
+   "1ad6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cd82",
+   "cf84",
+   "d384"
+  ],
+  "ds_writes": [
+   "cf84"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1d60",
+  "end": "1ecc",
+  "insns": 132,
+  "prologue": false,
+  "calls": [
+   "1ecc",
+   "1ef9",
+   "1f11",
+   "1f91",
+   "1fd2",
+   "23f6",
+   "2843",
+   "2e5c",
+   "2ee1",
+   "3365",
+   "33fb",
+   "3478",
+   "3524",
+   "3836",
+   "3875",
+   "3a01",
+   "3a0d",
+   "3a36",
+   "46ca",
+   "4df6",
+   "5e3d",
+   "61cb",
+   "6599",
+   "6613",
+   "70a9",
+   "70af",
+   "731f"
+  ],
+  "callers": [
+   "0ffa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0090",
+   "0890",
+   "089a",
+   "08b2",
+   "08ee",
+   "090f",
+   "0911",
+   "091c",
+   "091e",
+   "1006",
+   "1008",
+   "1356",
+   "1358",
+   "13ae",
+   "13b0",
+   "cf88",
+   "d500"
+  ],
+  "ds_writes": [
+   "0924",
+   "7384",
+   "738a",
+   "d500"
+  ],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "1ecc",
+  "end": "1ef9",
+  "insns": 11,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cf88"
+  ],
+  "ds_writes": [
+   "08ee",
+   "08fa",
+   "0a09",
+   "140c",
+   "140d",
+   "d500"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1ef9",
+  "end": "1f11",
+  "insns": 10,
+  "prologue": false,
+  "calls": [
+   "58f8"
+  ],
+  "callers": [
+   "1d60",
+   "3836",
+   "3875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0090"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1f11",
+  "end": "1f91",
+  "insns": 39,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "2062",
+   "2682",
+   "2684"
+  ],
+  "ds_writes": [
+   "08dc",
+   "08f2",
+   "08f4",
+   "08f6",
+   "08f8",
+   "08fc",
+   "0903",
+   "0905",
+   "0907",
+   "0908",
+   "090a",
+   "090b",
+   "090c",
+   "090f",
+   "0911",
+   "0920",
+   "0924",
+   "0929",
+   "092a",
+   "0a0b",
+   "0a60",
+   "0a65",
+   "0a67",
+   "199e",
+   "19b0",
+   "64ba",
+   "64bc",
+   "64be"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1f91",
+  "end": "1fd2",
+  "insns": 24,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "08ee",
+   "08fa",
+   "0929",
+   "092a",
+   "0a0b",
+   "0a11",
+   "0a13",
+   "0a15"
+  ],
+  "ds_writes": [
+   "092b",
+   "092c",
+   "0a0c",
+   "0a18",
+   "0a1a",
+   "0a1c",
+   "1840",
+   "1842",
+   "1844"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "1fd2",
+  "end": "2370",
+  "insns": 307,
+  "prologue": false,
+  "calls": [
+   "2370",
+   "239f",
+   "392a",
+   "3976"
+  ],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "08f4",
+   "08f8",
+   "0911",
+   "0912",
+   "13fe",
+   "1400",
+   "1402",
+   "1840",
+   "1846",
+   "1848",
+   "198a",
+   "198e",
+   "1996",
+   "1998",
+   "199a",
+   "199c",
+   "199e",
+   "19a0",
+   "19a4",
+   "19a6",
+   "200e"
+  ],
+  "ds_writes": [
+   "13fe",
+   "1400",
+   "1402",
+   "1840",
+   "1846",
+   "1848",
+   "184a",
+   "189a",
+   "198a",
+   "198c",
+   "198e",
+   "1992",
+   "1996",
+   "1998",
+   "199a",
+   "199c",
+   "199e",
+   "19a0",
+   "19a2",
+   "19a4",
+   "19a6",
+   "200e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "2370",
+  "end": "239f",
+  "insns": 22,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1fd2"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0914"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "0258": "Animation file open error"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "239f",
+  "end": "23f6",
+  "insns": 45,
+  "prologue": false,
+  "calls": [
+   "3957"
+  ],
+  "callers": [
+   "1fd2"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0916"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "23f6",
+  "end": "27aa",
+  "insns": 317,
+  "prologue": false,
+  "calls": [
+   "27aa",
+   "27d9",
+   "392a",
+   "3976"
+  ],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "08ee",
+   "08f4",
+   "08f8",
+   "0911",
+   "0912",
+   "13fe",
+   "1400",
+   "140a",
+   "1840",
+   "1846",
+   "1848",
+   "1990",
+   "199a",
+   "199c",
+   "19a4",
+   "19a6",
+   "19a8",
+   "19ac",
+   "19ae",
+   "19b0",
+   "19b2",
+   "200e"
+  ],
+  "ds_writes": [
+   "13fc",
+   "13fe",
+   "1400",
+   "140a",
+   "1840",
+   "1846",
+   "1848",
+   "18ea",
+   "193a",
+   "1990",
+   "1994",
+   "199a",
+   "199c",
+   "19a4",
+   "19a6",
+   "19a8",
+   "19aa",
+   "19ac",
+   "19ae",
+   "19b0",
+   "19b2",
+   "19b4",
+   "200e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "27aa",
+  "end": "27d9",
+  "insns": 22,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "23f6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0918"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "27d9",
+  "end": "2843",
+  "insns": 53,
+  "prologue": false,
+  "calls": [
+   "3957"
+  ],
+  "callers": [
+   "23f6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "091a"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "2843",
+  "end": "2d58",
+  "insns": 479,
+  "prologue": false,
+  "calls": [
+   "2d58",
+   "4c0c",
+   "6b94"
+  ],
+  "callers": [
+   "1d60",
+   "3875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0898",
+   "092b",
+   "092c",
+   "0a0c",
+   "0a18",
+   "0a1a",
+   "0a1c",
+   "0f76",
+   "0f78",
+   "0f7a",
+   "0f7c",
+   "134e",
+   "1350",
+   "1352",
+   "1354",
+   "13fa",
+   "13fb",
+   "13fe",
+   "1404",
+   "1406",
+   "1408",
+   "140e",
+   "1842",
+   "1844",
+   "198a",
+   "198c",
+   "198e",
+   "199e",
+   "19a2",
+   "1b94",
+   "d500"
+  ],
+  "ds_writes": [
+   "13fb",
+   "13fe",
+   "1404",
+   "1406",
+   "1408",
+   "140e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "2d58",
+  "end": "2df1",
+  "insns": 56,
+  "prologue": false,
+  "calls": [
+   "2df2"
+  ],
+  "callers": [
+   "2843"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0896",
+   "0898",
+   "1996",
+   "1998",
+   "19a0"
+  ],
+  "ds_writes": [
+   "1436",
+   "1998"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "2df2",
+  "end": "2e5c",
+  "insns": 46,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "2d58"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "1434",
+   "1436"
+  ],
+  "ds_writes": [
+   "1434",
+   "1436"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "2e5c",
+  "end": "2ee1",
+  "insns": 58,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1d60",
+   "3875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0896",
+   "0898",
+   "198a",
+   "19a0"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "2ee1",
+  "end": "3259",
+  "insns": 318,
+  "prologue": false,
+  "calls": [
+   "3259",
+   "4c0c",
+   "6b94"
+  ],
+  "callers": [
+   "1d60",
+   "3875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0898",
+   "0a0c",
+   "0a18",
+   "0a1a",
+   "0a1c",
+   "0ffe",
+   "1000",
+   "1002",
+   "1004",
+   "13fa",
+   "13fb",
+   "13fe",
+   "1404",
+   "1406",
+   "1408",
+   "140e",
+   "1842",
+   "1844",
+   "1990",
+   "19a8",
+   "19aa",
+   "19b0",
+   "d500"
+  ],
+  "ds_writes": [
+   "13fb",
+   "13fe",
+   "1404",
+   "1406",
+   "1408",
+   "140e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3259",
+  "end": "32ef",
+  "insns": 54,
+  "prologue": false,
+  "calls": [
+   "32ef"
+  ],
+  "callers": [
+   "2ee1"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0896",
+   "0898",
+   "19ac",
+   "19ae",
+   "19b2"
+  ],
+  "ds_writes": [
+   "1436",
+   "19ae"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "32ef",
+  "end": "3365",
+  "insns": 50,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "3259"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "1434",
+   "1436"
+  ],
+  "ds_writes": [
+   "1434",
+   "1436"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3365",
+  "end": "33fb",
+  "insns": 64,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1d60",
+   "3875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0896",
+   "0898",
+   "13fe",
+   "19a8",
+   "19b2"
+  ],
+  "ds_writes": [
+   "13fe"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "33fb",
+  "end": "3478",
+  "insns": 46,
+  "prologue": false,
+  "calls": [
+   "3a0d",
+   "6178",
+   "61cb",
+   "6759",
+   "7cc9"
+  ],
+  "callers": [
+   "1d60",
+   "3836",
+   "3875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0911",
+   "0920",
+   "0a0b",
+   "0a0f",
+   "1012",
+   "1014",
+   "138e",
+   "1390",
+   "cf88"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "1fec": " Pulling into the dealership... "
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3478",
+  "end": "3524",
+  "insns": 57,
+  "prologue": false,
+  "calls": [
+   "3a01",
+   "4c0c",
+   "4e7d",
+   "6189",
+   "61cb",
+   "6b94"
+  ],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "08b2",
+   "08b6",
+   "08b8",
+   "08ba",
+   "08bc",
+   "08be",
+   "08bf",
+   "0907",
+   "090a",
+   "0a65",
+   "0a67",
+   "1362",
+   "1364",
+   "1366",
+   "1368",
+   "136a",
+   "136c",
+   "136e",
+   "1370"
+  ],
+  "ds_writes": [
+   "08bf",
+   "0907",
+   "090a"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3524",
+  "end": "3818",
+  "insns": 285,
+  "prologue": false,
+  "calls": [
+   "3818",
+   "3a01",
+   "4c4e",
+   "4e7d",
+   "6189",
+   "61cb",
+   "65d1",
+   "6613",
+   "6717",
+   "6759",
+   "68a7",
+   "6d97",
+   "70df",
+   "7360"
+  ],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "089a",
+   "089e",
+   "08a0",
+   "08a2",
+   "08a4",
+   "08a6",
+   "08a8",
+   "08aa",
+   "08ac",
+   "08ae",
+   "08b0",
+   "08d8",
+   "08da",
+   "08fc",
+   "0903",
+   "090b",
+   "0910",
+   "09ed",
+   "135a",
+   "135c",
+   "135e",
+   "1360",
+   "138a",
+   "138c",
+   "1392",
+   "1394",
+   "13aa",
+   "13ac",
+   "13e2",
+   "13e4",
+   "13e6",
+   "13e8",
+   "140c",
+   "140d",
+   "1842",
+   "2666",
+   "266e",
+   "2670",
+   "27ce",
+   "73a8",
+   "d500"
+  ],
+  "ds_writes": [
+   "08d8",
+   "08da",
+   "090b",
+   "140c",
+   "140d"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3818",
+  "end": "3836",
+  "insns": 12,
+  "prologue": false,
+  "calls": [
+   "65d1"
+  ],
+  "callers": [
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "08a2"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3836",
+  "end": "3875",
+  "insns": 20,
+  "prologue": false,
+  "calls": [
+   "1ef9",
+   "33fb",
+   "3a0d",
+   "3a36",
+   "58f8",
+   "5a72",
+   "61cb"
+  ],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "100a",
+   "100c",
+   "100e",
+   "1010"
+  ],
+  "ds_writes": [
+   "0920"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3875",
+  "end": "392a",
+  "insns": 86,
+  "prologue": false,
+  "calls": [
+   "1ef9",
+   "2843",
+   "2e5c",
+   "2ee1",
+   "3365",
+   "33fb",
+   "3a0d",
+   "3a36",
+   "6d97"
+  ],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "2505",
+   "250c",
+   "7384"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "392a",
+  "end": "3957",
+  "insns": 20,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1fd2",
+   "23f6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3957",
+  "end": "3976",
+  "insns": 15,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "239f",
+   "27d9"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3976",
+  "end": "3a01",
+  "insns": 79,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1fd2",
+   "23f6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "19a4",
+   "19a6"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3a01",
+  "end": "3a0d",
+  "insns": 6,
+  "prologue": false,
+  "calls": [
+   "4e7d"
+  ],
+  "callers": [
+   "1d60",
+   "3478",
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3a0d",
+  "end": "3a36",
+  "insns": 10,
+  "prologue": false,
+  "calls": [
+   "4e7d"
+  ],
+  "callers": [
+   "1d60",
+   "33fb",
+   "3836",
+   "3875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0890"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "3a36",
+  "end": "3a50",
+  "insns": 12,
+  "prologue": false,
+  "calls": [
+   "4e7d",
+   "5a72"
+  ],
+  "callers": [
+   "1d60",
+   "3836",
+   "3875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0894",
+   "0896"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "46ca",
+  "end": "4853",
+  "insns": 141,
+  "prologue": false,
+  "calls": [
+   "4ea5",
+   "5e7f",
+   "70af",
+   "7c89"
+  ],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "1366",
+   "1368",
+   "138a",
+   "138c",
+   "27ce",
+   "27d0",
+   "27d1",
+   "27d2",
+   "27d3",
+   "cf8a",
+   "cf8c",
+   "cf8e",
+   "cf90",
+   "cf9c",
+   "cf9e"
+  ],
+  "ds_writes": [
+   "0890",
+   "0892",
+   "0894",
+   "0896",
+   "0898",
+   "089a",
+   "089c",
+   "089e",
+   "08a0",
+   "08a2",
+   "08a4",
+   "08a6",
+   "08a8",
+   "08aa",
+   "08ac",
+   "08ae",
+   "08b0",
+   "08b2",
+   "08b4",
+   "08b6",
+   "08b8",
+   "08ba",
+   "08bc",
+   "091c",
+   "091e"
+  ],
+  "strings": {
+   "0f45": "0   1   2   3   4   5   6   7   8   9   spdotach"
+  },
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "4853",
+  "end": "4857",
+  "insns": 2,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0ffa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4857",
+  "end": "4ad8",
+  "insns": 253,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0516",
+   "7cf2",
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4ad8",
+  "end": "4af7",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0010",
+   "02ba",
+   "0375",
+   "0987",
+   "1422",
+   "1677",
+   "180e",
+   "1933",
+   "4bda",
+   "4e53",
+   "7db6",
+   "82d3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4af7",
+  "end": "4b0d",
+  "insns": 10,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "1422",
+   "1677",
+   "1c9a",
+   "7a6a",
+   "7cc9",
+   "82d3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "68ee",
+   "68f0"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4b0e",
+  "end": "4bc2",
+  "insns": 72,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "68e8",
+   "68ea",
+   "68ec",
+   "68ee",
+   "68f0",
+   "68f4",
+   "68f6",
+   "68fa",
+   "68fc",
+   "68fe"
+  ],
+  "ds_writes": [
+   "68ee",
+   "68f0"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4bda",
+  "end": "4c0c",
+  "insns": 22,
+  "prologue": false,
+  "calls": [
+   "4ad8"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "0040": "herc"
+  },
+  "ints": [
+   "0x10"
+  ],
+  "ports": []
+ },
+ {
+  "start": "4c0c",
+  "end": "4c2f",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "2843",
+   "2ee1",
+   "3478"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4c30",
+  "end": "4c4d",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4c4e",
+  "end": "4d2e",
+  "insns": 87,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4df6",
+  "end": "4e53",
+  "insns": 37,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0516",
+   "078d",
+   "0aad",
+   "0d3f",
+   "1933",
+   "1cc0",
+   "1d60",
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4e53",
+  "end": "4e7d",
+  "insns": 18,
+  "prologue": false,
+  "calls": [
+   "4ad8"
+  ],
+  "callers": [
+   "0010",
+   "7c6d"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "0040": "herc"
+  },
+  "ints": [
+   "0x10"
+  ],
+  "ports": []
+ },
+ {
+  "start": "4e7d",
+  "end": "4ea5",
+  "insns": 19,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0010",
+   "03ef",
+   "0516",
+   "078d",
+   "0aad",
+   "0d3f",
+   "0ffa",
+   "1422",
+   "1933",
+   "1ad6",
+   "1cc0",
+   "3478",
+   "3524",
+   "3a01",
+   "3a0d",
+   "3a36",
+   "7db6",
+   "82d3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "4ea5",
+  "end": "58f3",
+  "insns": 1271,
+  "prologue": true,
+  "calls": [
+   "7c6d",
+   "8234"
+  ],
+  "callers": [
+   "0010",
+   "0ffa",
+   "46ca",
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "1720",
+   "a000",
+   "a005",
+   "a00a",
+   "a019"
+  ],
+  "ds_writes": [
+   "0e60",
+   "16d0",
+   "3630",
+   "3680",
+   "3e00"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "58f8",
+  "end": "5a2a",
+  "insns": 85,
+  "prologue": true,
+  "calls": [
+   "5cd0",
+   "8023"
+  ],
+  "callers": [
+   "1ef9",
+   "3836",
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "63e2"
+  ],
+  "strings": {},
+  "ints": [
+   "0x16"
+  ],
+  "ports": []
+ },
+ {
+  "start": "5a30",
+  "end": "5a53",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "1cc0"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "5a54",
+  "end": "5a71",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "03ef",
+   "0516",
+   "078d",
+   "0aad",
+   "0d3f"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "5a72",
+  "end": "5b52",
+  "insns": 87,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0d3f",
+   "3836",
+   "3a36"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "5c55",
+  "end": "5cd0",
+  "insns": 55,
+  "prologue": true,
+  "calls": [
+   "7c6d"
+  ],
+  "callers": [
+   "0010",
+   "03ef",
+   "0516",
+   "078d",
+   "0aad",
+   "1422",
+   "1677",
+   "1933",
+   "7c89"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x20"
+  ],
+  "ports": []
+ },
+ {
+  "start": "5cd0",
+  "end": "5cdb",
+  "insns": 6,
+  "prologue": false,
+  "calls": [
+   "5cdb"
+  ],
+  "callers": [
+   "0010",
+   "1933",
+   "58f8",
+   "82d3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "5cdb",
+  "end": "5ce5",
+  "insns": 3,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "5cd0",
+   "614e",
+   "63fe"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "63e0"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "5e2c",
+  "end": "5e3d",
+  "insns": 10,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0010",
+   "0987",
+   "1677"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x16"
+  ],
+  "ports": []
+ },
+ {
+  "start": "5e3d",
+  "end": "5e7f",
+  "insns": 30,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0010",
+   "1d60",
+   "7c6d"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "63e4",
+   "63e6"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": [
+   "0x21, al",
+   "0x40, al",
+   "0x61, al",
+   "al, 0x21",
+   "al, 0x61"
+  ]
+ },
+ {
+  "start": "5e7f",
+  "end": "5e90",
+  "insns": 5,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "46ca"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "63f2",
+   "63fd"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "5e91",
+  "end": "5ea8",
+  "insns": 6,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0010",
+   "0ffa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "63f2",
+   "63f4",
+   "63fd"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "5ea9",
+  "end": "5f12",
+  "insns": 41,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "63e4",
+   "63e6",
+   "63f2",
+   "63f4",
+   "63fb",
+   "63fd"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": [
+   "0x21, al",
+   "0x40, al",
+   "0x43, al",
+   "0x61, al",
+   "al, 0x21",
+   "al, 0x61"
+  ]
+ },
+ {
+  "start": "612e",
+  "end": "614e",
+  "insns": 14,
+  "prologue": true,
+  "calls": [
+   "7f8e",
+   "7f92"
+  ],
+  "callers": [
+   "0d3f",
+   "0ffa",
+   "1ad6",
+   "1cc0",
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "614e",
+  "end": "6178",
+  "insns": 18,
+  "prologue": true,
+  "calls": [
+   "5cdb",
+   "7f8e",
+   "7f92"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6178",
+  "end": "6189",
+  "insns": 8,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0010",
+   "02ba",
+   "078d",
+   "1422",
+   "1677",
+   "180e",
+   "1ad6",
+   "33fb",
+   "7db6",
+   "82d3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "68e8",
+   "68ea"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6189",
+  "end": "61ac",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "1677",
+   "3478",
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "61ad",
+  "end": "61ca",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "61cb",
+  "end": "6242",
+  "insns": 49,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "03ef",
+   "0516",
+   "078d",
+   "0aad",
+   "0d3f",
+   "1422",
+   "1933",
+   "1d60",
+   "33fb",
+   "3478",
+   "3524",
+   "3836",
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "62dc",
+  "end": "62ed",
+  "insns": 8,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "68ee",
+   "68f0"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "62ed",
+  "end": "6338",
+  "insns": 33,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "03ef",
+   "0516",
+   "0aad",
+   "0d3f",
+   "0ffa",
+   "1933",
+   "1ad6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "634c",
+  "end": "63fe",
+  "insns": 69,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "03ef",
+   "0516",
+   "0ffa",
+   "1933"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "63fe",
+  "end": "641b",
+  "insns": 13,
+  "prologue": false,
+  "calls": [
+   "5cdb",
+   "7f92"
+  ],
+  "callers": [
+   "7d72"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "64ca",
+   "64cc"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "641b",
+  "end": "642e",
+  "insns": 9,
+  "prologue": false,
+  "calls": [
+   "7f92"
+  ],
+  "callers": [
+   "0aad",
+   "0d3f"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "64ca",
+   "64cc"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "642e",
+  "end": "643f",
+  "insns": 8,
+  "prologue": true,
+  "calls": [
+   "7f8e"
+  ],
+  "callers": [
+   "02ba",
+   "03ef",
+   "0516",
+   "078d",
+   "0987",
+   "0aad",
+   "0d3f",
+   "0ffa",
+   "1677",
+   "180e",
+   "1933",
+   "1cc0",
+   "7a6a"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "64ca",
+   "64cc"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "643f",
+  "end": "6599",
+  "insns": 150,
+  "prologue": true,
+  "calls": [
+   "7c6d",
+   "8174",
+   "81b2"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "64ce": "%s FILE ERROR\\n"
+  },
+  "ints": [
+   "0x20",
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "6599",
+  "end": "65d1",
+  "insns": 25,
+  "prologue": true,
+  "calls": [
+   "8272"
+  ],
+  "callers": [
+   "0ffa",
+   "1d60",
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "65d1",
+  "end": "65f4",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "3524",
+   "3818"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "65f5",
+  "end": "6612",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6613",
+  "end": "6690",
+  "insns": 52,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "1d60",
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6717",
+  "end": "673a",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "673b",
+  "end": "6758",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6759",
+  "end": "67d5",
+  "insns": 52,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "33fb",
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6865",
+  "end": "6888",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "8006"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6889",
+  "end": "68a6",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "68a7",
+  "end": "6923",
+  "insns": 52,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "69aa",
+  "end": "69cd",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "69ce",
+  "end": "69eb",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "69ec",
+  "end": "6acc",
+  "insns": 87,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6b94",
+  "end": "6bb7",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "2843",
+   "2ee1",
+   "3478"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6bb8",
+  "end": "6bd5",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6bd6",
+  "end": "6cb6",
+  "insns": 87,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "6d97",
+  "end": "7091",
+  "insns": 288,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "3524",
+   "3875",
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7091",
+  "end": "7097",
+  "insns": 2,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0375",
+   "0987",
+   "1422",
+   "1933"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "63fc"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "70a9",
+  "end": "70af",
+  "insns": 2,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "63fc"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "70af",
+  "end": "70df",
+  "insns": 18,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "1d60",
+   "46ca"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "63fb"
+  ],
+  "ds_writes": [
+   "63ea",
+   "63ec",
+   "63ee",
+   "63f0",
+   "63fb",
+   "63fc"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "70df",
+  "end": "70fc",
+  "insns": 12,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0375",
+   "0987",
+   "1422",
+   "1933",
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "63ea",
+   "63ec",
+   "63fb",
+   "63fc"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "70fc",
+  "end": "7285",
+  "insns": 169,
+  "prologue": true,
+  "calls": [
+   "7285",
+   "7c6d",
+   "8174",
+   "81b2"
+  ],
+  "callers": [
+   "0375",
+   "0aad",
+   "0ffa",
+   "1422",
+   "1677",
+   "1933"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "64de": "%s FILE ERROR"
+  },
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "7285",
+  "end": "72a5",
+  "insns": 16,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "70fc"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "72a5",
+  "end": "72b0",
+  "insns": 6,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "63e0"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "72b0",
+  "end": "731f",
+  "insns": 45,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "731f",
+  "end": "733c",
+  "insns": 11,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "1d60"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "64ec"
+  ],
+  "ds_writes": [
+   "64ec"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "733c",
+  "end": "735f",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7360",
+  "end": "737d",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "3524"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "737e",
+  "end": "73ea",
+  "insns": 44,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "73ea",
+  "end": "753b",
+  "insns": 146,
+  "prologue": true,
+  "calls": [
+   "753b",
+   "7c6d"
+  ],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "753b",
+  "end": "755b",
+  "insns": 16,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "73ea"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "755b",
+  "end": "7587",
+  "insns": 22,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cf86"
+  ],
+  "ds_writes": [
+   "cf86",
+   "cf92",
+   "d1a0",
+   "d382"
+  ],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "7587",
+  "end": "75d7",
+  "insns": 37,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "0040": "herc"
+  },
+  "ints": [
+   "0x10"
+  ],
+  "ports": [
+   "dx, al"
+  ]
+ },
+ {
+  "start": "75d7",
+  "end": "7627",
+  "insns": 37,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "0040": "herc"
+  },
+  "ints": [
+   "0x10"
+  ],
+  "ports": [
+   "dx, al"
+  ]
+ },
+ {
+  "start": "7627",
+  "end": "764b",
+  "insns": 18,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "1309",
+   "15ce"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7662",
+  "end": "77fc",
+  "insns": 73,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "0010",
+   "0375"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0010"
+  ],
+  "ds_writes": [
+   "0010",
+   "0012",
+   "765b",
+   "7661"
+  ],
+  "strings": {
+   "0201": "CTRL - (J)OYSTICK OR CTRL - (K)EYBOARD"
+  },
+  "ints": [
+   "0x11",
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "7a6a",
+  "end": "7c6d",
+  "insns": 186,
+  "prologue": true,
+  "calls": [
+   "4af7",
+   "642e",
+   "7d72",
+   "8006"
+  ],
+  "callers": [
+   "1422"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7c6d",
+  "end": "7c89",
+  "insns": 12,
+  "prologue": true,
+  "calls": [
+   "4e53",
+   "5e3d",
+   "83d7",
+   "87bb"
+  ],
+  "callers": [
+   "0d3f",
+   "1309",
+   "15ce",
+   "4ea5",
+   "5c55",
+   "643f",
+   "70fc",
+   "73ea",
+   "81b2",
+   "8234",
+   "8272"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7c89",
+  "end": "7cc9",
+  "insns": 26,
+  "prologue": true,
+  "calls": [
+   "5c55"
+  ],
+  "callers": [
+   "0516",
+   "0d3f",
+   "46ca"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7cc9",
+  "end": "7cf2",
+  "insns": 18,
+  "prologue": true,
+  "calls": [
+   "4af7",
+   "89b1"
+  ],
+  "callers": [
+   "0010",
+   "02ba",
+   "078d",
+   "1422",
+   "1677",
+   "180e",
+   "33fb",
+   "7db6",
+   "82d3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7cf2",
+  "end": "7d72",
+  "insns": 50,
+  "prologue": true,
+  "calls": [
+   "4857"
+  ],
+  "callers": [
+   "1422"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7d72",
+  "end": "7d9b",
+  "insns": 16,
+  "prologue": true,
+  "calls": [
+   "63fe"
+  ],
+  "callers": [
+   "02ba",
+   "03ef",
+   "0516",
+   "078d",
+   "0987",
+   "1677",
+   "180e",
+   "1cc0",
+   "7a6a"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7d9b",
+  "end": "7db6",
+  "insns": 12,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7db6",
+  "end": "7f8e",
+  "insns": 200,
+  "prologue": true,
+  "calls": [
+   "4857",
+   "4ad8",
+   "4df6",
+   "4e7d",
+   "4ea5",
+   "58f8",
+   "612e",
+   "6178",
+   "61cb",
+   "6599",
+   "6d97",
+   "72b0",
+   "7cc9",
+   "82ab",
+   "82bf"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "66c2",
+   "66c3"
+  ],
+  "strings": {
+   "665a": " to move the joystick position indicator ",
+   "6684": " below, to all squares ",
+   "669c": " Press joystick button when complete "
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7f8e",
+  "end": "7f92",
+  "insns": 2,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "612e",
+   "614e",
+   "642e"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "63e8"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "7f92",
+  "end": "7fa6",
+  "insns": 11,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "612e",
+   "614e",
+   "63fe",
+   "641b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "63e8"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8006",
+  "end": "8023",
+  "insns": 13,
+  "prologue": true,
+  "calls": [
+   "6865"
+  ],
+  "callers": [
+   "7a6a"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8023",
+  "end": "8174",
+  "insns": 116,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "58f8"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "66c2",
+   "6900",
+   "6902",
+   "6904",
+   "6905",
+   "6906",
+   "6908",
+   "690a",
+   "690e",
+   "6910",
+   "6912",
+   "6914",
+   "6916",
+   "691a",
+   "691c"
+  ],
+  "ds_writes": [
+   "6900",
+   "6902",
+   "6904",
+   "6905",
+   "6906",
+   "6908",
+   "690a",
+   "690c",
+   "690e",
+   "6910",
+   "6912",
+   "6914",
+   "6916",
+   "6918",
+   "691a",
+   "691c"
+  ],
+  "strings": {
+   "0201": "CTRL - (J)OYSTICK OR CTRL - (K)EYBOARD"
+  },
+  "ints": [],
+  "ports": [
+   "al, dx",
+   "dx, al"
+  ]
+ },
+ {
+  "start": "8174",
+  "end": "81b2",
+  "insns": 31,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "643f",
+   "70fc"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "81b2",
+  "end": "8234",
+  "insns": 53,
+  "prologue": true,
+  "calls": [
+   "7c6d"
+  ],
+  "callers": [
+   "643f",
+   "70fc"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cf92",
+   "d382"
+  ],
+  "ds_writes": [
+   "cf92"
+  ],
+  "strings": {
+   "691e": "OUT OF MEMORY LOADING %s\\n"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8234",
+  "end": "8272",
+  "insns": 28,
+  "prologue": true,
+  "calls": [
+   "7c6d"
+  ],
+  "callers": [
+   "4ea5"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cf92",
+   "d382"
+  ],
+  "ds_writes": [
+   "d382"
+  ],
+  "strings": {
+   "693a": "OUT OF MEMORY BUFFERS",
+   "6950": "OUT OF BUFFER MEMORY"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8272",
+  "end": "82ab",
+  "insns": 25,
+  "prologue": true,
+  "calls": [
+   "7c6d"
+  ],
+  "callers": [
+   "6599"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "d382"
+  ],
+  "ds_writes": [
+   "d382"
+  ],
+  "strings": {
+   "6966": "BUFFER NOT FOUND RELEASE ERROR"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "82ab",
+  "end": "82bf",
+  "insns": 7,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "82bf",
+  "end": "82d3",
+  "insns": 7,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "7db6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "82d3",
+  "end": "83cd",
+  "insns": 100,
+  "prologue": true,
+  "calls": [
+   "4ad8",
+   "4af7",
+   "4e7d",
+   "5cd0",
+   "6178",
+   "7cc9",
+   "83cd",
+   "88f4"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "cf86",
+   "cf92",
+   "d1a0",
+   "d382"
+  ],
+  "ds_writes": [],
+  "strings": {
+   "69b6": "MBOT=%4.4x LOW=%4.4x HIGH=%4.4x MTOP=%4.4x",
+   "69e1": "%-12.12s  %4.4x  %4.4x",
+   "69f8": " %4.4x  %4.4x"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "83cd",
+  "end": "83d7",
+  "insns": 3,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "82d3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "83d7",
+  "end": "83ec",
+  "insns": 11,
+  "prologue": true,
+  "calls": [
+   "911f",
+   "9a3e"
+  ],
+  "callers": [
+   "7c6d"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "83ec",
+  "end": "8400",
+  "insns": 8,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0ffa",
+   "84aa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "8400",
+  "end": "84aa",
+  "insns": 71,
+  "prologue": false,
+  "calls": [
+   "0010",
+   "9059",
+   "9108",
+   "911f",
+   "9a0e",
+   "9a3e",
+   "a276",
+   "a35b"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "0002",
+   "709e",
+   "70a0",
+   "70a2"
+  ],
+  "ds_writes": [
+   "0002"
+  ],
+  "strings": {},
+  "ints": [
+   "0x20",
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "84aa",
+  "end": "854d",
+  "insns": 71,
+  "prologue": true,
+  "calls": [
+   "83ec",
+   "8c01",
+   "91bb",
+   "99f3",
+   "a3c1",
+   "a3f2",
+   "a44e"
+  ],
+  "callers": [
+   "023e",
+   "0d3f",
+   "1309",
+   "15ce"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "854d",
+  "end": "85a5",
+  "insns": 42,
+  "prologue": true,
+  "calls": [
+   "89f4"
+  ],
+  "callers": [
+   "023e",
+   "0fca",
+   "1309"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "85a5",
+  "end": "85cb",
+  "insns": 19,
+  "prologue": true,
+  "calls": [
+   "8c30",
+   "a417"
+  ],
+  "callers": [
+   "023e",
+   "0d3f",
+   "1309",
+   "15ce"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "85cb",
+  "end": "8602",
+  "insns": 26,
+  "prologue": true,
+  "calls": [
+   "8d33",
+   "8dd2",
+   "9a67"
+  ],
+  "callers": [
+   "15ce"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8602",
+  "end": "8616",
+  "insns": 10,
+  "prologue": true,
+  "calls": [
+   "9223"
+  ],
+  "callers": [
+   "0d3f"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8616",
+  "end": "8624",
+  "insns": 7,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "8c01"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8624",
+  "end": "866a",
+  "insns": 33,
+  "prologue": true,
+  "calls": [
+   "8e5b",
+   "8f98"
+  ],
+  "callers": [
+   "89f4",
+   "8ad6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "6f04",
+   "6f06",
+   "6f0a"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "866a",
+  "end": "87bb",
+  "insns": 128,
+  "prologue": true,
+  "calls": [
+   "9046"
+  ],
+  "callers": [
+   "0ffa",
+   "8c30"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6f0e",
+   "6f3a",
+   "6f3b",
+   "70db"
+  ],
+  "ds_writes": [
+   "6f39",
+   "6f3a",
+   "6f3b"
+  ],
+  "strings": {
+   "0040": "herc"
+  },
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "87bb",
+  "end": "87f1",
+  "insns": 27,
+  "prologue": true,
+  "calls": [
+   "8d33",
+   "8dd2",
+   "9a67"
+  ],
+  "callers": [
+   "7c6d"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "87f1",
+  "end": "8802",
+  "insns": 7,
+  "prologue": true,
+  "calls": [],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "6f3c",
+   "6f3e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8802",
+  "end": "882e",
+  "insns": 18,
+  "prologue": true,
+  "calls": [
+   "a811"
+  ],
+  "callers": [
+   "0987",
+   "1ad6"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6f3c",
+   "6f3e"
+  ],
+  "ds_writes": [
+   "6f3c",
+   "6f3e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "882e",
+  "end": "88f4",
+  "insns": 80,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0ffa",
+   "89f4"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6f40"
+  ],
+  "ds_writes": [
+   "6f40"
+  ],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "88f4",
+  "end": "8945",
+  "insns": 38,
+  "prologue": true,
+  "calls": [
+   "8ad6",
+   "9a67"
+  ],
+  "callers": [
+   "0aad",
+   "0d3f",
+   "0ffa",
+   "15ce",
+   "1677",
+   "1ad6",
+   "82d3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8945",
+  "end": "897c",
+  "insns": 26,
+  "prologue": true,
+  "calls": [
+   "89b1",
+   "9223"
+  ],
+  "callers": [
+   "1309"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "897c",
+  "end": "89b1",
+  "insns": 30,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0010"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "89b1",
+  "end": "89cc",
+  "insns": 17,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "023e",
+   "0fca",
+   "1309",
+   "7cc9",
+   "8945",
+   "9cf7",
+   "a0c9"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "89cc",
+  "end": "89f4",
+  "insns": 24,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "1422"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "89f4",
+  "end": "8ad6",
+  "insns": 93,
+  "prologue": true,
+  "calls": [
+   "8624",
+   "882e"
+  ],
+  "callers": [
+   "854d",
+   "9223",
+   "9964"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8ad6",
+  "end": "8c01",
+  "insns": 121,
+  "prologue": true,
+  "calls": [
+   "8624",
+   "a538",
+   "a600"
+  ],
+  "callers": [
+   "88f4",
+   "9fb0",
+   "9ff9",
+   "a05e"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "70dc"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8c01",
+  "end": "8c30",
+  "insns": 20,
+  "prologue": true,
+  "calls": [
+   "8616"
+  ],
+  "callers": [
+   "84aa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8c30",
+  "end": "8d33",
+  "insns": 98,
+  "prologue": true,
+  "calls": [
+   "866a"
+  ],
+  "callers": [
+   "85a5"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [
+   "70dc"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8d33",
+  "end": "8dd2",
+  "insns": 57,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "85cb",
+   "87bb"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6f4e"
+  ],
+  "ds_writes": [
+   "70dc",
+   "732e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8dd2",
+  "end": "8e5b",
+  "insns": 58,
+  "prologue": true,
+  "calls": [
+   "91bb",
+   "a538"
+  ],
+  "callers": [
+   "85cb",
+   "87bb"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6f4e",
+   "732e"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8e5b",
+  "end": "8f3c",
+  "insns": 105,
+  "prologue": false,
+  "calls": [
+   "8f3c",
+   "8f76"
+  ],
+  "callers": [
+   "8624"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8f3c",
+  "end": "8f76",
+  "insns": 29,
+  "prologue": false,
+  "calls": [
+   "8f76"
+  ],
+  "callers": [
+   "8e5b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8f76",
+  "end": "8f98",
+  "insns": 18,
+  "prologue": false,
+  "calls": [
+   "8f98"
+  ],
+  "callers": [
+   "8e5b",
+   "8f3c"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8f98",
+  "end": "8fb7",
+  "insns": 20,
+  "prologue": false,
+  "calls": [
+   "a45b"
+  ],
+  "callers": [
+   "8624",
+   "8f76"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8fb7",
+  "end": "8fd3",
+  "insns": 15,
+  "prologue": false,
+  "calls": [
+   "9a3e"
+  ],
+  "callers": [
+   "911f"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "8fd3",
+  "end": "9046",
+  "insns": 41,
+  "prologue": true,
+  "calls": [
+   "9046"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6f39",
+   "70db"
+  ],
+  "ds_writes": [
+   "6f39"
+  ],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "9046",
+  "end": "9059",
+  "insns": 8,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "866a",
+   "8fd3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7080"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9059",
+  "end": "9108",
+  "insns": 74,
+  "prologue": false,
+  "calls": [
+   "9164"
+  ],
+  "callers": [
+   "8400"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7084",
+   "71e8",
+   "71ea"
+  ],
+  "ds_writes": [
+   "7072",
+   "7074",
+   "7086"
+  ],
+  "strings": {
+   "7066": ";C_FILE_INFO"
+  },
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "9108",
+  "end": "911f",
+  "insns": 9,
+  "prologue": true,
+  "calls": [
+   "9164"
+  ],
+  "callers": [
+   "8400"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "911f",
+  "end": "914b",
+  "insns": 18,
+  "prologue": true,
+  "calls": [
+   "8fb7",
+   "914b",
+   "9164"
+  ],
+  "callers": [
+   "83d7",
+   "8400"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "914b",
+  "end": "9164",
+  "insns": 10,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "911f"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7072",
+   "71e6",
+   "71e8"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "9164",
+  "end": "9187",
+  "insns": 20,
+  "prologue": false,
+  "calls": [
+   "918d"
+  ],
+  "callers": [
+   "9059",
+   "9108",
+   "911f"
+  ],
+  "indirect_calls": 1,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "918d",
+  "end": "91bb",
+  "insns": 21,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "9164"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7086"
+  ],
+  "ds_writes": [
+   "707e",
+   "7088"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "91bb",
+  "end": "9223",
+  "insns": 46,
+  "prologue": true,
+  "calls": [
+   "a600"
+  ],
+  "callers": [
+   "84aa",
+   "8dd2",
+   "a73d"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9223",
+  "end": "958c",
+  "insns": 228,
+  "prologue": true,
+  "calls": [
+   "89f4",
+   "992b",
+   "9997",
+   "a51f",
+   "a5a6"
+  ],
+  "callers": [
+   "8602",
+   "8945"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7330",
+   "7332",
+   "733c",
+   "7346",
+   "734e"
+  ],
+  "ds_writes": [
+   "70c2",
+   "7330",
+   "7332",
+   "7334",
+   "7336",
+   "7338",
+   "733a",
+   "733c",
+   "733e",
+   "7344",
+   "7346",
+   "7348",
+   "734a",
+   "734c",
+   "734e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "958c",
+  "end": "964e",
+  "insns": 70,
+  "prologue": true,
+  "calls": [
+   "9964",
+   "9997",
+   "99cc",
+   "a51f",
+   "a5a6"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7330",
+   "7332",
+   "7336",
+   "7338",
+   "733e",
+   "7346",
+   "7348",
+   "734a"
+  ],
+  "ds_writes": [
+   "733a",
+   "733e",
+   "7344",
+   "734e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "964e",
+  "end": "97c3",
+  "insns": 138,
+  "prologue": true,
+  "calls": [
+   "9964",
+   "9997",
+   "99cc",
+   "a51f",
+   "a5a6",
+   "a83d",
+   "a875"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "70c2",
+   "7332",
+   "7334",
+   "7338",
+   "733c",
+   "733e",
+   "7344",
+   "7348",
+   "734c"
+  ],
+  "ds_writes": [
+   "7334",
+   "733e",
+   "7344",
+   "7346",
+   "734e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "97c3",
+  "end": "9901",
+  "insns": 130,
+  "prologue": true,
+  "calls": [
+   "9901",
+   "9964",
+   "9997",
+   "99cc",
+   "a51f",
+   "a535",
+   "a5a6"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7332",
+   "7338",
+   "733c",
+   "733e",
+   "7348"
+  ],
+  "ds_writes": [
+   "733e",
+   "7344",
+   "7346",
+   "734e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9901",
+  "end": "992b",
+  "insns": 18,
+  "prologue": true,
+  "calls": [
+   "99cc",
+   "a51f"
+  ],
+  "callers": [
+   "97c3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "992b",
+  "end": "9964",
+  "insns": 25,
+  "prologue": true,
+  "calls": [
+   "9964",
+   "a51f",
+   "a5a6"
+  ],
+  "callers": [
+   "9223"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7332"
+  ],
+  "ds_writes": [
+   "7344"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9964",
+  "end": "9997",
+  "insns": 22,
+  "prologue": true,
+  "calls": [
+   "89f4",
+   "a51f"
+  ],
+  "callers": [
+   "958c",
+   "964e",
+   "97c3",
+   "992b",
+   "9997"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7332"
+  ],
+  "ds_writes": [
+   "7344"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9997",
+  "end": "99cc",
+  "insns": 22,
+  "prologue": true,
+  "calls": [
+   "9964",
+   "a51f",
+   "a5a6"
+  ],
+  "callers": [
+   "9223",
+   "958c",
+   "964e",
+   "97c3"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7332"
+  ],
+  "ds_writes": [
+   "733a",
+   "7344"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "99cc",
+  "end": "99f3",
+  "insns": 16,
+  "prologue": true,
+  "calls": [
+   "a51f"
+  ],
+  "callers": [
+   "958c",
+   "964e",
+   "97c3",
+   "9901"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7346",
+   "734a"
+  ],
+  "ds_writes": [
+   "7346"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "99f3",
+  "end": "9a0e",
+  "insns": 13,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "84aa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9a0e",
+  "end": "9a3e",
+  "insns": 28,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "8400",
+   "9a3e"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9a3e",
+  "end": "9a67",
+  "insns": 21,
+  "prologue": true,
+  "calls": [
+   "9a0e"
+  ],
+  "callers": [
+   "83d7",
+   "8400",
+   "8fb7"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "0040": "herc"
+  },
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "9a67",
+  "end": "9cf7",
+  "insns": 159,
+  "prologue": true,
+  "calls": [
+   "a05e",
+   "a1e3",
+   "a24e",
+   "a51f"
+  ],
+  "callers": [
+   "85cb",
+   "87bb",
+   "88f4"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7354",
+   "7358",
+   "7362",
+   "736a"
+  ],
+  "ds_writes": [
+   "7350",
+   "7352",
+   "7354",
+   "7356",
+   "7358",
+   "735a",
+   "735c",
+   "735e",
+   "7360",
+   "7362",
+   "7364",
+   "7366",
+   "736a",
+   "736c",
+   "7370",
+   "7372"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9cf7",
+  "end": "9e2c",
+  "insns": 113,
+  "prologue": true,
+  "calls": [
+   "89b1",
+   "a0c9",
+   "a51f",
+   "a59c"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7350",
+   "7352",
+   "7358",
+   "735a",
+   "735c",
+   "735e",
+   "7362",
+   "7364",
+   "7366",
+   "7370"
+  ],
+  "ds_writes": [
+   "735a",
+   "7366",
+   "736e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9e2c",
+  "end": "9f10",
+  "insns": 81,
+  "prologue": true,
+  "calls": [
+   "9ff9",
+   "a05e",
+   "a51f"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7358",
+   "735a",
+   "735c",
+   "7364",
+   "7368",
+   "7372"
+  ],
+  "ds_writes": [
+   "735a",
+   "7360"
+  ],
+  "strings": {
+   "70c4": "(null)",
+   "70cb": "(null)"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9f10",
+  "end": "9fb0",
+  "insns": 52,
+  "prologue": true,
+  "calls": [
+   "a0c9",
+   "a51f",
+   "a535"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7350",
+   "7352",
+   "735a",
+   "735c",
+   "735e",
+   "7362",
+   "7364",
+   "7370"
+  ],
+  "ds_writes": [
+   "735a",
+   "7364",
+   "736e"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9fb0",
+  "end": "9ff9",
+  "insns": 30,
+  "prologue": true,
+  "calls": [
+   "8ad6",
+   "a51f"
+  ],
+  "callers": [
+   "a0c9",
+   "a191",
+   "a1b0"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7354",
+   "736c"
+  ],
+  "ds_writes": [
+   "736a",
+   "736c"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "9ff9",
+  "end": "a05e",
+  "insns": 42,
+  "prologue": true,
+  "calls": [
+   "8ad6",
+   "a51f"
+  ],
+  "callers": [
+   "9e2c",
+   "a0c9"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7354",
+   "7360",
+   "736c"
+  ],
+  "ds_writes": [
+   "736a",
+   "736c"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a05e",
+  "end": "a0c9",
+  "insns": 45,
+  "prologue": true,
+  "calls": [
+   "8ad6",
+   "a51f"
+  ],
+  "callers": [
+   "9a67",
+   "9e2c",
+   "a0c9"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7354",
+   "736c"
+  ],
+  "ds_writes": [
+   "736a",
+   "736c"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a0c9",
+  "end": "a191",
+  "insns": 75,
+  "prologue": true,
+  "calls": [
+   "89b1",
+   "9fb0",
+   "9ff9",
+   "a05e",
+   "a191",
+   "a1b0",
+   "a51f"
+  ],
+  "callers": [
+   "9cf7",
+   "9f10"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "735e",
+   "7360",
+   "7368",
+   "736e",
+   "7372"
+  ],
+  "ds_writes": [
+   "7360"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a191",
+  "end": "a1b0",
+  "insns": 14,
+  "prologue": true,
+  "calls": [
+   "9fb0",
+   "a51f"
+  ],
+  "callers": [
+   "a0c9"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7362"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a1b0",
+  "end": "a1e3",
+  "insns": 21,
+  "prologue": true,
+  "calls": [
+   "9fb0",
+   "a51f"
+  ],
+  "callers": [
+   "a0c9"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "7350",
+   "736e"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a1e3",
+  "end": "a24e",
+  "insns": 48,
+  "prologue": true,
+  "calls": [
+   "a51f"
+  ],
+  "callers": [
+   "9a67"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "735a",
+   "735c"
+  ],
+  "ds_writes": [
+   "735a",
+   "7360"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a24e",
+  "end": "a276",
+  "insns": 20,
+  "prologue": true,
+  "calls": [
+   "a51f"
+  ],
+  "callers": [
+   "9a67"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "70d2": "+- #"
+  },
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a276",
+  "end": "a32d",
+  "insns": 90,
+  "prologue": false,
+  "calls": [
+   "a32d",
+   "a334"
+  ],
+  "callers": [
+   "8400"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "002c",
+   "7084",
+   "70d8"
+  ],
+  "ds_writes": [
+   "709e",
+   "70a0",
+   "70d8"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a32d",
+  "end": "a334",
+  "insns": 4,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "a276"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a334",
+  "end": "a35b",
+  "insns": 21,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "a276"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a35b",
+  "end": "a3c1",
+  "insns": 57,
+  "prologue": true,
+  "calls": [
+   "a55a"
+  ],
+  "callers": [
+   "8400"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "002c",
+   "7084"
+  ],
+  "ds_writes": [
+   "70a2"
+  ],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a3c1",
+  "end": "a3f2",
+  "insns": 28,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "84aa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a3f2",
+  "end": "a417",
+  "insns": 22,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "84aa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a417",
+  "end": "a44e",
+  "insns": 24,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "85a5"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "705a"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a44e",
+  "end": "a45b",
+  "insns": 6,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "84aa"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "a45b",
+  "end": "a4c9",
+  "insns": 53,
+  "prologue": true,
+  "calls": [
+   "a4c9"
+  ],
+  "callers": [
+   "8f98"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6efa"
+  ],
+  "ds_writes": [
+   "6efa"
+  ],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "a4c9",
+  "end": "a51f",
+  "insns": 39,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "a45b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6ea6",
+   "7084"
+  ],
+  "ds_writes": [
+   "6ea6"
+  ],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "a51f",
+  "end": "a535",
+  "insns": 10,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "9223",
+   "958c",
+   "964e",
+   "97c3",
+   "9901",
+   "992b",
+   "9964",
+   "9997",
+   "99cc",
+   "9a67",
+   "9cf7",
+   "9e2c",
+   "9f10",
+   "9fb0",
+   "9ff9",
+   "a05e",
+   "a0c9",
+   "a191",
+   "a1b0",
+   "a1e3",
+   "a24e"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "70de"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a535",
+  "end": "a538",
+  "insns": 1,
+  "prologue": false,
+  "calls": [
+   "a737"
+  ],
+  "callers": [
+   "97c3",
+   "9f10"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a538",
+  "end": "a55a",
+  "insns": 15,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "8ad6",
+   "8dd2"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a55a",
+  "end": "a59c",
+  "insns": 29,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "a35b"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "6ea6",
+   "6eaa",
+   "7084"
+  ],
+  "ds_writes": [
+   "6ea6",
+   "6eaa"
+  ],
+  "strings": {},
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "a59c",
+  "end": "a5a6",
+  "insns": 6,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "9cf7"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a5a6",
+  "end": "a600",
+  "insns": 40,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "9223",
+   "958c",
+   "964e",
+   "97c3",
+   "992b",
+   "9997"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a600",
+  "end": "a737",
+  "insns": 157,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "8ad6",
+   "91bb"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {
+   "0040": "herc"
+  },
+  "ints": [
+   "0x21"
+  ],
+  "ports": []
+ },
+ {
+  "start": "a737",
+  "end": "a73d",
+  "insns": 2,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "a535"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a73d",
+  "end": "a76e",
+  "insns": 25,
+  "prologue": true,
+  "calls": [
+   "91bb"
+  ],
+  "callers": [],
+  "indirect_calls": 0,
+  "ds_reads": [
+   "705a"
+  ],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a76e",
+  "end": "a811",
+  "insns": 74,
+  "prologue": true,
+  "calls": [
+   "a811"
+  ],
+  "callers": [
+   "0ffa",
+   "11fd",
+   "a853"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a811",
+  "end": "a83d",
+  "insns": 21,
+  "prologue": true,
+  "calls": [],
+  "callers": [
+   "0ffa",
+   "11fd",
+   "8802",
+   "a76e"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a83d",
+  "end": "a848",
+  "insns": 6,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "964e",
+   "a875"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a848",
+  "end": "a853",
+  "insns": 6,
+  "prologue": false,
+  "calls": [],
+  "callers": [
+   "078d"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a853",
+  "end": "a875",
+  "insns": 14,
+  "prologue": true,
+  "calls": [
+   "a76e"
+  ],
+  "callers": [
+   "078d"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ },
+ {
+  "start": "a875",
+  "end": "a894",
+  "insns": 13,
+  "prologue": true,
+  "calls": [
+   "a83d"
+  ],
+  "callers": [
+   "964e"
+  ],
+  "indirect_calls": 0,
+  "ds_reads": [],
+  "ds_writes": [],
+  "strings": {},
+  "ints": [],
+  "ports": []
+ }
+]

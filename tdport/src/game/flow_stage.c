@@ -10,7 +10,7 @@
 #include "../platform/res.h"
 #include "../platform/timer.h"
 
-#define DS_STAGE_START 0x6361   /* u16[5] road stream start per stage (read by 0x1F4E and 0x1DC0) */
+#define DS_STAGE_START EGA_CGA(0x6361, 0x6331)   /* u16[5] road stream start per stage (read by 0x1F4E and 0x1DC0) */
 
 /* 0x1030 run_game — game_flow.md §4 (verified against disassembly 0x1030-0x125C) */
 int run_game(void)
@@ -27,11 +27,16 @@ int run_game(void)
         u16 si = (u16)(DSW(DS_g_stage) * 2);
         DSW(DS_g_parTime) = DSW(DS_STAGE_PAR_TIME + si);
         DSW(DS_g_stageConstB) = DSW(DS_STAGE_CONST_B + si);
+#if TD_CGA
+        /* TDCGA 0x1036: one traffic archive, xroadb.cmp, kept in g_xroadC (xroada.cmp is loaded by main) */
+        far_wr(DGROUP, DS_g_xroadC, load_archive(DSTR(0x27A), 0x0908));
+#else
         far_wr(DGROUP, DS_g_xroadA, load_archive(DSTR(0x26E), 0x1E84));
         far_wr(DGROUP, DS_g_xroadB, load_archive(DSTR(0x279), 0x17AE));
         far_wr(DGROUP, DS_g_xroadC, load_archive(DSTR(0x284), 0x0FA0));
-        snprintf(tmp, sizeof tmp, "%s.pes", flow_car_name(DSS(DS_g_selectedCar)));
-        far_wr(DGROUP, DS_g_carArchive, load_archive(tmp, 0x7D0));
+#endif
+        snprintf(tmp, sizeof tmp, EGA_CGA("%s.pes", "%s.cmp"), flow_car_name(DSS(DS_g_selectedCar)));
+        far_wr(DGROUP, DS_g_carArchive, load_archive(tmp, EGA_CGA(0x7D0, 0x3E8)));
 
         /* car .BIN loader at 0x10E2: open(O_BINARY); read(fd, car_data_ptr(), 0x4D6); close (no checks) */
         snprintf(tmp, sizeof tmp, "%s.bin", flow_car_name(DSS(DS_g_selectedCar)));
@@ -46,7 +51,7 @@ int run_game(void)
         delay_ticks(400);
         gfx_free_buffer(flow_page_desc());
         r = run_stage();
-        far_wr(DGROUP, DS_page_buf_desc, gfx_create_buffer(0x28, 200, 0x0F));
+        far_wr(DGROUP, DS_page_buf_desc, gfx_create_buffer(EGA_CGA(0x28, 0x50), 200, 0x0F));
         if (DSW(DS_g_stageTime) == 0) DSW(DS_g_stageTime) = 1;
         s16 t = DSS(DS_g_stageTime);
         DSS(DS_g_avgSpeed) = (s16)(((s32)DSS(DS_g_avgSpeed) * 0x5A) / (s32)t);   /* _aNlmul, _aNldiv */
@@ -99,14 +104,14 @@ void stage_results(s32 score)
     DSW(DS_g_scrollDelay) = 15;
     snd_play_oneshot(far_rd(DGROUP, DS_g_songGas));
     DSS(DS_g_lives) = (s16)(DSS(DS_g_lives) + 2);
-    FarPtr sb  = load_archive(DSTR(DS_g_sbArchiveName), 0x109A);          /* "<car>sb.pes" (cached) */
-    FarPtr gas = load_archive(DSTR(0x768), 2000);                         /* "gas.pes" */
-    FarPtr gcar = res_find(sb, DSTR(0x770));                              /* "gcar" */
-    FarPtr bg   = res_find(gas, DSTR(0x775));                             /* "gas " */
+    FarPtr sb  = load_archive(DSTR(DS_g_sbArchiveName), EGA_CGA(0x109A, 0x908));  /* "<car>sb.pes" (cached) */
+    FarPtr gas = load_archive(DSTR(EGA_CGA(0x768, 0x75E)), EGA_CGA(2000, 1000));  /* "gas.pes" (.cmp) */
+    FarPtr gcar = res_find(sb, DSTR(EGA_CGA(0x770, 0x766)));              /* "gcar" */
+    FarPtr bg   = res_find(gas, DSTR(EGA_CGA(0x775, 0x76B)));             /* "gas " */
     FarPtr sign = res_find(gas, DSTR(DSW(DS_GAS_SIGN_NAMES + DSW(DS_g_stage) * 2)));
     gfx_select_target(flow_page_desc());
     gfx_clear_clip(0);
-    gfx_set_clip(scr, 0, 0x28, 0, 200);
+    gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 200);
     gfx_select_target(scr);
     for (int i = 0; i < 8; i++) {                         /* wipe to black: deadline set, never waited */
         set_deadline(10);
@@ -125,7 +130,7 @@ void stage_results(s32 score)
     }
     results_text(score);
     getkey_wait();
-    gfx_set_clip(scr, 0, 0x28, 0, 200);
+    gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 200);
     gfx_clear_screen(0);
     snd_stop_oneshot();
 }
@@ -135,7 +140,7 @@ void results_text(s32 score)
 {
     char buf[80];
     u16 l1, l2;
-    gfx_set_text_colours(0x0F, 0);
+    gfx_set_text_colours(EGA_CGA(0x0F, 3), 0);
     s16 secs = DSS(DS_g_stageTime);
     gfx_select_target(flow_page_desc());
     gfx_clear_clip(0);
@@ -144,16 +149,16 @@ void results_text(s32 score)
     u16 k = (u16)(s16)(crt_rand() % 3);                   /* cwd; idiv 3 */
     s16 avg = DSS(DS_g_avgSpeed);
     if (avg < 50) {
-        l1 = DSW(0x792 + k * 2); l2 = DSW(0x7B0 + k * 2);
+        l1 = DSW(DS_MSG_TABLES + 0x18 + k * 2); l2 = DSW(DS_MSG_TABLES + 0x36 + k * 2);   /* DS:0792, DS:07B0 */
         DSW(DS_g_tooSlow) = 1;
     } else if (avg > 105) {
-        l1 = DSW(0x77A + k * 2); l2 = DSW(0x798 + k * 2);
+        l1 = DSW(DS_MSG_TABLES + 0x00 + k * 2); l2 = DSW(DS_MSG_TABLES + 0x1E + k * 2);   /* DS:077A, DS:0798 */
     } else if (avg > 95) {
-        l1 = DSW(0x780 + k * 2); l2 = DSW(0x79E + k * 2);
+        l1 = DSW(DS_MSG_TABLES + 0x06 + k * 2); l2 = DSW(DS_MSG_TABLES + 0x24 + k * 2);   /* DS:0780, DS:079E */
     } else if (avg > 65) {
-        l1 = DSW(0x786 + k * 2); l2 = DSW(0x7A4 + k * 2);
+        l1 = DSW(DS_MSG_TABLES + 0x0C + k * 2); l2 = DSW(DS_MSG_TABLES + 0x2A + k * 2);   /* DS:0786, DS:07A4 */
     } else {
-        l1 = DSW(0x78C + k * 2); l2 = DSW(0x7AA + k * 2);
+        l1 = DSW(DS_MSG_TABLES + 0x12 + k * 2); l2 = DSW(DS_MSG_TABLES + 0x30 + k * 2);   /* DS:078C, DS:07AA */
     }
     delay_ticks(50);
     results_add_line(DSTR(l1));
@@ -173,9 +178,9 @@ void results_text(s32 score)
     results_add_line(buf);
     if (DSW(DS_g_tooSlow) == 0) {
         u16 tip = (u16)(s16)(crt_rand() % 3);
-        results_add_line(DSTR(DSW(0x7B6 + tip * 2)));
+        results_add_line(DSTR(DSW(DS_MSG_TABLES + 0x3C + tip * 2)));                  /* DS:07B6 */
     }
-    results_add_line(DSTR(0x865));                        /* "Press key or joystick button to continue" */
+    results_add_line(DSTR(EGA_CGA(0x865, 0x85B)));                        /* "Press key or joystick button to continue" */
     results_scroll();
 }
 
@@ -194,7 +199,7 @@ void results_scroll(void)
 {
     s16 y = 199;
     gfx_select_target(gfx_screen_desc());
-    gfx_set_clip(gfx_screen_desc(), 0, 0x28, 0xB0, 200);
+    gfx_set_clip(gfx_screen_desc(), 0, EGA_CGA(0x28, 0x50), 0xB0, 200);
     for (s16 line = 0; line < DSS(DS_g_resultLineCount); line++) {
         for (s16 j = 0; j < 8; j++) {
             set_deadline(DSW(DS_g_scrollDelay));
@@ -214,10 +219,17 @@ int run_stage(void)
     reset_car_state();
     stage_enter_install_isr();
     select_screen();
+#if TD_CGA
+    /* TDCGA 0x1D7B: dash and roof are drawn before the clip is set, and there is no clear_clip(8) */
+    blit_copy_own(far_rd(DGROUP, DS_car_handles));       /* dash */
+    blit_copy_own(far_rd(DGROUP, DS_spr_roof));
+    gfx_set_clip(gfx_screen_desc(), 0, 0x50, 0x13, 200);
+#else
     gfx_set_clip(gfx_screen_desc(), 0, 0x28, 0x13, 200);
     gfx_clear_clip(8);
     blit_copy_own(far_rd(DGROUP, DS_car_handles));       /* dash */
     blit_copy_own(far_rd(DGROUP, DS_spr_roof));
+#endif
     DSW(DS_g_stageTime) = 0;
     for (;;) {
         host_frame_begin();                               /* PORT: ticks (and the sim ISR) advance here; paced
@@ -226,7 +238,9 @@ int run_stage(void)
         project_road_main();
         project_road_mirror();
         select_road_buffer();
-        gfx_clear_clip(8);
+#if !TD_CGA
+        gfx_clear_clip(8);                                /* TDCGA 0x1DC1: none */
+#endif
         fill_scenery_above_road();
         draw_road_main();
         draw_mirror_background();
@@ -256,7 +270,9 @@ int run_stage(void)
         crash_windscreen_sequence();
         DSW(DS_g_lives) = (u16)(DSW(DS_g_lives) - 1);
         if (DSW(DS_g_lives) == 0) {
-            blit_and_own(far_rd(DGROUP, DS_spr_gvrm));    /* GAME OVER mask */
+#if !TD_CGA
+            blit_and_own(far_rd(DGROUP, DS_spr_gvrm));    /* GAME OVER mask (TDCGA 0x1E66: none) */
+#endif
             blit_or_own(far_rd(DGROUP, DS_spr_govr));
             wait_fire_button();
             r = 0;

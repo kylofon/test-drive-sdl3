@@ -5,7 +5,9 @@
  *   --bios-keys driving keys act only through key repeat, exactly like the original (default: held keys)
  *   --game-dir  folder with the original game files (default: "Game" next to the working directory)
  *   --scale     initial window scale (default 3)
- *   --check     load and verify TDEGA.EXE, print a summary and exit (no window)
+ *   --check     load and verify the original executable, print a summary and exit (no window)
+ * Hercules build (tdport-herc) only:
+ *   --monitor   phosphor colour: green (default), amber or white
  */
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL.h>
@@ -16,6 +18,9 @@
 
 #include "host.h"
 #include "mem.h"
+#if TD_HERC
+#include "platform/gfx.h"
+#endif
 
 int game_main(void);   /* game/flow.c: port of main() at image 0x0010 */
 
@@ -30,14 +35,18 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i], "--check")) check = true;
         else if (!strcmp(argv[i], "--bios-keys")) host_set_held_keys(false);
         else if (!strcmp(argv[i], "--frame-rate") && i + 1 < argc) host_set_frame_rate(atoi(argv[++i]));
+#if TD_HERC
+        else if (!strcmp(argv[i], "--monitor") && i + 1 < argc && gfx_set_monitor(argv[i + 1])) i++;
+#endif
         else {
-            fprintf(stderr, "usage: %s [--game-dir DIR] [--scale N] [--frame-rate FPS] [--bios-keys] [--check]\n", argv[0]);
+            fprintf(stderr, "usage: %s [--game-dir DIR] [--scale N] [--frame-rate FPS] [--bios-keys] [--check]%s\n",
+                    argv[0], TD_HERC ? " [--monitor green|amber|white]" : "");
             return 2;
         }
     }
 
     char exe_path[1024];
-    snprintf(exe_path, sizeof exe_path, "%s/TDEGA.EXE", dir);
+    snprintf(exe_path, sizeof exe_path, "%s/%s", dir, TD_EXE_NAME);
     char err[256];
     if (!mem_load_exe(exe_path, err, sizeof err)) {
         fprintf(stderr, "%s\n", err);
@@ -45,7 +54,8 @@ int main(int argc, char **argv)
         return 1;
     }
     if (check) {
-        printf("TDEGA.EXE ok: image %u bytes at %04X:0000, DGROUP %04X\n", mem_image_size, LOAD_SEG, DGROUP);
+        printf("%s ok (%s): image %u bytes at %04X:0000, DGROUP %04X\n", TD_EXE_NAME, TD_VARIANT_NAME,
+               mem_image_size, LOAD_SEG, DGROUP);
         return 0;
     }
 

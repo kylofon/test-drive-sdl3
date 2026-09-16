@@ -68,61 +68,79 @@ int car_select(void)
 void show_car(int idx, int dir)
 {
     FarPtr scr = gfx_screen_desc();
+#if !TD_CGA
     FarPtr none = far_make(0, 0);
+#endif
     FarPtr old = flow_page_sprite();                     /* page contents = previous car image */
-    gfx_set_clip(scr, 0, 0x28, 0, 0x58);                 /* top 88 lines */
+    gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 0x58);                 /* top 88 lines */
     if (dir == 1) {
         for (s16 i = -0x57; i < 1; i++) {
             set_deadline(1);
+#if TD_CGA
+            blit_copy_clip_raw(old, 0, (s16)(i + 0x57));  /* TDCGA 0x0AFE: page (old car) moves down */
+#else
             gfx_scroll_window(0, 0x57, 0x28, 0x57, -0x28, none, 0);
+#endif
             wait_deadline();
-            gfx_set_clip(scr, 0, 0x28, 0, 0x58);
+            gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 0x58);
         }
     } else if (dir == -1) {
         for (s16 i = 0x57; i >= 0; i--) {
             set_deadline(1);
+#if TD_CGA
+            blit_copy_clip_raw(old, 0, (s16)(i - 0x57));  /* TDCGA 0x0B4D: page (old car) moves up */
+#else
             gfx_scroll_window(0, 0, 0x28, 0x57, 0x28, none, 0);
+#endif
             wait_deadline();
-            gfx_set_clip(scr, 0, 0x28, 0, 0x58);
+            gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 0x58);
         }
     }
     {
         char tmp[30];                                    /* sprintf(g_sbArchiveName, "%ssb.pes", name) DS:022C */
-        int n = snprintf(tmp, sizeof tmp, "%ssb.pes", flow_car_name(idx));
+        int n = snprintf(tmp, sizeof tmp, EGA_CGA("%ssb.pes", "%ssb.cmp"), flow_car_name(idx));
         if (n < 0) n = 0;
         if (n > (int)sizeof tmp - 1) n = (int)sizeof tmp - 1;
         tmp[n] = 0;
         memcpy(DSTR(DS_g_sbArchiveName), tmp, (size_t)n + 1);
     }
-    far_wr(DGROUP, DS_g_carSBArchive, load_archive(DSTR(DS_g_sbArchiveName), 0x109A));
+    far_wr(DGROUP, DS_g_carSBArchive, load_archive(DSTR(DS_g_sbArchiveName), EGA_CGA(0x109A, 0x908)));
     FarPtr sb = far_rd(DGROUP, DS_g_carSBArchive);
-    far_wr(DGROUP, DS_g_showroomCarSpr, res_find(sb, DSTR(0x235)));      /* "car " */
-    FarPtr stat = res_find(sb, DSTR(0x23A));                             /* "stat" */
-    FarPtr name = res_find(sb, DSTR(0x23F));                             /* "name" */
+    far_wr(DGROUP, DS_g_showroomCarSpr, res_find(sb, DSTR(EGA_CGA(0x235, 0x241))));      /* "car " */
+    FarPtr stat = res_find(sb, DSTR(EGA_CGA(0x23A, 0x246)));                             /* "stat" */
+    FarPtr name = res_find(sb, DSTR(EGA_CGA(0x23F, 0x24B)));                             /* "name" */
     gfx_select_target(flow_page_desc());
     gfx_clear_clip(0);
     blit_copy_own(far_rd(DGROUP, DS_g_showroomCarSpr));
     blit_copy_own(name);
-    gfx_set_clip(scr, 0, 0x28, 0, 0x58);
+    gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 0x58);
     gfx_select_target(scr);
     if (dir == 0) {
         blit_copy_own(old);                              /* page at (0,0), clipped to 88 lines */
     } else if (dir == 1) {
         for (s16 i = -0x57; i < 1; i++) {
             set_deadline(1);
+#if TD_CGA
+            blit_copy_clip_raw(old, 0, i);                /* TDCGA 0x0C87: page (new car) */
+#else
             gfx_scroll_window(0, 0x57, 0x28, 0x57, -0x28, old, (s16)-i);
+#endif
             wait_deadline();
-            gfx_set_clip(scr, 0, 0x28, 0, 0x58);
+            gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 0x58);
         }
     } else if (dir == -1) {
         for (s16 i = 0x57; i >= 0; i--) {
             set_deadline(1);
+#if TD_CGA
+            blit_copy_clip_raw(old, 0, i);                /* TDCGA 0x0CD2: page (new car) */
+#else
             gfx_scroll_window(0, 0, 0x28, 0x57, 0x28, old, (s16)(0x57 - i));
+#endif
             wait_deadline();
-            gfx_set_clip(scr, 0, 0x28, 0, 0x58);
+            gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 0x58);
         }
     }
-    gfx_set_clip(scr, 0, 0x28, 0, 200);
+    gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 200);
     gfx_select_target(scr);
     blit_copy_own(stat);                                 /* spec sheet */
 }
@@ -139,7 +157,7 @@ void showroom_drive_away(int idx)
     memset(rrm_names, 0, sizeof rrm_names);
     memset(wnd_names, 0, sizeof wnd_names);
     snprintf(fn, sizeof fn, "%s.ss", flow_car_name(idx));                /* DS:0244 */
-    if (!flow_text_open(&f, fn)) fatal("%s", DSTR(0x24C));               /* "Animation file open error" */
+    if (!flow_text_open(&f, fn)) fatal("%s", DSTR(EGA_CGA(0x24C, 0x258)));               /* "Animation file open error" */
     flow_text_scan_2d(&f, &wnd_count, &start_frame);                     /* "%d %d\n" */
     read_line_strip(frm_names, 30, &f);
     read_line_strip(rrm_names, 30, &f);
@@ -174,12 +192,12 @@ void showroom_drive_away(int idx)
             wf++;
             if (start_frame <= wf) moving = 1;
         }
-        gfx_set_clip(scr, 0, 0x28, 0, 0x58);
+        gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 0x58);
         gfx_select_target(scr);
         blit_copy_clip_raw(pg, (s16)(0 - dist), 0);
         wait_deadline();                                 /* not interruptible */
     }
-    gfx_set_clip(scr, 0, 0x28, 0, 200);
+    gfx_set_clip(scr, 0, EGA_CGA(0x28, 0x50), 0, 200);
     delay_ticks(100);
 }
 
@@ -195,25 +213,25 @@ void read_line_strip(char *buf, int n, FlowText *f)
 int credits_show(void)
 {
     gfx_clear_screen(0);
-    gfx_set_text_colours(0x0F, 1);
-    draw_text_centered(DSTR(0x3EA), 0x00);               /* " Created by: " */
-    draw_text_centered(DSTR(0x3F8), 0x24);               /* " Design and Programming " */
-    draw_text_centered(DSTR(0x411), 0x70);               /* " Art: " */
-    draw_text_centered(DSTR(0x418), 0x94);               /* " Sound and Music: " */
-    gfx_set_text_colours(0x0F, 0);
-    draw_text_centered(DSTR(0x42B), 0x0C);
-    draw_text_centered(DSTR(0x445), 0x14);
-    draw_text_centered(DSTR(0x454), 0x30);
-    draw_text_centered(DSTR(0x461), 0x38);
-    draw_text_centered(DSTR(0x46C), 0x40);
-    draw_text_centered(DSTR(0x47A), 0x48);
-    draw_text_centered(DSTR(0x484), 0x50);
-    draw_text_centered(DSTR(0x491), 0x58);
-    draw_text_centered(DSTR(0x49C), 0x60);
-    draw_text_centered(DSTR(0x4A9), 0x7C);
-    draw_text_centered(DSTR(0x4B7), 0x84);
-    draw_text_centered(DSTR(0x4C0), 0xA0);
-    draw_text_centered(DSTR(0x4CE), 0xA8);
+    gfx_set_text_colours(EGA_CGA(0x0F, 2), 1);
+    draw_text_centered(DSTR(EGA_CGA(0x3EA, 0x3E0)), 0x00);               /* " Created by: " */
+    draw_text_centered(DSTR(EGA_CGA(0x3F8, 0x3EE)), 0x24);               /* " Design and Programming " */
+    draw_text_centered(DSTR(EGA_CGA(0x411, 0x407)), 0x70);               /* " Art: " */
+    draw_text_centered(DSTR(EGA_CGA(0x418, 0x40E)), 0x94);               /* " Sound and Music: " */
+    gfx_set_text_colours(EGA_CGA(0x0F, 3), 0);
+    draw_text_centered(DSTR(EGA_CGA(0x42B, 0x421)), 0x0C);
+    draw_text_centered(DSTR(EGA_CGA(0x445, 0x43B)), 0x14);
+    draw_text_centered(DSTR(EGA_CGA(0x454, 0x44A)), 0x30);
+    draw_text_centered(DSTR(EGA_CGA(0x461, 0x457)), 0x38);
+    draw_text_centered(DSTR(EGA_CGA(0x46C, 0x462)), 0x40);
+    draw_text_centered(DSTR(EGA_CGA(0x47A, 0x470)), 0x48);
+    draw_text_centered(DSTR(EGA_CGA(0x484, 0x47A)), 0x50);
+    draw_text_centered(DSTR(EGA_CGA(0x491, 0x487)), 0x58);
+    draw_text_centered(DSTR(EGA_CGA(0x49C, 0x492)), 0x60);
+    draw_text_centered(DSTR(EGA_CGA(0x4A9, 0x49F)), 0x7C);
+    draw_text_centered(DSTR(EGA_CGA(0x4B7, 0x4AD)), 0x84);
+    draw_text_centered(DSTR(EGA_CGA(0x4C0, 0x4B6)), 0xA0);
+    draw_text_centered(DSTR(EGA_CGA(0x4CE, 0x4C4)), 0xA8);
     set_deadline(1000);
     return menu_key();
 }

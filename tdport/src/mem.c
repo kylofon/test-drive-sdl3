@@ -144,11 +144,18 @@ bool mem_load_exe(const char *path, char *err, size_t errlen)
     }
     mem_image_size = (u32)image_len;
 
-    /* Identify the build: TDEGA.EXE keeps these strings at fixed DGROUP offsets. */
+    /* Identify the build: each executable keeps these strings at fixed DGROUP offsets. */
+#if TD_CGA
+    if (memcmp(mp(DGROUP, 0x08DD), "ROADDATA.SHP", 12) != 0 || memcmp(mp(DGROUP, 0x0063), "xroada.cmp", 10) != 0) {
+        set_err(err, errlen, "%s is not the expected TDCGA.EXE (CGA build of Test Drive 1987)", path);
+        goto done;
+    }
+#else
     if (memcmp(mp(DGROUP, 0x08F5), "ROADDATA.SHP", 12) != 0 || memcmp(mp(DGROUP, 0x00DE), "94857102387604294775", 20) != 0) {
         set_err(err, errlen, "%s is not the expected TDEGA.EXE (EGA build of Test Drive 1987)", path);
         goto done;
     }
+#endif
     ok = true;
 done:
     SDL_free(relocs);

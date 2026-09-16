@@ -24,6 +24,22 @@ game/sim*.c         simulation spec: stage setup 0x4792, driving ISR 0x3B1F and 
 
 Only `host.c` and `main.c` include SDL. Game and platform code talks to the host through `host.h`.
 
+## Build variants (`build.h`)
+
+TDCGA.EXE (the CGA build, also run as `tdcga herc` for Hercules) is the same C game code linked with a
+different graphics layer. The port builds it from the same sources:
+
+* `TD_CGA=1` loads TDCGA.EXE (DGROUP 0x1A8A, screen segment 0xB800) and compiles `platform/gfx_cga.c`
+  instead of `platform/gfx.c`. `TD_HERC=1` additionally selects the Hercules path of TDCGA's `main`
+  and the Hercules picture.
+* `symbols.h` has a TDCGA block. `tools/xmap.py` aligns the two executables and translates
+  `port/symbols.csv` into `port/cga/symbols_cga.csv`, then `tools/gen_symbols.py` regenerates the header.
+  Symbols that TDCGA lacks are left undefined there, so using one in a CGA build fails to compile.
+* In shared code, a value that differs is written `EGA_CGA(ega, cga)`, e.g. a raw DS offset or a colour.
+  A statement that differs goes in `#if TD_CGA`, with a `/* TDCGA 0xADDR */` comment.
+  `port/cga/game_diffs.txt` and `port/cga/call_swaps.txt` (generated) list where the game code differs.
+* Specs: `port/cga/graphics.md` (graphics layer) and `port/cga/game_code.md` (game-code differences).
+
 ## Memory model (`mem.h`)
 
 * The original's data stays **in `mem[]` at its original address**. Every global, table, string, sprite

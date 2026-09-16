@@ -12,10 +12,10 @@ static bool timer_hooked;         /* INT 8 vector == CS:6A1F (checked by 0x694A)
 static void (*driving_isr)(void);
 
 /* DS layout of the song pointers: segment word first, offset word second. */
-#define SND_PTR_SEG       0x642C
-#define SND_PTR_OFF       0x642E
-#define SND_LOOP_SEG      0x6430
-#define SND_LOOP_OFF      0x6432
+#define SND_PTR_SEG       EGA_CGA(0x642C, 0x63EA)
+#define SND_PTR_OFF       EGA_CGA(0x642E, 0x63EC)
+#define SND_LOOP_SEG      EGA_CGA(0x6430, 0x63EE)
+#define SND_LOOP_OFF      EGA_CGA(0x6432, 0x63F0)
 
 static void spk_off(void)                       /* in al,61h ; and al,0FCh ; out 61h,al */
 {

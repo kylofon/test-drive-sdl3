@@ -13,9 +13,12 @@ void host_shutdown(void);
  * The timer/sound module installs the base ISR body; driving mode chains the simulation ISR. */
 void host_set_tick_handler(void (*handler)(void));
 
-/* Source of the displayed image: fills a 320x200 XRGB8888 frame and returns true if it changed
- * since the last call. Installed by the graphics module. */
-void host_set_frame_source(bool (*compose)(u32 *xrgb320x200));
+/* Source of the displayed image: fills a w x h XRGB8888 frame (at most HOST_FRAME_MAX_W x
+ * HOST_FRAME_MAX_H) and returns true if it changed since the last call. The frame is shown with 4:3
+ * aspect. Installed by the graphics module (EGA/CGA 320x200, Hercules 640x300). */
+#define HOST_FRAME_MAX_W 640
+#define HOST_FRAME_MAX_H 300
+void host_set_frame_source(bool (*compose)(u32 *xrgb), int w, int h);
 
 /* Runs due timer ticks, generates speaker audio, handles window events and presents the screen when
  * it changed. Every busy-wait loop of the original (key polls, deadlines, delays) must call this.

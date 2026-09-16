@@ -38,7 +38,7 @@ void scores_load(char *names, s32 *scores, char *cars)
     memset(line1, 0, sizeof line1);
     memset(line2, 0, sizeof line2);
 
-    if (!flow_text_open(&f, DSTR(0x2BE))) {              /* "SCORES", "r" */
+    if (!flow_text_open(&f, DSTR(EGA_CGA(0x2BE, 0x2B4)))) {              /* "SCORES", "r" */
         /* PORT: the original calls fatal("SCORE file open error"); the port starts from the padded
          * default table below (the file is created by scores_save when a score qualifies). */
     } else {
@@ -72,12 +72,12 @@ void scores_enter_name(s32 score, int car, char *names, s32 *scores, char *cars)
     gfx_clear_screen(0);
     snd_play_oneshot(far_rd(DGROUP, DS_g_songHiScore));
     gfx_select_target(gfx_screen_desc());
-    FarPtr ll = load_archive(DSTR(0x2EA), 2000);          /* "llogo.pes" */
+    FarPtr ll = load_archive(DSTR(EGA_CGA(0x2EA, 0x2E0)), EGA_CGA(2000, 1000)); /* "llogo.pes" (.cmp) */
     blit_copy_own(res_find(ll, flow_car_name(car)));      /* 4-char match "coun", "lotu", ... */
     gfx_set_text_colours(3, 0);
-    draw_text_centered(DSTR(0x2F4), 0x96);                /* "You have qualified as one" */
-    draw_text_centered(DSTR(0x30E), 0xA0);                /* "of Test Drive's best drivers." */
-    gfx_draw_text(DSTR(0x32C), 0x14, 0xB4);               /* "Enter your name:" */
+    draw_text_centered(DSTR(EGA_CGA(0x2F4, 0x2EA)), 0x96);                /* "You have qualified as one" */
+    draw_text_centered(DSTR(EGA_CGA(0x30E, 0x304)), 0xA0);                /* "of Test Drive's best drivers." */
+    gfx_draw_text(DSTR(EGA_CGA(0x32C, 0x322)), 0x14, 0xB4);               /* "Enter your name:" */
     draw_rect_outline(0xAC, 0xAF, 0x13C, 0xBE, 0xFF);     /* colour 0xFFFF */
     text_input_line(name, 15, 0xB8, 0xB4, 3000);
     if (name[0] != 0) {
@@ -99,8 +99,8 @@ void scores_enter_name(s32 score, int car, char *names, s32 *scores, char *cars)
 /* 0x162E scores_save — game_flow.md §4 (verified) */
 void scores_save(char *names, s32 *scores, char *cars)
 {
-    FILE *f = flow_fopen_game(DSTR(0x33F), true, "wb");    /* "SCORES", "w" */
-    if (!f) fatal("%s", DSTR(0x362));                     /* "SCORE file save error" */
+    FILE *f = flow_fopen_game(DSTR(EGA_CGA(0x33F, 0x335)), true, "wb");    /* "SCORES", "w" */
+    if (!f) fatal("%s", DSTR(EGA_CGA(0x362, 0x358)));                     /* "SCORE file save error" */
     for (int i = 0; i < 8; i++) {
         char line[80];
         int len = snprintf(line, sizeof line, "%-20.20s%-20.20s%ld\n",
@@ -121,10 +121,10 @@ int scores_show(char *names, s32 *scores, char *cars)
 {
     char buf[80];
     gfx_clear_screen(0);
-    gfx_set_text_colours(0x0C, 0);
-    draw_text_centered(DSTR(0x378), 0);                   /* "TEST DRIVE'S BEST" */
-    gfx_set_text_colours(0x0F, 0);
-    FarPtr sl = load_archive(DSTR(0x38A), 2000);          /* "slogo.pes" */
+    gfx_set_text_colours(EGA_CGA(0x0C, 1), 0);
+    draw_text_centered(DSTR(EGA_CGA(0x378, 0x36E)), 0);                   /* "TEST DRIVE'S BEST" */
+    gfx_set_text_colours(EGA_CGA(0x0F, 3), 0);
+    FarPtr sl = load_archive(DSTR(EGA_CGA(0x38A, 0x380)), EGA_CGA(2000, 1000)); /* "slogo.pes" (.cmp) */
     int i;
     for (i = 0; i < 4; i++) {
         char *car = cars + i * 20;
@@ -140,7 +140,7 @@ int scores_show(char *names, s32 *scores, char *cars)
         gfx_draw_text(buf, 0x5A, (s16)(i * 10 + 0x69));
     }
     if (DSW(DS_demo_mode) != 0) {
-        draw_text_centered(DSTR(0x3B2), 0xBE);            /* CTRL - (J)OYSTICK OR CTRL - (K)EYBOARD */
+        draw_text_centered(DSTR(EGA_CGA(0x3B2, 0x3A8)), 0xBE);            /* CTRL - (J)OYSTICK OR CTRL - (K)EYBOARD */
     } else if ((s32)DSL(DS_g_totalScore) > 0) {
         snprintf(buf, sizeof buf, "Your Score : %ld", (long)(s32)DSL(DS_g_totalScore));
         draw_text_centered(buf, 0xBE);
