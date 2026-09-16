@@ -1,0 +1,177 @@
+kind,address,name,type,notes
+func,0x1DC0,drive_stage,int(void),stage loop and frame composition (game_flow range)
+func,0x1F4E,stage_init_road_ptr,void(void),road_ptr = stage_ptr[stage]+0x2D
+func,0x1F7B,wait_fire_button,void(void),poll 0x5C24 bit 0x10; skipped in demo
+func,0x1F93,reset_car_state,void(void),per-life reset
+func,0x2013,snapshot_sim_state,void(void),copy ISR state to render copies
+func,0x2054,project_road_main,void(void),39-row projection + span arrays
+func,0x23F2,proj_x_main,AX=f(BX X;DX Z),600*X/Z clamp 3200 +480
+func,0x2421,proj_y_main,AX=f(BX X;DX Z;CX Y),perspective y +70
+func,0x2478,project_road_mirror,void(void),24-row mirror projection
+func,0x282C,proj_x_mirror,AX=f(BX X;DX Z),150*X/Z clamp 800 +1120
+func,0x285B,proj_y_mirror,AX=f(BX X;DX Z;CX Y),y sar2 clamp 0..17 +10
+func,0x28C5,draw_road_main,void(void),road fill and deferred object list
+func,0x2DEE,fill_road_scanlines_main,void(void),per-scanline spans
+func,0x2E8B,fill_span_to,ZF=f(AX end;DX bytepos;DI;ES),set bits to end-1
+func,0x2EDC,fill_scenery_above_road,void(void),colour 4/2 split above road
+func,0x2F7A,draw_road_mirror,void(void),mirror objects
+func,0x3306,fill_road_scanlines_mirror,void(void),mirror spans
+func,0x339E,fill_span_to_mirror,ZF=f(AX end;DX;DI;ES),clamps x>=240
+func,0x33FB,draw_mirror_background,void(void),clear + scenery split in mirror
+func,0x349D,draw_buffer_overlays,void(void),mirr mask; tick; status text
+func,0x351A,draw_gear_box,void(void),gear gate via RAM buffer
+func,0x35C6,draw_dashboard_dynamic,void(void),radar; wheel XOR; marker; gauges
+func,0x38CD,draw_digit,(BL digit;DX x),digital gauge digit
+func,0x38EB,dealership_ending,void(void),stage 5 finish screens
+func,0x392C,crash_windscreen_sequence,void(void),windscreen crack lines
+func,0x39EB,sin_deg,AX=f(AX deg),15*sin table DS:22F2
+func,0x3A18,atan_lookup,AX=f(AX ratio256),returns 45..90
+func,0x3A37,interp_edge_span,(AX a;BX b;CL n;DL n;DI dst),span interpolation
+func,0x3AC2,select_screen,void(void),target CS:5A7C
+func,0x3ACE,select_road_buffer,void(void),target road buffer + default clip
+func,0x3AF7,present_road_buffer,void(void),replace-blit buffer to VRAM
+global,DS:0906,road_ptr,u16,car road stream pointer (sim)
+global,DS:0910,car_lateral,s16,lateral position (sim)
+global,DS:090C,car_heading,s16,heading deg*256 (sim)
+global,DS:0912,road_subpos,s16,sub-unit counter (sim)
+global,DS:0914,steer,s16,steering (sim)
+global,DS:0927,speed_w,u16,speed; hi byte mph (sim)
+global,DS:091B,rpm,u16,engine rpm (sim)
+global,DS:0929,drive_state,u8,0 drive 1 quit 2 end of road 3 crash
+global,DS:092A,road_end_ptr,u16,stream ptr where records become 0
+global,DS:092C,proj_cx_main,s16,480 (1/4 px)
+global,DS:092E,proj_horizon_main,s16,70
+global,DS:0930,proj_cx_mirror,s16,1120 (1/4 px)
+global,DS:0932,proj_y_mirror_off,s16,10
+global,DS:0941,traffic_count_left,u8,sim
+global,DS:0942,traffic_count_right,u8,sim
+global,DS:0943,r_traffic_count_l,u8,snapshot
+global,DS:0944,r_traffic_count_r,u8,snapshot
+global,DS:0945,traffic_slots,13x8 bytes,sim slots
+global,DS:09AD,r_traffic_slots,13x8 bytes,snapshot; 0-4 left 5-9 right 11 cop-ahead 12 hazard
+global,DS:0A05,r_slot11_pos,u16,radar source position
+global,DS:0A0D,r_hazard_slot,8 bytes,+0 pos +6 type/lane
+global,DS:0A23,cop_state,u8,sim
+global,DS:0A24,r_cop_state,u8,snapshot
+global,DS:0A27,ticket_flag,u8,sim
+global,DS:0A29,cop_lane,s16,sim
+global,DS:0A2B,cop_sub,s16,sim
+global,DS:0A2D,cop_pos,u16,sim
+global,DS:0A30,r_cop_pos,u16,snapshot
+global,DS:0A32,r_cop_lane,s16,snapshot
+global,DS:0A34,r_cop_sub,s16,snapshot
+global,DS:0A7D,knob_x,s16,gear knob x
+global,DS:0A7F,knob_y,s16,gear knob y
+global,DS:08BE,gearbox_visible,u8,shift gate shown
+global,DS:08BF,gearbox_prev,u8,last value
+global,DS:091F,gearbox_hide_delay,u8,frames
+global,DS:0922,redraw_gearbox,u8,flag
+global,DS:0923,redraw_instruments,u8,flag
+global,DS:08C0,marker_save_sprite,sprite hdr,16x4 save-under
+global,DS:08F0,marker_save_x,s16,
+global,DS:08F2,marker_save_y,s16,
+global,DS:0890,road_buf_desc,far ptr,target descriptor of road buffer
+global,DS:0894,road_buf_sprite,far ptr,sprite header of road buffer
+global,DS:0898,road_buf_rowtab,u16,CS offset of row table
+global,DS:089A,inst_buf_desc,far ptr,instrument buffer
+global,DS:089E,inst_buf_sprite,far ptr,
+global,DS:08A2,inst_x,u16,
+global,DS:08A4,inst_y,u16,
+global,DS:08A6,inst_h,u16,
+global,DS:08A8,inst_wbytes,u16,
+global,DS:08AA,speedo_pivot,2xu16,buffer coords
+global,DS:08AE,tach_pivot,2xu16,buffer coords
+global,DS:08B2,gbox_buf_desc,far ptr,
+global,DS:08B6,gbox_buf_sprite,far ptr,
+global,DS:08BA,gbox_x,u16,
+global,DS:08BC,gbox_y,u16,
+global,DS:0F9F,xroada_handles,117 far ptrs,sprite table
+global,DS:1173,xroadb_handles,50 far ptrs,front views
+global,DS:123B,xroadc_handles,82 far ptrs,rear views and cop
+global,DS:1383,car_handles,25 far ptrs,cockpit sprites
+global,DS:13E7,digit_handles,15 far ptrs,digital gauges
+global,DS:1433,dash_phase,u8,+1 per road unit (sim)
+global,DS:1434,dash_counter,u8,per-row counter
+global,DS:1437,crest_sy,u8,clip bottom / highest scanline
+global,DS:1439,cached_top_sy,u8,
+global,DS:143B,cached_top_row,u16,
+global,DS:143D,obj_scale,u16,min(W>>4;31)
+global,DS:143F,xclip_px,u16,
+global,DS:1441,xclip_bytes,u16,
+global,DS:1443,cached_top_row_mirror,u16,
+global,DS:1445,wheel_state,u8,0 right 1 centre 2 left
+global,DS:1446,marker_saved,u8,
+global,DS:1447,cop_row_smooth,u16,
+global,DS:1449,mask_left_from_bit,u8[8],
+global,DS:1451,mask_right_to_bit,u8[8],
+global,DS:1459,mask_single_pixel,u8[8],
+global,DS:1463,span_bit,u16,
+global,DS:1465,span_ol,s16[111],per scanline
+global,DS:1543,span_l,s16[111],
+global,DS:1621,span_r,s16[111],
+global,DS:16FF,span_or,s16[111],
+global,DS:17DD,span_ol_mirror,s16[18],
+global,DS:1801,span_l_mirror,s16[18],
+global,DS:1825,span_r_mirror,s16[18],
+global,DS:1849,span_or_mirror,s16[18],
+global,DS:186D,walk_ptr,u16,
+global,DS:186F,r_road_ptr,u16,snapshot
+global,DS:1871,r_subpos,s16,snapshot
+global,DS:1873,heading_acc,s16,
+global,DS:1875,slope_acc,s16,
+global,DS:1877,row_X,s16[40],X[i] at +2i
+global,DS:18C7,row_Y,s16[40],Y[i] at +2i
+global,DS:1917,row_X_mirror,s16[25],
+global,DS:1967,row_Y_mirror,s16[25],
+global,DS:19B7,cut_x,s16,
+global,DS:19B9,cut_sy,u16,
+global,DS:19BB,cut_row,u16,
+global,DS:19BD,cut_row_mirror,u16,
+global,DS:19BF,cut_top_sy,u8,unused
+global,DS:19C1,cut_top_sy_mirror,u8,unused
+global,DS:19C3,min_ol,s16,
+global,DS:19C5,min_ol_sy,u8,doubled by 0x2DEE
+global,DS:19C7,first_changed_row,u16,
+global,DS:19C9,prev_row_limit,u16,
+global,DS:19CB,row_limit_main,u16,
+global,DS:19CD,top_sy,u8,
+global,DS:19CF,top_row,u16,
+global,DS:19D1,span_clamp_min,s16,
+global,DS:19D3,span_clamp_max,s16,
+global,DS:19D5,cut_x_mirror,s16,
+global,DS:19D7,cut_sy_mirror,u16,
+global,DS:19D9,min_ol_mirror,s16,
+global,DS:19DB,min_ol_sy_mirror,u8,
+global,DS:19DD,row_limit_mirror,u16,
+global,DS:19DF,top_sy_mirror,u8,
+global,DS:19E1,top_row_mirror,u16,
+global,DS:19E3,row_ol,s16[40],outer left px
+global,DS:1A33,row_l,s16[40],left edge px
+global,DS:1A83,row_r,s16[40],right edge px
+global,DS:1AD3,row_or,s16[40],outer right px
+global,DS:1B23,row_cx,s16[40],centre px
+global,DS:1B73,row_sy,u8 at even offsets,scanline
+global,DS:1D03,row_obj,u8 at even offsets,record object byte
+global,DS:1D53,row_ol_mirror,s16[25],
+global,DS:1D8F,row_l_mirror,s16[25],
+global,DS:1DCB,row_r_mirror,s16[25],
+global,DS:1E07,row_or_mirror,s16[25],
+global,DS:1E43,row_cx_mirror,s16[25],
+global,DS:1E7F,row_sy_mirror,u8 at even offsets,
+global,DS:1FAB,row_obj_mirror,u8 at even offsets,
+global,DS:1435,mirror_rows_done,u16,unused
+global,DS:203B,cur_curve,u8,temp
+global,DS:203E,roadside_pattern,u16[16],type/count
+global,DS:21A5,road_halfwidth_q4,u16[40],W[i]
+global,DS:21F5,traffic_scale_main,u8[40],
+global,DS:221E,traffic_scale_mirror,u8[25],
+global,DS:2247,row_depth_Z,u16[40],Z[i]
+global,DS:22F2,sine_x15,u16[91],
+global,DS:23A8,wheel_sin90,u8[60],
+global,DS:23E4,wheel_cos90,u8[61],
+global,DS:2420,persp_T,u16[91],
+global,DS:24D6,tan256,u16[46],
+global,DS:2532,crack_counts,u8[7],
+global,DS:2539,crack_ptrs,u16[7],
+global,DS:80A4,tick_count,u16,timer ISR counter
+global,DS:1423,int0_handler,code,in DGROUP: AX=FFFF; skip div

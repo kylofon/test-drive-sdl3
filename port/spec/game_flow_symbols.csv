@@ -1,0 +1,143 @@
+kind,address,name,type,notes
+func,0x0010,main,int main(int argc char **argv),verified; state machine intro/scores/menu/carselect/game/dos prompt
+func,0x0243,load_cars_txt,void(void),verified; CARS.TXT up to 10 lines into DS:7F64
+func,0x02BF,play_again_menu,int(void),verified; 0 same car 1 new car -1 Esc
+func,0x037A,run_intro,int(void),verified; ACCOLADE.PES then TESTDRV.PES
+func,0x03F4,intro_accolade,int(void),verified; acc/pres/copy wipe + bull bar
+func,0x051B,intro_testdrive_car,int(void),verified; window anim then car drives off
+func,0x0792,intro_testdrive_logo,int(void),verified; tdrv bounce + fob/tmar + controls hint
+func,0x098C,car_select,int(void),verified; 0 Enter 1 Esc -1 timeout
+func,0x0AB2,show_car,void(int idx int dir),verified flow; slide primitive 0x91CF guess
+func,0x0D75,showroom_drive_away,void(int idx),verified; parses <car>.SS
+func,0x1000,read_line_strip,void(char *buf int n FILE *f),verified; fgets + drop last char
+func,0x1030,run_game,int(void),verified; 0 -> scores 1 -> intro
+func,0x125D,stage_score,long(void),verified; factor*1e6/max(100 (t-par)*12)+bonus
+func,0x12DB,high_scores,int(long newScore),verified
+func,0x1369,scores_load,void(char *names long *scores char *cars),verified; CRC-8 seed = valid row count
+func,0x1482,scores_enter_name,void(long score int car char *names long *scores char *cars),verified
+func,0x162E,scores_save,void(char *names long *scores char *cars),verified
+func,0x16D7,scores_show,int(char *names long *scores char *cars),verified
+func,0x186E,credits_show,int(void),verified
+func,0x1993,stage_results,void(long score),verified; gas station screen
+func,0x1B36,results_text,void(long score),verified; speed tiers 50/65/95/105
+func,0x1CFA,results_add_line,void(const char *s),verified
+func,0x1D20,results_scroll,void(void),verified
+func,0x1DC0,run_stage,int(void),verified; asm; -1 quit/demo end 0 game over 1 stage done
+func,0x1F4E,stage_init,void(void),verified
+func,0x1F7B,wait_any_input,void(void),likely
+func,0x1F93,car_state_reset,void(void),see scene_render; provisional name
+func,0x38EB,ending_dealership,void(void),see scene_render; deal + glove box note
+func,0x392C,crash_sequence,void(void),see scene_render; provisional name
+func,0x4792,stage_setup,void(void),see simulation; sprites + int0/int8 hooks; provisional name
+func,0x4941,fill_rect,void(int x int y int w int h int color),see platform; likely
+func,0x4B98,clear_screen,void(int color),see platform; verified
+func,0x4BD0,draw_text,void(char *s int x int y),see platform; verified; falls into 0x4BE7
+func,0x4BE7,draw_text_at_pen,void(char *s),see platform; verified; 8x8 font renderer
+func,0x4D84,set_palette,void(int dsOffset),see platform; verified; int10 AX=1002h
+func,0x4D96,video_init,void(void),see platform; likely
+func,0x50A1,set_clip,void(desc far* int x0b int x1b int y0 int y1),see platform; verified
+func,0x50FE,restore_text_mode,void(void),see platform; likely
+func,0x5128,set_target,void(desc far*),see platform; verified
+func,0x5150,alloc_page,far*(int wBytes int h int planes),see platform; likely
+func,0x5C24,read_joy_key,uint(void),see platform; likely
+func,0x5D84,draw_sprite_at_hot,void(spr far* int x int y),see platform; likely
+func,0x5DB6,draw_sprite_at,void(spr far* int x int y),see platform; likely
+func,0x5DE2,draw_sprite_5DE2,void(spr far*),see platform; guess
+func,0x6762,find_res,far*(archive far* char *name4),see platform; verified
+func,0x67DD,wait_key,int(void),see platform; verified
+func,0x6939,kbd_flush,void(void),see platform; verified
+func,0x694A,timer_stop,void(void),see platform; likely
+func,0x699E,timer_start,void(void),see platform; verified; PIT 0x2E97
+func,0x6C3B,delay,void(uint ticks),see platform; verified
+func,0x6C85,text_color,void(int fg int bg),see platform; verified
+func,0x6CBE,draw_sprite_at_hot2,void(spr far* int x int y),see platform; likely
+func,0x6D1C,draw_sprite,void(spr far*),see platform; likely
+func,0x74F4,fill_clip,void(int color),see platform; verified
+func,0x768B,wipe_step,void(page far* int step),see platform; guess on pattern
+func,0x7881,frame_wait,void(void),see platform; verified
+func,0x7894,frame_start,void(uint ticks),see platform; verified
+func,0x78A5,load_sound_bank,far*(char *name uint size),see platform; likely
+func,0x79FF,free_page,void(far*),see platform; likely
+func,0x7A5F,draw_or,void(spr far*),see platform; likely
+func,0x7C63,draw_and_mask,void(spr far*),see platform; likely
+func,0x89F0,song_stop,void(void),see platform; likely
+func,0x8A08,sound_stop_all,void(void),see platform; likely
+func,0x8A5B,load_archive,far*(char *file uint sizeHint),see platform; likely
+func,0x8AFD,input_select,void(int mode),see platform; verified
+func,0x8CC0,dos_mem_init,void(void),see platform; likely
+func,0x8CEC,herc_init,void(void),see platform; likely; unreachable in TDEGA
+func,0x8D3C,herc_shutdown,void(void),see platform; likely
+func,0x8D8C,crc8,uint8(char *p int len uint8 seed),verified; reflected poly 0xB8
+func,0x8DC7,copyprot_check,int(void),see platform; drop
+func,0x91CF,scroll_rect,void(...),see platform; guess
+func,0x92A8,text_input,void(char *buf int len int x int y uint timeout),see platform; verified
+func,0x9507,draw_text_centered,void(char *s int y),see platform; verified; x=160-4*len
+func,0x9530,draw_box,void(int x0 int y0 int x1 int y1 int color),see platform; verified
+func,0x95B0,wait_input_deadline,int(void),see platform; verified; 0->-1 Esc->1
+func,0x95D9,toupper,int(char),verified
+func,0xC954,long_sar_cl,long(long dxax uint8 cl),verified
+func,0xC95F,ldiv_assign,void(long *p long d),verified; calls 0xC87A
+global,DS:0084,g_attract,int16,1 = attract/demo mode
+global,DS:0086,g_carAutoSelected,int16,car chosen by timeout; forces car select
+global,DS:0088,g_numCars,int16,lines read from CARS.TXT
+global,DS:008A,g_hercules,int16,herc argv flag
+global,DS:00CC,PALETTE_EGA,uint8[17],int10 AX=1002h table
+global,DS:00DE,LAUNCH_PASSWORD,char[21],"94857102387604294775"
+global,DS:0118,g_introArchive,far ptr,ACCOLADE then TESTDRV archive
+global,DS:029E,STAGE_SCORE_FACTOR,int16[5],{4 5 6 7 8}
+global,DS:02A8,STAGE_PAR_TIME,int16[5],{98 134 131 123 153}
+global,DS:02B2,STAGE_CONST_B,int16[5],{250 233 291 333 375}; unused copy
+global,DS:077A,MSG_TABLES,near char*[33],results message tables 077A..07BA
+global,DS:07BC,GAS_SIGN_NAMES,near char*[4],don john kevn tony
+global,DS:0B05,SONG_INGAME,bytecode,in-stage song
+global,DS:0906,g_roadPos,int16,road stream position (shared with simulation)
+global,DS:0927,g_carSpeedFixed,int16,hi byte mph; 0 required for stage end; see simulation
+global,DS:0929,g_stageEvent,uint8,0 drive 1 quit 2 stage end 3+ crash; see simulation
+global,DS:0934,g_savedInt0,far ptr,old int 0 vector
+global,DS:102F,spr_govr,far ptr,GAME OVER sprite
+global,DS:1033,spr_gvrm,far ptr,GAME OVER mask
+global,DS:1037,spr_deal,far ptr,dealership sign
+global,DS:103B,spr_note,far ptr,glove box note
+global,DS:103F,spr_tick,far ptr,speeding ticket
+global,DS:1383,spr_dash,far ptr,cockpit dash
+global,DS:13BB,spr_mirr,far ptr,cockpit mirror
+global,DS:13DB,spr_roof,far ptr,cockpit roof
+global,DS:642A,g_timerTicks,uint16,100.04 Hz tick counter
+global,DS:650C,g_frameStart,uint16,frame_start base tick
+global,DS:650E,g_frameLen,uint16,frame_start length
+global,DS:690E,g_textFg,uint16,text foreground
+global,DS:6910,g_textBg,uint16,text background
+global,DS:6912,g_textLeft,int16,x after CR/LF
+global,DS:6914,g_penX,int16,text pen x
+global,DS:6916,g_penY,int16,text pen y
+global,DS:691A,g_glyphH,int16,8
+global,DS:691C,g_glyphTable,far ptr,0C9A:6E2C; glyphs DS:6B44+(c-0x20)*8
+global,DS:6920,g_advanceX,int16,8
+global,DS:6922,g_lineH,int16,8
+global,DS:6924,g_textEnable,int16,1
+global,DS:78E2,g_showroomCarSpr,far ptr,'car ' from <car>SB.PES
+global,DS:78E6,g_lives,int16,5 at start; -1 crash; +2 gas station
+global,DS:78E8,g_songIntro,far ptr,sng2
+global,DS:78EC,g_avgSpeed,int16,distance units then average speed
+global,DS:78EE,g_carSBArchive,far ptr,<car>SB.PES
+global,DS:78F2,g_carNames,near char*[10],car base names
+global,DS:7906,g_songCarSel,far ptr,sng4
+global,DS:790A,g_selectedCar,int16,-1 none
+global,DS:790C,g_resultLineCount,int16,results lines
+global,DS:7B12,g_scrollDelay,int16,results scroll ticks per pixel
+global,DS:7B16,g_stage,int16,0..4
+global,DS:7B1C,g_xroadA,far ptr,xroada.pes
+global,DS:7B20,g_xroadB,far ptr,xroadb.pes
+global,DS:7B26,g_xroadC,far ptr,xroadc.pes
+global,DS:7B2A,g_songHiScore,far ptr,sng3
+global,DS:7B32,g_carArchive,far ptr,<car>.pes
+global,DS:7F1A,g_offscreenPage,far ptr,320x200 page handle
+global,DS:7F40,g_stageConstB,int16,copy of DS:02B2[stage]; no reader
+global,DS:7F44,g_tooSlow,int16,avg speed < 50 ends run
+global,DS:7F46,g_sbArchiveName,char[30],"<car>sb.pes"
+global,DS:7F64,g_carNameBuf,char[],CARS.TXT text
+global,DS:8090,g_songGas,far ptr,sng1
+global,DS:8094,g_parTime,int16,par for current stage
+global,DS:8098,g_totalScore,int32,accumulated score
+global,DS:80A4,g_stageTime,int16,+1 per 8 sim ticks; +240 per crash; /12 after stage
+global,DS:80A6,g_resultTextY,int16,results page y

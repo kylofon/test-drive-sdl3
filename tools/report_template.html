@@ -1,0 +1,447 @@
+<title>Test Drive, Unpacked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  --ground: #EEF1F5;
+  --panel: #FFFFFF;
+  --ink: #18213A;
+  --ink-soft: #4A5570;
+  --rule: #C9D0DC;
+  --accent: #AA5500;
+  --accent-ink: #8A4400;
+  --blue: #2B3FB0;
+  --sheet-bg: #282C34;
+  --s-counta: #AA00AA;
+  --s-lotus: #2B3FB0;
+  --s-p911t: #AA5500;
+  --s-rossa: #C62828;
+  --s-vette: #00897B;
+  --curve-r: #AA5500;
+  --curve-l: #2B3FB0;
+  --verified: #2E7D32;
+  --inferred: #B26A00;
+  --display: "Chakra Petch", "Bahnschrift", "Segoe UI", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0C1222; --panel: #141C31; --ink: #E4E8F1; --ink-soft: #A3ADC4; --rule: #2A3450;
+    --accent: #E08A3C; --accent-ink: #F0A45C; --blue: #7F8CFF; --sheet-bg: #1A1F2B;
+    --s-counta: #FF55FF; --s-lotus: #7F8CFF; --s-p911t: #E08A3C; --s-rossa: #FF6B6B; --s-vette: #4DD0C0;
+    --curve-r: #E08A3C; --curve-l: #7F8CFF; --verified: #7BD88F; --inferred: #F2B75B;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0C1222; --panel: #141C31; --ink: #E4E8F1; --ink-soft: #A3ADC4; --rule: #2A3450;
+  --accent: #E08A3C; --accent-ink: #F0A45C; --blue: #7F8CFF; --sheet-bg: #1A1F2B;
+  --s-counta: #FF55FF; --s-lotus: #7F8CFF; --s-p911t: #E08A3C; --s-rossa: #FF6B6B; --s-vette: #4DD0C0;
+  --curve-r: #E08A3C; --curve-l: #7F8CFF; --verified: #7BD88F; --inferred: #F2B75B;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink); font: 16px/1.65 var(--body);
+  padding-inline: 20px; padding-block: 48px 96px; margin: 0;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 72px; }
+.col { max-width: 44rem; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.9rem; font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 500; }
+p { margin: 0; }
+.stack { display: grid; gap: 16px; }
+.eyebrow { font: 500 0.78rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); }
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+code { background: color-mix(in srgb, var(--rule) 45%, transparent); padding: 0.08em 0.35em; border-radius: 3px; }
+a { color: var(--blue); }
+.lede { font-size: 1.15rem; color: var(--ink-soft); }
+
+header.top { display: grid; gap: 20px; border-bottom: 3px solid var(--ink); padding-bottom: 32px; }
+.byline { display: flex; flex-wrap: wrap; gap: 8px 24px; font: 0.85rem var(--mono); color: var(--ink-soft); }
+
+.answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.answers > div { padding: 24px 24px 24px 0; display: grid; gap: 10px; align-content: start; }
+.answers > div + div { padding-left: 24px; border-left: 1px solid var(--rule); }
+.answers .q { font: 500 0.78rem/1.3 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+.answers .a { font: 700 1.35rem/1.25 var(--display); }
+@media (max-width: 640px) {
+  .answers > div, .answers > div + div { padding: 20px 0; border-left: 0; }
+  .answers > div + div { border-top: 1px solid var(--rule); }
+}
+
+section { display: grid; gap: 28px; }
+.sec-head { display: grid; gap: 10px; }
+
+/* Container pipeline */
+.pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.stage { background: var(--panel); border: 1px solid var(--rule); padding: 16px; display: grid; gap: 6px; align-content: start; }
+.stage .lbl { font: 500 0.72rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-ink); }
+.stage h3 { font-size: 1.05rem; }
+.stage p { font-size: 0.9rem; color: var(--ink-soft); }
+.stage .hex { font: 0.8rem/1.5 var(--mono); color: var(--ink); overflow-wrap: anywhere; }
+
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 0.72rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); background: color-mix(in srgb, var(--rule) 25%, var(--panel)); }
+tr:last-child td { border-bottom: 0; }
+td.num { text-align: right; font-family: var(--mono); }
+td.mono { font-family: var(--mono); white-space: nowrap; }
+
+.conf { display: inline-block; font: 500 0.7rem/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 6px; border: 1px solid currentColor; border-radius: 2px; white-space: nowrap; }
+.conf.v { color: var(--verified); }
+.conf.i { color: var(--inferred); }
+
+figure { margin: 0; display: grid; gap: 10px; }
+figure .frame { background: var(--sheet-bg); overflow-x: auto; }
+figure img { display: block; image-rendering: pixelated; max-width: 100%; height: auto; }
+figcaption { font-size: 0.88rem; color: var(--ink-soft); max-width: 48rem; }
+figcaption b { color: var(--ink); font-family: var(--mono); font-weight: 500; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+.chart-card { background: var(--panel); border: 1px solid var(--rule); padding: 20px; display: grid; gap: 14px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.85rem; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 14px; height: 3px; display: inline-block; }
+.legend i.tri { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid var(--accent); background: none; }
+svg text { font-family: var(--mono); }
+
+.plan { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.plan > div { display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 8px 28px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+.plan .dos { font: 500 0.9rem var(--mono); color: var(--accent-ink); }
+.plan p { font-size: 0.95rem; }
+@media (max-width: 640px) { .plan > div { grid-template-columns: 1fr; } }
+
+.risks { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+.tools { font-size: 0.92rem; }
+footer { border-top: 3px solid var(--ink); padding-top: 20px; font-size: 0.85rem; color: var(--ink-soft); }
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <span class="eyebrow">Game archaeology · DOS · 1987</span>
+  <h1>Test Drive, Unpacked</h1>
+  <p class="lede col">Distinctive Software's Test Drive (Accolade, 1987): how the EGA release is put together, which assets and data tables come out of it cleanly, and what an SDL3 port would take. Every claim below is checked against the unpacked executable or against byte-exact, CRC-checked decoding of the shipped files. Anything that is only inferred is labelled as such.</p>
+  <div class="byline">
+    <span>TDEGA.EXE · 65 584 B packed / 81 424 B unpacked</span>
+    <span>18 PES + 17 CMP archives</span>
+    <span>1 093 sprites extracted</span>
+  </div>
+</header>
+
+<div class="answers">
+  <div>
+    <span class="q">How is it built?</span>
+    <span class="a">Microsoft C plus hand-written EGA assembly, EXEPACK-compressed</span>
+    <p>A small launcher (<code>TD.EXE</code>) runs either <code>TDCGA.EXE</code> or <code>TDEGA.EXE</code>. The game itself is about 52 KB of code in roughly 170 C functions, with planar blitters written in assembly.</p>
+  </div>
+  <div>
+    <span class="q">What can be extracted?</span>
+    <span class="a">All art, all five stages of road data, car physics, music and scores</span>
+    <p>The graphics archives use ARC compression. The road layout and sign placement are byte tables in the data segment. Gearboxes, torque curves and gauge geometry sit in each <code>.BIN</code> file.</p>
+  </div>
+  <div>
+    <span class="q">Is an SDL3 port feasible?</span>
+    <span class="a">Yes. The hardware footprint is small and well understood</span>
+    <p>It uses one video mode, a timer hook, the PC speaker, BIOS keyboard and joystick, and DOS file I/O. Everything else is plain game logic that can be translated function by function.</p>
+  </div>
+</div>
+
+<section>
+  <div class="sec-head col">
+    <span class="eyebrow">Containers</span>
+    <h2>From file on disk to sprite</h2>
+    <p>The EGA files reuse ARC's compression methods unchanged: "crunched" (RLE90 + 12-bit LZW, method 8) and, for the title archive only, "squeezed" (static Huffman, method 4). The CGA files use a simpler escape-byte RLE. Both decode to the same resource archive.</p>
+  </div>
+  <div class="pipeline">
+    <div class="stage">
+      <span class="lbl">EGA · .PES</span>
+      <h3>"Pckd" header</h3>
+      <p>Packed and unpacked sizes, the ARC method number (8 or 4) and an ARC CRC-16.</p>
+      <span class="hex">50 63 6B 64 · 44 07 00 00 · 6E 10 00 00 · 08 00 · 37 16</span>
+    </div>
+    <div class="stage">
+      <span class="lbl">Decompress</span>
+      <h3>LZW → RLE90</h3>
+      <p>A Unix <code>compress</code> 4.0 decoder at image 0x9E40 feeds an RLE90 expander at 0x9CF9 (<code>90 nn</code> repeats the previous byte).</p>
+    </div>
+    <div class="stage">
+      <span class="lbl">CGA · .CMP</span>
+      <h3>Escape RLE</h3>
+      <p>A raw u32 size, then <code>83 vv nn</code> writes byte <code>vv</code> <code>nn</code> times.</p>
+      <span class="hex">83 AA 06 → AA AA AA AA AA AA</span>
+    </div>
+    <div class="stage">
+      <span class="lbl">Archive</span>
+      <h3>Named resources</h3>
+      <p>u32 total size, u16 count, 4-character names, u32 offsets.</p>
+      <span class="hex">dash dot dota gbo0 gbox …</span>
+    </div>
+    <div class="stage">
+      <span class="lbl">Sprite</span>
+      <h3>16-byte header + planes</h3>
+      <p>Width (in bytes), height, hotspot, x, y and a plane map. The low nibble of each plane-map byte says which colour planes that stored plane is written to; the high nibble of the first byte clears planes and of the second sets them. Masks are separate sprites, AND-blitted before the image.</p>
+    </div>
+  </div>
+  <p class="col">Result: all 18 <code>.PES</code> files decode to exactly their stated size and pass their CRC-16. All 17 <code>.CMP</code> files match their size field. Every resource in every archive parses as a sprite.</p>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <span class="eyebrow">Extracted art</span>
+    <h2>The garage, the road and the traffic</h2>
+    <p>Contact sheets straight from the decoder, shown at 2× with the 1:1.2 pixel aspect of a 200-line display. Colours use the game's own remapped palette (DS:00CC), which <code>main</code> loads through <code>int 10h AX=1002h</code> right after switching to mode 0Dh; index 6 is light grey, 10 is brown and 14 is light blue rather than the stock order.</p>
+  </div>
+
+  <figure>
+    <div class="frame"><img src="img/testdrv.png" alt="Contact sheet of TESTDRV.PES: title logo, Accolade key fob, side-view car, wheel frames and passenger window animation" width="1392" height="549"></div>
+    <figcaption><b>TESTDRV.PES</b>: the only squeezed (Huffman) archive. Title logo, key fob, the intro car with wheel frames, and 19 frames of the passenger-window driver animation.</figcaption>
+  </figure>
+
+  <div class="duo">
+    <figure>
+      <div class="frame"><img src="img/lotus_ega.png" alt="Lotus Esprit cockpit sprites, EGA 16 colours" width="1248" height="624"></div>
+      <figcaption><b>LOTUS.PES</b>: the cockpit, cut into dashboard, instrument cluster, roof, steering-wheel frames, gear gate, mirror and radar-detector lights.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame"><img src="img/lotus_cga.png" alt="Lotus Esprit cockpit sprites, CGA 4 colours" width="1392" height="528"></div>
+      <figcaption><b>LOTUS.CMP</b>: the same resources redrawn for CGA palette 1. The pixel data is packed at 2 bits per pixel in rows.</figcaption>
+    </figure>
+  </div>
+
+  <figure>
+    <div class="frame"><img src="img/countasb.png" alt="Lamborghini Countach showroom sprites with specification sheet" width="1304" height="808"></div>
+    <figcaption><b>COUNTASB.PES</b>: the showroom. The spec sheet, including its acceleration graph, is a single bitmap; nothing is typeset at runtime.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="frame"><img src="img/xroada.png" alt="Road-side object sprites: dealership, game over, signs, poles, rocks, hazards, speeding ticket" width="1400" height="1010"></div>
+    <figcaption><b>XROADA.PES</b>: the road itself. Cliff edges, lane lines, poles, rocks, and speed, turn, two-way and gas signs at five distance scales. Also oil slicks, potholes, gravel, the speeding ticket, GAME OVER, THE END MOTORS and the glove-box note.</figcaption>
+  </figure>
+
+  <div class="duo">
+    <figure>
+      <div class="frame"><img src="img/xroadb.png" alt="Traffic vehicle sprites at five scales with masks" width="1360" height="756"></div>
+      <figcaption><b>XROADB.PES</b>: traffic at five scales. Each vehicle comes with a separate mask sprite (<code>rig0</code> / <code>rg0m</code>). XROADC holds the rest.</figcaption>
+    </figure>
+    <figure>
+      <div class="frame"><img src="img/gas.png" alt="Gas station screen and four station name signs" width="1184" height="556"></div>
+      <figcaption><b>GAS.PES</b>: the stop between stages, with signs for four stations named after the team: Don's Gas-O-Rama, JB's Pitstop, Kevin's, and Mr. Tony's Fuel King.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <span class="eyebrow">Road data</span>
+    <h2>Five stages, one byte per road unit</h2>
+    <p>There is no road file on disk; the string <code>ROADDATA.SHP</code> is left over and never referenced. The road is a byte stream inside the data segment (DS:2D28–6360). Each byte indexes a 4-byte record <code>[flag, curve, pitch, object]</code> in a 110-entry table at DS:2B70. The renderer reads 40 units ahead, bending each row by the curve value, and spawns signs, traffic, police and hazards from the object codes.</p>
+  </div>
+
+  <div class="chart-card">
+    <h3>Stage strips</h3>
+    <div class="legend" id="strip-legend">
+      <span><i style="background:var(--curve-r)"></i>Right curve</span>
+      <span><i style="background:var(--curve-l)"></i>Left curve</span>
+      <span><i style="background:var(--ink)"></i>Sign</span>
+      <span><i class="tri"></i>Hazard</span>
+      <span><i style="background:var(--s-rossa);height:8px;width:8px;border-radius:50%"></i>Police</span>
+    </div>
+    <div style="overflow-x:auto"><svg id="strips" viewBox="0 0 1000 400" role="img" aria-label="Stage strips of curves, signs, hazards and police for all five stages" style="width:100%;min-width:640px;height:auto"></svg></div>
+    <p style="font-size:.85rem;color:var(--ink-soft)">Curve colour strength follows the total turn in each run. Stages end at a gas station, and the last one at THE END MOTORS.</p>
+  </div>
+
+  <figure>
+    <div class="frame" style="background:#FAF7F0"><img src="img/route.png" alt="Schematic top-down route map integrated from curve values" width="1600" height="1600" style="image-rendering:auto;max-height:900px;width:auto;margin:0 auto"></div>
+    <figcaption><b>Route map, schematic</b>. The curve values are integrated at ¼° per unit and the stages are joined end to end. The game only ever turns the road within a 40-row window around the car, so the whole route was never designed to close up: stage 3 nets +1022° of turning and draws loops. Read this as a chart of rhythm and sequence, not geography.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <span class="eyebrow">Car files</span>
+    <h2>Five cars, 1 238 bytes each</h2>
+    <p>Each <code>.BIN</code> is read raw into DS:268F. It holds the gear ratios, a shift-gate graph that joystick movements walk through, an 80-point torque curve (one entry per 128 rpm), and pixel lists for the speedometer and tachometer needle tips. Drag, braking and idle rpm are constants in the executable, not in the car files.</p>
+  </div>
+
+  <div class="chart-card">
+    <h3>Torque curves from the car files</h3>
+    <div class="legend" id="tq-legend"></div>
+    <svg id="torque" viewBox="0 0 760 320" role="img" aria-label="Torque value against rpm for the five cars" style="width:100%;height:auto"></svg>
+    <p style="font-size:.85rem;color:var(--ink-soft)">The y axis shows raw table values (the game's own units). The marker on each line is that car's rev limit.</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table id="cars">
+      <thead><tr><th>Car</th><th>Gears</th><th>Rev limit</th><th>Grip limit</th><th>Peak torque</th><th>Gauges</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Offset</th><th>Field</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">+000</td><td>Number of gears</td><td><span class="conf v">verified</span></td></tr>
+        <tr><td class="mono">+004 / +008</td><td>Rev limit (going over damages the engine) · grip limit (going over starts a skid and tyre squeal)</td><td><span class="conf v">verified</span></td></tr>
+        <tr><td class="mono">+012</td><td>7 gear ratios; rpm = ratio × speed ÷ 65536</td><td><span class="conf v">verified</span></td></tr>
+        <tr><td class="mono">+03C / +07C / +10C</td><td>Shift-gate nodes, a joystick-direction × node transition table, and node → gear</td><td><span class="conf v">verified</span></td></tr>
+        <tr><td class="mono">+11C</td><td>Torque curve, 80 bytes, one entry per 128 rpm</td><td><span class="conf v">verified</span></td></tr>
+        <tr><td class="mono">+16C … +328</td><td>Gauge type, needle pivots, speedometer and tachometer needle-tip tables</td><td><span class="conf v">verified</span></td></tr>
+        <tr><td class="mono">+00C</td><td>Steering-wheel sprite position</td><td><span class="conf i">inferred</span></td></tr>
+        <tr><td class="mono">+002 +006 +010</td><td>Not read anywhere in TDEGA; possibly used by TD.EXE or the CGA build</td><td><span class="conf i">unknown</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <span class="eyebrow">Sound &amp; scores</span>
+    <h2>A 100 Hz speaker sequencer and a checksummed hall of fame</h2>
+  </div>
+  <div class="duo">
+    <div class="stack">
+      <h3><code>TDSND.SND</code></h3>
+      <p>Four songs stored as bytecode in the usual resource archive. Each event is a note number (55 ≈ A440) followed by a u16 duration in ticks. <code>FE</code> sets how early notes cut off, <code>FD–FB</code>/<code>FA–F8</code> open and close three levels of loops, and <code>FF</code> ends the song or chains to the next. The player runs from the timer interrupt and plays through the PC speaker using a divisor table at DS:6452. <code>tools/sndplay.py</code> renders the songs to square-wave WAVs, which have not been listened to yet.</p>
+    </div>
+    <div class="stack">
+      <h3><code>SCORES</code></h3>
+      <p>Eight entries, each written with <code>%-20.20s%-20.20s%ld</code>. The line after each is a CRC-8 checksum (reflected polynomial 0xB8), seeded with the row number. Entries whose checksum doesn't match are dropped on load, so hand-edited scores disappear.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <span class="eyebrow">SDL3 port</span>
+    <h2>What has to be replaced</h2>
+    <p>Only a handful of places touch hardware. The rest is ordinary 16-bit C logic working on tables that are now decoded. The practical route is a function-by-function reimplementation using a Ghidra decompilation of <code>TDEGA_unp.exe</code> as reference, loading the original data files through the decoders above.</p>
+  </div>
+  <div class="plan">
+    <div><span class="dos">int 10h · mode 0Dh</span><p>Draw into a 320×200 indexed framebuffer, convert it through the 16-colour palette, and present it as a streaming <code>SDL_Texture</code> with 4:3 logical presentation.</p></div>
+    <div><span class="dos">~190 × out dx,al</span><p>These are EGA plane-select and write-mode calls inside the planar blitters. In software they become a sprite blit using the plane map and mask sprites.</p></div>
+    <div><span class="dos">int 8 hook · PIT</span><p>The game tick and the 100 Hz music tick. Run them as a fixed-step loop with <code>SDL_GetTicksNS</code>. The physics steps are tick-based, so the tick rate has to match the original.</p></div>
+    <div><span class="dos">port 61h/42h speaker</span><p>Generate a square wave into an <code>SDL_AudioStream</code> from the same divisor table. Tyre squeal and engine sounds come from the same routines.</p></div>
+    <div><span class="dos">int 16h · joystick</span><p>Use SDL keyboard events and <code>SDL_Gamepad</code>. The shift-gate graph maps directly onto a stick.</p></div>
+    <div><span class="dos">int 21h files</span><p>Replace with plain <code>SDL_IOStream</code> reads. Keep the SCORES CRC so existing score files still load.</p></div>
+    <div><span class="dos">int 13h key disk</span><p>Leave it out. It checks for fake-numbered sectors on track 39 that return CRC errors.</p></div>
+  </div>
+  <div class="stack col">
+    <h3>Open risks</h3>
+    <ul class="risks">
+      <li>Traffic AI, collisions, police pursuit and the radar logic have been located but not fully traced.</li>
+      <li>Speed units: the speedometer table is indexed by the high byte of speed, and top speeds computed without drag come out too high for plain mph.</li>
+      <li>The Corvette's digital dash drawing code hasn't been found.</li>
+      <li>Timing: EGA-era frame pacing and tick-based physics have to be reproduced exactly for the game to feel right.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <span class="eyebrow">Toolkit</span>
+    <h2>Reproduce everything</h2>
+  </div>
+  <div class="tbl-wrap tools">
+    <table>
+      <thead><tr><th>Script</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">tools/unexepack.py</td><td>Unpacks the EXEPACK-compressed executables into plain MZ files</td></tr>
+        <tr><td class="mono">tools/x86dis.py</td><td>Byte search and 16-bit disassembly addressed by image offset</td></tr>
+        <tr><td class="mono">tools/tdres.py</td><td>Decodes PES/CMP archives and exports every sprite as .bin and .png</td></tr>
+        <tr><td class="mono">tools/sheet.py</td><td>Builds a labelled contact sheet per archive</td></tr>
+        <tr><td class="mono">tools/roadmap.py</td><td>Writes the road stream to JSON and draws the schematic route map</td></tr>
+        <tr><td class="mono">tools/cardata.py</td><td>Annotated per-car JSON plus a comparison table</td></tr>
+        <tr><td class="mono">tools/sndplay.py</td><td>Renders TDSND songs to square-wave WAVs</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="col">The format reference lives next to the game files in <code>FORMATS.md</code>.</p>
+</section>
+
+<footer>Test Drive © 1987 Accolade / Distinctive Software Inc. Analysis of an abandonware copy for preservation and study.</footer>
+</div>
+
+<script>
+const STAGES = /*STAGES*/null;
+const CARS = /*CARS*/null;
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent, text) => {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (text != null) n.textContent = text;
+  if (parent) parent.appendChild(n);
+  return n;
+};
+
+(function strips() {
+  const svg = document.getElementById('strips');
+  const maxLen = Math.max(...STAGES.map(s => s.len));
+  const left = 70, right = 20, width = 1000 - left - right, rowH = 74, top = 14;
+  svg.setAttribute('viewBox', `0 0 1000 ${top + STAGES.length * rowH + 26}`);
+  STAGES.forEach((s, i) => {
+    const y = top + i * rowH;
+    const sx = u => left + (u / maxLen) * width;
+    el('text', { x: 0, y: y + 22, fill: 'var(--ink)', 'font-size': 13, 'font-weight': 500 }, svg, `Stage ${s.stage}`);
+    el('text', { x: 0, y: y + 38, fill: 'var(--ink-soft)', 'font-size': 10 }, svg, `${s.len} u`);
+    el('rect', { x: sx(0), y: y + 14, width: sx(s.len) - sx(0), height: 14, fill: 'var(--rule)' }, svg);
+    s.seg.forEach(([u, len, dir, turn]) => {
+      if (dir === 'S') return;
+      const strength = Math.min(1, 0.35 + Math.abs(turn) / 360);
+      el('rect', { x: sx(u), y: y + 14, width: Math.max(1, sx(u + len) - sx(u)), height: 14,
+        fill: dir === 'R' ? 'var(--curve-r)' : 'var(--curve-l)', 'fill-opacity': strength }, svg);
+    });
+    s.ev.forEach(e => {
+      const x = sx(e.u);
+      if (e.k === 'sign') el('rect', { x: x - 0.75, y: y + 32, width: 1.5, height: 9, fill: 'var(--ink)' }, svg);
+      else if (e.k === 'hazard') el('path', { d: `M${x} ${y + 44} l4 8 h-8 z`, fill: 'var(--accent)' }, svg);
+      else if (e.k === 'police') el('circle', { cx: x, cy: y + 58, r: 3.5, fill: 'var(--s-rossa)' }, svg);
+    });
+  });
+  const axisY = top + STAGES.length * rowH + 4;
+  for (let u = 0; u <= maxLen; u += 500) {
+    const x = left + (u / maxLen) * width;
+    el('line', { x1: x, x2: x, y1: axisY, y2: axisY + 5, stroke: 'var(--ink-soft)' }, svg);
+    el('text', { x, y: axisY + 18, fill: 'var(--ink-soft)', 'font-size': 10, 'text-anchor': 'middle' }, svg, u === 0 ? '0 units' : u);
+  }
+})();
+
+(function torque() {
+  const svg = document.getElementById('torque');
+  const W = 760, H = 320, m = { l: 44, r: 16, t: 12, b: 36 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const xMax = 10240, yMax = 180;
+  const X = rpm => m.l + (rpm / xMax) * pw;
+  const Y = v => m.t + ph - (v / yMax) * ph;
+  for (let v = 0; v <= yMax; v += 30) {
+    el('line', { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: 'var(--rule)', 'stroke-width': v ? 1 : 1.5 }, svg);
+    el('text', { x: m.l - 8, y: Y(v) + 4, fill: 'var(--ink-soft)', 'font-size': 11, 'text-anchor': 'end' }, svg, v);
+  }
+  for (let r = 0; r <= 10000; r += 2000) {
+    el('text', { x: X(r), y: H - m.b + 18, fill: 'var(--ink-soft)', 'font-size': 11, 'text-anchor': 'middle' }, svg, r);
+  }
+  el('text', { x: W - m.r, y: H - 4, fill: 'var(--ink-soft)', 'font-size': 11, 'text-anchor': 'end' }, svg, 'rpm');
+  const legend = document.getElementById('tq-legend');
+  const tbody = document.querySelector('#cars tbody');
+  CARS.forEach(c => {
+    const color = `var(--s-${c.name})`;
+    const pts = c.torque.map((v, i) => `${X(i * 128).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+    el('polyline', { points: pts, fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-linejoin': 'round' }, svg);
+    const li = Math.min(c.torque.length - 1, Math.round(c.rpm_limit / 128));
+    el('circle', { cx: X(c.rpm_limit), cy: Y(c.torque[li]), r: 4, fill: 'var(--panel)', stroke: color, 'stroke-width': 2 }, svg);
+    const s = document.createElement('span');
+    s.innerHTML = `<i style="background:${color}"></i>${c.full}`;
+    legend.appendChild(s);
+    const peak = Math.max(...c.torque), at = c.torque.indexOf(peak) * 128;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.full}</td><td class="num">${c.gears}</td><td class="num">${c.rpm_limit}</td><td class="num">${c.grip}</td><td class="num">${peak} @ ${at}</td><td>${c.dash}</td>`;
+    tbody.appendChild(tr);
+  });
+})();
+</script>

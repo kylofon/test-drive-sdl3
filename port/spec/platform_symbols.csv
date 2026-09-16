@@ -1,0 +1,278 @@
+kind,address,name,type,notes
+func,0x4941,gfx_fill_rect,"void (s16 x, s16 y, s16 w, s16 h, u8 colour)","Pixel rectangle fill, no clipping; RAM per-plane set/clear or EGA write mode 2; verified"
+func,0x4B98,gfx_clear_screen,void (u8 colour),"Fills A000h (8000 bytes, all planes) regardless of target; verified"
+func,0x4BD0,gfx_draw_text,"void (char *s, s16 x, s16 y)","Sets text cursor DS:6914/6916, falls into 0x4BE7; verified"
+func,0x4BE7,gfx_draw_text_at_cursor,void (char *s),"Opaque 8×8 font text, fg DS:690E / bg DS:6910; verified"
+func,0x4D78,gfx_set_border,void (u8 colour),INT 10h AH=0Bh; unreferenced; verified
+func,0x4D84,gfx_set_palette,void (u16 ds_table),"INT 10h AX=1002h, ES:DX = DS:table (17 bytes); verified"
+func,0x4D96,gfx_init_ega,void (void),"Reset GC, clear, equipment = colour, mode 0Dh, palette DS:637C; verified"
+func,0x4DF1,blit_or_clip_hot,"void (u16 off, u16 seg, s16 x, s16 y)","Clipped OR blit at x−hot_x, y−hot_y; verified"
+func,0x4E05,blit_or_clip_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Clipped OR blit at x, y; verified"
+func,0x4E19,blit_or_clip_own,"void (u16 off, u16 seg)","Clipped OR blit at header x&~3, y; verified"
+func,0x50A1,gfx_set_clip,"void (u16 doff, u16 dseg, s16 x0, s16 x1, s16 y0, s16 y1)","Clip in byte columns / rows (x1, y1 exclusive); also updates the live copy; verified"
+func,0x50FE,gfx_shutdown,void (void),"Clear screen, equipment = colour, INT 10h mode 3, AH=0Bh BX=20h; verified"
+func,0x5128,gfx_select_target,"void (u16 doff, u16 dseg)","Copies 12-word descriptor to CS:5A64, pointer to CS:5A60; verified"
+func,0x5150,gfx_create_buffer,"far desc (u16 w_bytes, u16 h, u16 plane_mask)",Off-screen planar buffer (= sprite); descriptor in CS:5290..5A5F; verified
+func,0x5D84,blit_copy_clip_hot,"void (u16 off, u16 seg, s16 x, s16 y)",Clipped REPLACE blit at hotspot; verified
+func,0x5DB6,blit_copy_clip_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Clipped REPLACE blit at x, y; verified"
+func,0x5DE2,blit_copy_clip_own,"void (u16 off, u16 seg)","Clipped REPLACE at own x&~3, y; body of all clipped blits (0x5E0E); verified"
+func,0x6CBE,blit_copy_hot,"void (u16 off, u16 seg, s16 x, s16 y)",Unclipped REPLACE at hotspot; verified
+func,0x6CF0,blit_copy_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Unclipped REPLACE at x, y; verified"
+func,0x6D1C,blit_copy_own,"void (u16 off, u16 seg)","Unclipped REPLACE at own x&~3, y; body of all unclipped blits (0x6D48); verified"
+func,0x74E3,gfx_set_text_cursor,"void (s16 x, s16 y)",DS:6914/6916; verified
+func,0x74F4,gfx_clear_clip,void (u8 colour),Fills the current clip rectangle (EGA path quirks); verified
+func,0x768B,gfx_dissolve,"void (u16 off, u16 seg, u8 phase)","Screen-only dissolve: 12 interlaced row passes, one pixel per byte; verified"
+func,0x79FF,gfx_free_buffer,"void (u16 doff, u16 dseg)",Pops descriptor pool (LIFO) and frees buffer memory (0xA37E); verified
+func,0x7A37,blit_or_hot,"void (u16 off, u16 seg, s16 x, s16 y)",Unclipped OR at hotspot (table CS:7A73); verified
+func,0x7A4B,blit_or_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Unclipped OR at x, y; verified"
+func,0x7A5F,blit_or_own,"void (u16 off, u16 seg)","Unclipped OR at own x, y; verified"
+func,0x7C3B,blit_and_hot,"void (u16 off, u16 seg, s16 x, s16 y)",Unclipped AND at hotspot (table CS:7C77); verified
+func,0x7C4F,blit_and_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Unclipped AND at x, y; verified"
+func,0x7C63,blit_and_own,"void (u16 off, u16 seg)","Unclipped AND at own x, y; verified"
+func,0x7E54,blit_xor_hot,"void (u16 off, u16 seg, s16 x, s16 y)",Unclipped XOR at hotspot (table CS:7E90); verified
+func,0x7E68,blit_xor_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Unclipped XOR at x, y; verified"
+func,0x7E7C,blit_xor_own,"void (u16 off, u16 seg)","Unclipped XOR at own x, y; verified"
+func,0x8058,blit_xor_clip_hot,"void (u16 off, u16 seg, s16 x, s16 y)",Clipped XOR at hotspot (table CS:8094); verified
+func,0x806C,blit_xor_clip_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Clipped XOR at x, y; verified"
+func,0x8080,blit_xor_clip_own,"void (u16 off, u16 seg)","Clipped XOR at own x, y; verified"
+func,0x8308,blit_and_clip_hot,"void (u16 off, u16 seg, s16 x, s16 y)",Clipped AND at hotspot (table CS:8344); verified
+func,0x831C,blit_and_clip_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Clipped AND at x, y; verified"
+func,0x8330,blit_and_clip_own,"void (u16 off, u16 seg)","Clipped AND at own x, y; verified"
+func,0x85D5,gfx_draw_line,"void (s16 x0, s16 y0, s16 x1, s16 y1, u8 colour)","Clipped line: H/V via fill_rect, else 16.16 DDA; verified"
+func,0x8B08,gfx_grab_screen,"void (s16 sx, s16 sy, s16 dx, s16 dy, s16 w_bytes, s16 h)",Copies a screen rectangle into the current RAM target; verified
+func,0x8BDC,grab_into_sprite_hot,"void (u16 off, u16 seg, s16 x, s16 y)","Screen → sprite planes at x−hot_x, y−hot_y; unreferenced; verified"
+func,0x8C00,grab_into_sprite_raw,"void (u16 off, u16 seg, s16 x, s16 y)","Screen → sprite planes at x, y (background save, caller 0x35C6); verified"
+func,0x8C1E,grab_into_sprite_own,"void (u16 off, u16 seg)","Screen → sprite planes at own x&~7, y; body 0x8C3C; unreferenced; verified"
+func,0x8CEC,herc_init,void (void),"Hercules graphics mode (argv[1] == ""herc""); verified"
+func,0x8D3C,herc_shutdown,void (void),Hercules back to text mode 7; verified
+func,0x91CF,gfx_scroll_window,"void (s16 x, s16 y, s16 w, s16 h, s16 row_step, u16 soff, u16 sseg, s16 srow)",EGA write-mode-1 one-row scroll + one sprite row (credits); verified
+func,0x97D4,rect_clear_plane,"asm: ES:DI dst, DX width, SI rows, CX skip, BX shift",RAM: clear sprite-rectangle pixels of one plane; verified
+func,0x981E,rect_set_plane,same,RAM: set sprite-rectangle pixels; verified
+func,0x9868,rect_xor_plane,same,RAM: invert sprite-rectangle pixels; verified
+func,0x98C2,rect_clear_plane_ega,same,EGA read-modify-write variant; verified
+func,0x992B,rect_set_plane_ega,same,EGA variant; verified
+func,0x9994,rect_xor_plane_ega,same,EGA variant (wrong at partial bytes with GC function XOR); verified
+func,0x9A69,draw_glyph,"void (int x, int y, int idx)",Blits built-in glyph sprite CS:[0x9A19+idx*2] (text cursor); verified
+func,0xA3B7,gfx_target_save,void (void),Copies 24 words CS:5A64..5A93 (current + screen descriptor) to DS:6AC4; verified
+func,0xA3CB,gfx_target_restore,void (void),Copies them back; verified
+func,0xA4D9,gfx_get_target_ptr,u32 (void),Returns CS:5A60/5A62 (debug dump only); verified
+func,0x5C24,input_poll_drive,u16 (void),"Last buffered key → direction/fire/hotkey, else joystick; ESC = 0xFFFF; verified"
+func,0x67DD,getkey_wait,u16 (void),Loops `getkey` until nonzero; verified
+func,0x67E8,getkey,u16 (void),Dispatch through CS:67F2[DS:6422] (modes 0/2/4); verified
+func,0x67F8,getkey_kbd,mode 0,Non-blocking INT 16h: ASCII or scan<<8; verified
+func,0x680E,getkey_kbd_joy_level,mode 2,Keyboard or level-triggered joystick menu codes; unused; verified
+func,0x6846,getkey_kbd_ctrl,internal,"Drains INT 16h buffer, keeps last key, handles Ctrl hotkeys; verified"
+func,0x68F4,getkey_kbd_joy_edge,mode 4 (used),Keyboard or edge-triggered joystick menu codes; verified
+func,0x6939,kbd_flush,u16 (void),Empties the BIOS keyboard buffer; verified
+func,0x694A,timer_restore,void (void),"Restores INT 8, PIT ch0 divisor 0, speaker off; verified"
+func,0x698C,timer_install_drive,void (void),"100.04 Hz, no BIOS chaining; verified"
+func,0x699E,timer_install_menu,void (void),"100.04 Hz, BIOS INT 8 every 5 ticks; verified"
+func,0x69B6,timer_install_div,"void (int unused, u16 divisor)",Generic install; dead; verified
+func,0x69CF,timer_install_common,DX = divisor,"Speaker off, 43h=B6h, hook INT 8 → 0x6A1F, load ch0 divisor; verified"
+func,0x6A1F,timer_isr,INT 8 handler,"Tick count, BIOS chain, song step, EOI; verified"
+func,0x6AA8,snd_fetch,internal,"Song bytecode interpreter (handlers 0x6B5A–0x6C38, table CS:6B42); verified"
+func,0x6C3B,delay_ticks,void (u16 n),Busy wait n ticks; verified
+func,0x6C5B,getkey_timeout,u16 (u16 n),getkey with n-tick timeout; no callers; verified
+func,0x6C85,gfx_set_text_colours,"void (u16 fg, u16 bg)",DS:690E / DS:6910; verified
+func,0x7864,getkey_until_deadline,u16 (void),"getkey until deadline, else 0; verified"
+func,0x7881,wait_deadline,void (void),Busy wait until deadline; verified
+func,0x7894,set_deadline,void (u16 ticks),"DS:650C = now, DS:650E = ticks; verified"
+func,0x89F0,snd_stop_oneshot,void (void),DS:643E &= 6; verified
+func,0x89F6,snd_off,void (void),DS:643E &= 3; no callers; verified
+func,0x89FC,snd_on,void (void),DS:643E \|= 4; no callers; verified
+func,0x8A02,snd_oneshot_active,u8 (void),DS:643E & 1; no callers; verified
+func,0x8A08,snd_stop_all,void (void),DS:643E &= 4; verified
+func,0x8A0E,snd_set_loop,"void (u16 off, u16 seg)",Sets background loop stream; starts it if idle; verified
+func,0x8A3E,snd_play_oneshot,"void (u16 off, u16 seg)",Starts a stream now (current note count still finishes); verified
+func,0x8AFD,input_set_mode,void (u16 mode),DS:6422 = mode (main: 4); verified
+func,0x8BAF,rand8,u8 (void),Table PRNG DS:6520/6522 (not the CRT rand); verified
+func,0x95B0,menu_key,int (void),"getkey_until_deadline: 0→−1, ESC→1, else code; verified"
+func,0x95D9,toupper_c,int (char c),a–z → A–Z; verified
+func,0x95F4,joy_calibrate_screen,void (void),3×3 grid calibration screen; verified
+func,0x9A01,ticks_now,u16 (void),Returns DS:642A; verified
+func,0x9A05,ticks_elapsed,u16 (u16 start),\|now − start\| (absolute difference); verified
+func,0xA12F,joy_read,u8 (void),"Port 201h timing, adaptive calibration, direction + button bits; verified"
+func,0xDDC3,div0_isr,INT 0 handler (data segment),"AX=0xFFFF, skip 2-byte div, iret (installed in driving by 0x4908) [0xDDC3 (DGROUP:1423)]; verified"
+func,0x6762,res_find,"far ptr (u16 aoff, u16 aseg, char *name4)",Linear case-sensitive 4-char lookup; fatal if missing; verified
+func,0x78A5,load_raw_archive,"far ptr (char *fname, u16 reserve)","Uncompressed archive (tdsnd.snd) via raw INT 21h; ""%s FILE ERROR""; verified"
+func,0x8A5B,load_archive,"far ptr (char *fname, u16 reserve)","Cache check, load_packed_archive, relocate offset table; verified"
+func,0x8CC0,mem_init,void (void),Grabs the largest DOS memory block; verified
+func,0x8D8C,crc8_b8,"u8 (u8 *buf, int len, u8 seed)",SCORES checksum (FORMATS.md); verified
+func,0x8DC7,copy_protection_check,int (void),"0 = pass, 0xFEF6 = fail; verified"
+func,0x92A8,text_input_line,"int (char *buf, int maxlen, int x, int y, u16 timeout)",High-score name editor (see game_flow); likely
+func,0x94AB,fatal,"void (char *fmt, ...)","Text mode, timer_restore, printf, abort; verified"
+func,0x94C7,res_find_list,"void (far arc, char *names, far ptr *out)",res_find for a packed 4-char name list; verified
+func,0x9507,draw_text_centered,"void (char *s, int y)",x = 0xA0 − strlen*4; verified
+func,0x9530,draw_rect_outline,"void (x0, y0, x1, y1, colour)",Four fill_rect calls; verified
+func,0x9A86,load_packed_archive,"far ptr (char *fname, u16 reserve)","`Pckd` header, cache slot, methods 2/3/4/8; verified"
+func,0x9C1E,huff_read_tree,void (void),Method 4 tree (FORMATS.md); verified
+func,0x9C76,huff_read_word,int (void),Two input bytes; likely
+func,0x9C90,huff_decode,int (void),"Next Huffman symbol, −1 at EOF; verified"
+func,0x9CF9,rle90_out,void (u8 c),RLE90 output state machine; verified
+func,0x9D64,pack_getc,int (void),"Buffered 1 KB input, −1 when packed length exhausted; verified"
+func,0x9DD3,pack_putc,void (u8 c),"Huge-pointer output, drops bytes past unpacked length; verified"
+func,0x9E1D,lzw_decompress,void (void),Method 8; verified
+func,0x9FA2,lzw_getcode,int (void),LZW code reader; verified
+func,0xA0CF,lzw_alloc_tables,void (void),"malloc(0x438B); ""DECOMP BUFFER ALLOCATE ERROR""; verified"
+func,0xA111,lzw_free_tables,void (void),free tables; verified
+func,0xA280,cache_find,u16 seg (char *fname),"30-slot archive cache lookup (12 chars, exact case); verified"
+func,0xA2BE,cache_alloc,"u16 seg (char *fname, u16 paras, u16 reserve)","Low-end allocation with LIFO eviction; ""OUT OF MEMORY LOADING %s""; verified"
+func,0xA340,buf_alloc,u16 seg (u16 paras),"High-end buffer allocation, 8 slots; verified"
+func,0xA37E,buf_free,void (u16 seg),"""BUFFER NOT FOUND RELEASE ERROR""; verified"
+func,0xA3DF,mem_debug_dump,void (void),MBOT/LOW/HIGH/MTOP dump; unreferenced; verified
+func,0xA4E3,abort,,MSC 4.x runtime: abort; likely
+func,0xA4F8,close,,MSC 4.x runtime: close; verified
+func,0xA50C,_astart,,MSC 4.x runtime: _astart (entry); verified
+func,0xA5B6,fclose,,MSC 4.x runtime: fclose; verified
+func,0xA659,fgets,,MSC 4.x runtime: fgets; verified
+func,0xA6B1,fopen,,MSC 4.x runtime: fopen; verified
+func,0xA6D7,fprintf,,MSC 4.x runtime: fprintf; verified
+func,0xA70E,fscanf,,MSC 4.x runtime: fscanf; likely
+func,0xA722,free,,MSC 4.x runtime: free; verified
+func,0xA730,malloc,,MSC 4.x runtime: malloc; verified
+func,0xA776,open,,MSC 4.x runtime: open; verified
+func,0xA8C7,printf,,MSC 4.x runtime: printf; verified
+func,0xA8FD,srand,,MSC 4.x runtime: srand; verified
+func,0xA90E,rand,,MSC 4.x runtime: rand; verified
+func,0xA93A,read,,MSC 4.x runtime: read; verified
+func,0xAA00,sprintf,,MSC 4.x runtime: sprintf; verified
+func,0xAA51,sscanf,,MSC 4.x runtime: sscanf; verified
+func,0xAA88,strcmp,,MSC 4.x runtime: strcmp; verified
+func,0xAABD,strlen,,MSC 4.x runtime: strlen; verified
+func,0xAAD8,strncpy,,MSC 4.x runtime: strncpy; verified
+func,0xAB00,_filbuf,,MSC 4.x runtime: _filbuf; likely
+func,0xABE2,_flsbuf,,MSC 4.x runtime: _flsbuf; likely
+func,0xAD0D,_freebuf,,MSC 4.x runtime: _freebuf; likely
+func,0xAD3C,_openfile,,MSC 4.x runtime: _openfile; likely
+func,0xAE3F,_stbuf,,MSC 4.x runtime: _stbuf; likely
+func,0xAEDE,_ftbuf,,MSC 4.x runtime: _ftbuf; likely
+func,0xAF67,_nmalloc,,MSC 4.x runtime: _nmalloc search; likely
+func,0xB048,_amlink,,MSC 4.x runtime: _amlink; guess
+func,0xB082,_amexpand,,MSC 4.x runtime: _amexpand; guess
+func,0xB0A4,_amallocbrk,,MSC 4.x runtime: _amallocbrk; likely
+func,0xB0C3,_nullcheck,,MSC 4.x runtime: _nullcheck; likely
+func,0xB0DF,creat,,MSC 4.x runtime: creat; verified
+func,0xB152,umask,,MSC 4.x runtime: umask helper; likely
+func,0xB165,_cinit,,MSC 4.x runtime: _cinit; verified
+func,0xB214,exit,,MSC 4.x runtime: exit; likely
+func,0xB22B,_exit,,MSC 4.x runtime: _exit; verified
+func,0xB257,_ctermsub,,MSC 4.x runtime: _ctermsub; likely
+func,0xB270,_initterm,,MSC 4.x runtime: _initterm; likely
+func,0xB27F,_dosret0,,MSC 4.x runtime: _dosret0; likely
+func,0xB287,_dosretax,,MSC 4.x runtime: _dosretax; likely
+func,0xB2C7,fflush,,MSC 4.x runtime: fflush; likely
+func,0xB32F,_input,,MSC 4.x runtime: _input (scanf engine); likely
+func,0xB698,_input,,MSC 4.x runtime: _input helpers (0xB698–0xBAD8); guess
+func,0xBAFF,itoa,,MSC 4.x runtime: itoa; likely
+func,0xBB1A,_NMSG_TEXT,,MSC 4.x runtime: _NMSG_TEXT; likely
+func,0xBB4A,_NMSG_WRITE,,MSC 4.x runtime: _NMSG_WRITE; verified
+func,0xBB73,_output,,MSC 4.x runtime: _output (printf engine); verified
+func,0xBE03,_output,,MSC 4.x runtime: _output helpers (0xBE03–0xC35A); likely
+func,0xC382,_setargv,,MSC 4.x runtime: _setargv; likely
+func,0xC467,_setenvp,,MSC 4.x runtime: _setenvp; likely
+func,0xC4CD,strcat,,MSC 4.x runtime: strcat; verified
+func,0xC4FE,strcpy,,MSC 4.x runtime: strcpy; verified
+func,0xC523,_getstream,,MSC 4.x runtime: _getstream; likely
+func,0xC55A,unlink,,MSC 4.x runtime: unlink; verified
+func,0xC567,sbrk,,MSC 4.x runtime: sbrk; likely
+func,0xC5D5,_growseg,,MSC 4.x runtime: _growseg; likely
+func,0xC62B,_chkstk,,MSC 4.x runtime: _chkstk; verified
+func,0xC644,isatty,,MSC 4.x runtime: isatty; likely
+func,0xC6B2,ungetc,,MSC 4.x runtime: ungetc; likely
+func,0xC70C,write,,MSC 4.x runtime: write; verified
+func,0xC849,flushall,,MSC 4.x runtime: flushall; likely
+func,0xC87A,_aNldiv,,MSC 4.x runtime: _aNldiv; verified
+func,0xC91D,_aNlmul,,MSC 4.x runtime: _aNlmul; verified
+func,0xC949,_aNlshl,,MSC 4.x runtime: _aNlshl; verified
+func,0xC954,_aNlshr,,MSC 4.x runtime: _aNlshr; verified
+func,0xC95F,_aNaldiv,,MSC 4.x runtime: _aNaldiv; likely
+func,0xC981,_aNalshl,,MSC 4.x runtime: _aNalshl; likely
+global,CS:528E,gfx_desc_pool_top,u16,"Next free byte of descriptor pool (init 0x5290, limit 0x5A60); written by 0x5150, 0x79FF; read by 0x5150, 0x79FF"
+global,CS:5A60,gfx_cur_desc,far ptr,Selected target descriptor (init CS:5A7C); written by 0x5128; read by 0xA4D9
+global,CS:5A64,gfx_cur,12 words,"Live copy of selected descriptor: +2 planes CS:5A66..6C, rowtab CS:5A6E, clip x0/x1/y0/y1 CS:5A70..76, stride CS:5A78; written by 0x5128, 0x50A1, 0xA3CB, game (0x3ACE, 0x3AF7); read by all primitives"
+global,CS:5A7C,gfx_screen_desc,12 words,"Screen: planes A000h, rowtab CS:5A94, clip 0,40,0,200, stride 40; written by 0x50A1, game; read by 0x8B08, 0x8C1E"
+global,CS:5A94,gfx_screen_rows,u16[200],y*40; written by const; read by all
+global,DS:00CC,pal_game,u8[17],Game palette (see ega_palettes.json); written by const; read by 0x4D84 via main
+global,DS:0040,str_herc,char[],"""herc"" command-line switch; written by const; read by main"
+global,DS:008A,herc_mode,u16,"1 when Hercules selected; written by main; read by main, 0x098C"
+global,DS:0890,road_buf_desc,far ptr,"40×112×3-plane road view buffer (+0894 header ptr, +0898 rowtab); written by 0x4792; read by scene_render"
+global,DS:089A,buf_desc_b,far ptr,Buffer sized from sprite DS:13B7 (see scene_render); written by 0x4792; read by scene_render
+global,DS:08B2,buf_desc_c,far ptr,Buffer sized from sprite DS:1393 (see scene_render); written by 0x4792; read by scene_render
+global,DS:636C,fill_left_mask,u8[8],FF 7F 3F 1F 0F 07 03 01; written by const; read by 0x4941
+global,DS:6374,fill_right_mask,u8[8],80 C0 E0 F0 F8 FC FE FF; written by const; read by 0x4941
+global,DS:637C,pal_default,u8[17],Identity 200-line palette; written by const; read by 0x4D96
+global,DS:63A8,joy_dir_map,u8[16],Joystick bits → direction; written by const; read by 0x5C24
+global,DS:63B8,ext_scan_dir_map,u8[12],[scan−0x46] → direction; written by const; read by 0x5C24
+global,DS:63C4,digit_dir_map,u8[10],'0'..'9' → direction \| fire; written by const; read by 0x5C24
+global,DS:63F0,kbd_shift_btn,u8,"Shift flags \| buttons; write-only; written by 0x680E, 0x68F4; read by –"
+global,DS:63F2,joy_menu_scan,u16[16],"Joystick bits → menu scan codes; written by const; read by 0x680E, 0x68F4"
+global,DS:6420,joy_menu_last,u16,Edge detector for joystick menu codes; written by 0x68F4; read by 0x68F4
+global,DS:6422,input_mode,u16,getkey dispatch index (0/2/4); written by 0x8AFD; read by 0x67E8
+global,DS:6424,modal_pause,u8,"1 in pause/calibration: song frozen, speaker off, sim skipped; written by 0x5C24, 0x6846; read by 0x6A1F, 0x3B1F"
+global,DS:6426,old_int8,far ptr,"Saved BIOS INT 8; written by 0x69CF; read by 0x694A, 0x6A1F"
+global,DS:642A,tick_count,u16,"++ per 100.04 Hz tick; written by 0x6A1F; read by 0x9A01, 0x9A05"
+global,DS:642C,snd_ptr,seg (642C) : off (642E),"Current bytecode position; written by 0x8A0E, 0x8A3E, ISR; read by ISR"
+global,DS:6430,snd_loop_ptr,seg (6430) : off (6432),Background loop stream; written by 0x8A0E; read by ISR
+global,DS:6434,chain_reload,u16,"BIOS chain period (5 menu, 0x7D00 drive); written by 0x698C, 0x699E, 0x69B6; read by ISR"
+global,DS:6436,chain_count,s16,"Countdown to BIOS INT 8 call; written by 0x699E, 0x69B6, ISR; read by ISR"
+global,DS:6438,note_left,u16,Remaining ticks of current event; written by ISR; read by ISR
+global,DS:643A,note_cut,u16,Speaker off when note_left equals it; written by ISR; read by ISR
+global,DS:643C,snd_shift,u8,"Articulation shift (cut = dur >> shift), init 3; written by ISR (FE); read by ISR"
+global,DS:643D,snd_playing,u8,"0 idle, 1 one-shot, 2 loop; written by 0x69CF, 0x8A0E, 0x8A3E, 0x5C24, 0x6846, ISR; read by ISR, 0x8A0E"
+global,DS:643E,snd_flags,u8,"bit0 one-shot, bit1 loop set, bit2 sound enabled (init 4); written by 0x89F0–0x8A3E, 0x5C24, 0x6846, ISR; read by ISR, 0x5C24"
+global,DS:643F,chain_enable,u8,"1 = chain BIOS INT 8; written by 0x698C, 0x699E, 0x69B6; read by ISR"
+global,DS:6440,loop_cnt,s16[3],Loop counters FD/FC/FB; written by ISR; read by ISR
+global,DS:6446,loop_start,u16[3],Loop body offsets; written by ISR; read by ISR
+global,DS:644C,loop_end,u16[3],Loop end-opcode offsets; written by ISR; read by ISR
+global,DS:6452,note_div,u16[0x5E],"PIT divisor per note (note_divisors.json); written by const, patched 64FC/64FE/6500; read by ISR"
+global,DS:64FC,note_div_engine,u16,"Slot 0x55: engine divisor DS:2077[rpm_disp>>6]; written by 0x1FE4, 0x3B1F; read by ISR"
+global,DS:64FE,note_div_skid,u16,Slot 0x56: 0xFFFF / 0x08E8 skid / 0x0474 grind; written by sim; read by ISR
+global,DS:6500,note_div_beep,u16,Slot 0x57: 0x0384 radar beep; written by 0x1FEA; read by ISR
+global,DS:650C,deadline_start,u16,"set_deadline start tick; written by 0x7894; read by 0x7864, 0x7881"
+global,DS:650E,deadline_len,u16,"set_deadline length; written by 0x7894; read by 0x7864, 0x7881"
+global,DS:6520,rand8_idx,u16,rand8 index; written by 0x8BAF; read by 0x8BAF
+global,DS:6522,rand8_tab,u8[256],rand8 table; written by 0x8BAF; read by 0x8BAF
+global,DS:6642,herc_crtc_gfx,u8[12],"6845 values, graphics; written by const; read by 0x8CEC"
+global,DS:664E,herc_crtc_text,u8[12],"6845 values, text; written by const; read by 0x8D3C"
+global,DS:66E8,joy_enabled,u8,"0 keyboard only, 1 joystick; written by 0x5C24, 0x6846, 0x95F4; read by 0xA12F"
+global,DS:66E9,joy_calibrated,u8,"Calibration screen shown; written by 0x95F4; read by 0x5C24, 0x6846"
+global,DS:66EA,calib_sq_x,u16[9],Grid square x per direction; written by const; read by 0x95F4
+global,DS:66FC,calib_sq_y,u16[9],Grid square y per direction; written by const; read by 0x95F4
+global,DS:690E,text_fg,u16,Text foreground (init 3); written by 0x6C85; read by 0x4BE7
+global,DS:6910,text_bg,u16,Text background (init 0); written by 0x6C85; read by 0x4BE7
+global,DS:6912,text_margin_x,u16,x after CR/LF (0); written by const; read by 0x4BE7
+global,DS:6914,text_x,u16,"Cursor x, pixels (drawn at x>>3 bytes); written by 0x4BD0, 0x74E3, 0x4BE7; read by 0x4BE7"
+global,DS:6916,text_y,u16,"Cursor y; written by 0x4BD0, 0x74E3, 0x4BE7; read by 0x4BE7"
+global,DS:691A,text_glyph_h,u16,8; written by const; read by 0x4BE7
+global,DS:691C,text_font,far ptr,Font pointer table DS:6E2C; written by const; read by 0x4BE7
+global,DS:6920,text_adv_x,u16,8; written by const; read by 0x4BE7
+global,DS:6922,text_adv_y,u16,8; written by const; read by 0x4BE7
+global,DS:6924,text_enabled,u16,1 (text drawn only when 1); written by const; read by 0x4BE7
+global,DS:6A3C,lzw_tables,u16,"malloc'd LZW tables; written by 0xA0CF, 0xA111; read by 0xA0CF, 0xA111"
+global,DS:6A3E,joy_x,u16,X loop count (0x50 on timeout); DS:6A40 = joy_y; written by 0xA12F; read by 0xA12F
+global,DS:6A42,joy_port_pre,u8,201h sample before trigger; written by 0xA12F; read by 0xA12F
+global,DS:6A43,joy_result,u8,Bits being built; written by 0xA12F; read by 0xA12F
+global,DS:6A44,joy_xmin,u16,Learned min (init 0x50); DS:6A46 xmax (init 0); written by 0xA12F; read by 0xA12F
+global,DS:6A48,joy_xover_min,u16,Smallest above-max sample; DS:6A4A countdown (8); written by 0xA12F; read by 0xA12F
+global,DS:6A4C,joy_xlo,u16,25% threshold; DS:6A4E 75% threshold; written by 0xA12F; read by 0xA12F
+global,DS:6A50,joy_ymin,u16,Y equivalents of 6A44–6A4E at 6A50–6A5A; written by 0xA12F; read by 0xA12F
+global,DS:6AC4,gfx_target_save_area,u16[24],Saved CS:5A64..5A93; written by 0xA3B7; read by 0xA3CB
+global,DS:6E2C,font_ptrs,u16[256],"Near ptr per character, 0 = none (font8x8.json); written by const; read by 0x4BE7"
+global,DS:746C,lzw_tab_ptrs,u16 ×3 (746C/7470/748C),"Offsets into lzw_tables; written by 0xA0CF; read by 0x9E1D, 0x9FA2"
+global,DS:7478,rle_state,u16,"RLE90 state; written by 0x9A86, 0x9CF9; read by 0x9CF9"
+global,DS:78E0,pack_inptr,u16,"Input buffer cursor; written by 0x9A86, 0x9D64; read by 0x9D64"
+global,DS:790E,unpacked_len,u32,"Expected output size; written by 0x9A86; read by 0x9DD3, 0x9A86"
+global,DS:7B14,mem_bot,u16 seg,Base of DOS block; written by 0x8CC0; read by 0xA3DF
+global,DS:7B18,out_count,u32,"Bytes emitted; written by 0x9A86, 0x9DD3; read by 0x9DD3, 0x9A86"
+global,DS:7B24,mem_low,u16 seg,"Next free segment above archive cache; written by 0x8CC0, 0xA2BE; read by 0xA2BE, 0xA340"
+global,DS:7B2E,packed_left,u32,"Remaining packed bytes; written by 0x9A86, 0x9D64; read by 0x9D64"
+global,DS:7D36,mem_top,u16 seg,End of DOS block; written by 0x8CC0; read by 0xA3DF
+global,DS:7D38,cache_slots,16 B × 30,"`{char name[12]; u16 paras; u16 seg}`; written by 0xA2BE; read by 0xA280, 0xA2BE"
+global,DS:7F18,mem_high,u16 seg,"Lowest buffer segment; written by 0x8CC0, 0xA340, 0xA37E; read by 0xA2BE, 0xA340, 0xA37E"
+global,DS:7F1A,page_buf_desc,far ptr,"40×200×4-plane page buffer descriptor; written by main, 0x1030; read by game_flow"
+global,DS:7F1E,buf_slots,4 B × 8,"`{u16 seg; u16 paras}`; written by 0xA340, 0xA37E; read by 0xA340, 0xA37E"
+global,DS:7F3E,pack_inbuf,u16,malloc(0x400); written by 0x9A86; read by 0x9D64
+global,DS:7F42,pack_fd,u16,File handle; written by 0x9A86; read by 0x9D64
+global,DS:8096,pack_inpos,u16,"Bytes consumed in input buffer; written by 0x9A86, 0x9D64; read by 0x9D64"
+global,DS:809C,pack_outptr,huge ptr,"Output cursor; written by 0x9A86, 0x9DD3; read by 0x9DD3"
+global,DS:80A0,in_count,u32,"Bytes read (unused); written by 0x9A86, 0x9D64; read by –"
