@@ -1,32 +1,69 @@
-# Test Drive (1987) — reverse engineering and SDL3 port
+# Test Drive (1987) — SDL3 port
 
-Reverse engineering of Accolade / Distinctive Software's *Test Drive* (DOS, EGA), and a native C11 + SDL3 port
-that runs it from your own copy of the game.
+A faithful C reimplementation of the EGA version of Accolade / Distinctive Software's *Test Drive* (1987),
+running natively on SDL3. It is not an emulator - the original data is not redistributed, and you need to get it yourself.
+
+## Requirements
+
+* Your game files in a folder. The port needs `TDEGA.EXE`, `CARS.TXT`, `SCORES`, `TDSND.SND`, the `*.PES`
+  archives and the car `*.BIN` / `*.SS` files. By default the port looks in `Game` under the working directory.
+* CMake 3.24+, a C11 compiler and SDL 3. 
+
+## Build
+
+From the repository root, in Git Bash or an MSYS2 MinGW64 shell:
+
+```bash
+export PATH="/c/msys64/mingw64/bin:$PATH"
+cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
+cmake --build tdport/build
+```
+
+## Run
+
+```bash
+./tdport/build/tdport.exe --game-dir Game
+```
+
+| Option | Meaning |
+|---|---|
+| `--game-dir DIR` | Folder with the original game files (default `Game`) |
+| `--scale N` | Initial window size as a multiple of 320×240 (default 3) |
+| `--frame-rate FPS` | Emulated drawing speed of the original PC while driving (default 8, `0` = unpaced; see below) |
+| `--bios-keys` | Original keyboard behaviour for driving: keys act only through key repeat (see below) |
+| `--check` | Verify `TDEGA.EXE` loads and exit, without opening a window |
+
+Alt+Enter toggles fullscreen. The window keeps the 4:3 aspect of a 200-line EGA monitor.
+
+## Controls (from the original)
+
+* Arrow keys / numeric keypad: steer, accelerate, brake and shift through the gear gate, as in the original.
+* Esc: quit the current drive or menu.
+* Ctrl-J / Ctrl-K: joystick / keyboard control. A connected gamepad acts as the joystick (left stick or
+  D-pad, A = fire).
+* Ctrl-Q / Ctrl-S: sound off / on.
+
+
+## Changes from original
+
+* **Held-key driving:** arrows / keypad and A / Z are read while held, not only through key repeat
+  (`--bios-keys` restores the original).
+* **Frame rate:** the driving loop is paced to 8 fps, so frame-counted behaviour (gear-shift panel, traffic
+  randomness, crash animation) matches a 1987 PC (`--frame-rate`).
+* **Removed:** copy protection, the TD.EXE launcher password, and Hercules / CGA modes.
+* **Missing SCORES:** starts with an empty table instead of exiting.
+* **Extended-ASCII keys:** ignored instead of crashing.
 
 ## Layout
 
-| Path | Contents |
-|---|---|
-| `tdport/` | The SDL3 port (see `tdport/README.md`) |
-| `port/` | Specs, lookup tables and merged symbols used for the port |
-| `tools/` | Extractors (sprites, road, cars, sound), EXEPACK unpacker, Ghidra scripts |
-| `FORMATS.md` | File formats and data layouts |
+See `tdport/PORTING.md` for the architecture and porting rules. In short:
+* `tdport/src/mem.*` emulates the real-mode address space the game ran in.
+* `tdport/src/host.*` wraps SDL3.
+* `tdport/src/platform/` holds the EGA graphics, timer/sound, input and resource layers.
+* `tdport/src/game/`
 
-Not in the repository: the game files (`Game/`), DOSBox, Ghidra/JDK, and generated output.
+Reverse-engineering tools, specs and file formats are in `tools/`, `port/` and `FORMATS.md`. holds game flow, scene rendering and simulation.
 
-## Quick start
+## Support
 
-Needs your original game files in `Game/`, plus CMake, a C11 compiler and SDL 3 (for example MSYS2 MinGW64).
-
-```bash
-cd tdport
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-./build/tdport.exe --game-dir ../Game
-```
-
-Extract the graphics to PNG (Python 3 with Pillow and numpy):
-
-```bash
-python tools/tdres.py export Game/LOTUS.PES work/ega/LOTUS
-```
+https://buymeacoffee.com/krzysztofkania
