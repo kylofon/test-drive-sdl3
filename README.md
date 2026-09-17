@@ -4,6 +4,34 @@ A faithful C reimplementation of the EGA version of Accolade / Distinctive Softw
 running natively on SDL3. The CGA and Hercules modes of the original release can be built as separate
 executables. It is not an emulator - the original data is not redistributed, and you need to get it yourself.
 
+## How to play (Windows)
+
+You need the files of the original DOS *Test Drive*. They are not included.
+
+1. Open the [latest release](https://github.com/kylofon/test-drive-sdl3/releases/latest) and download
+   `tdport-…-win64.zip` (the one without `cga` or `herc` in its name).
+2. Put your original game files in a folder named `Game`.
+3. Open the zip. Copy everything inside its `tdport` folder into the folder that holds `Game`, so that
+   `tdport.exe` sits next to `Game`:
+
+   ```text
+   Test Drive\
+   ├── Game\             <- your original game files (TDEGA.EXE, CARS.TXT, SCORES, ...)
+   ├── tdport.exe
+   ├── SDL3.dll
+   ├── libiconv-2.dll
+   └── (the other files from the zip)
+   ```
+
+4. Double-click `tdport.exe`.
+
+Keep the folder somewhere you can save files, such as Documents or the Desktop, not Program Files. The game
+saves its high scores in `Game`. If Windows says "Windows protected your PC", click **More info**, then
+**Run anyway**. Press Alt+Enter for fullscreen. The keys are listed under [Controls](#controls-from-the-original).
+
+The `cga` and `herc` zips are the CGA and Hercules versions. They work the same way, with `tdport-cga.exe` or
+`tdport-herc.exe`, but need `TDCGA.EXE` and the `*.CMP` files in `Game`.
+
 ## Requirements
 
 * Your game files in a folder. The port needs `TDEGA.EXE`, `CARS.TXT`, `SCORES`, `TDSND.SND`, the `*.PES`
