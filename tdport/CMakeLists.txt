@@ -11,6 +11,11 @@ option(TDPORT_HERCULES "Also build tdport-herc: TDCGA.EXE in Hercules monochrome
 
 find_package(SDL3 REQUIRED CONFIG)
 
+# The MSYS2 SDL3.dll imports libiconv-2.dll. TARGET_RUNTIME_DLLS does not list it, so it is copied separately.
+if(WIN32)
+    find_file(TDPORT_ICONV_DLL libiconv-2.dll HINTS "${SDL3_DIR}/../../../bin" NO_DEFAULT_PATH)
+endif()
+
 file(GLOB_RECURSE TD_SOURCES CONFIGURE_DEPENDS src/*.c)
 # One graphics layer per executable: gfx.c drives the EGA planes, gfx_cga.c the CGA/Hercules screen.
 list(FILTER TD_SOURCES EXCLUDE REGEX "/platform/gfx(_cga)?\\.c$")
@@ -30,6 +35,10 @@ function(tdport_add_variant target gfx_source)
         add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${target}> $<TARGET_FILE_DIR:${target}>
             COMMAND_EXPAND_LISTS)
+        if(TDPORT_ICONV_DLL)
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${TDPORT_ICONV_DLL} $<TARGET_FILE_DIR:${target}>)
+        endif()
     endif()
 endfunction()
 

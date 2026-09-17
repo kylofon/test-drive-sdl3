@@ -34,6 +34,9 @@ cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TY
 cmake --build tdport/build
 ```
 
+The build copies `SDL3.dll` next to the executables. The MSYS2 `SDL3.dll` also needs `libiconv-2.dll`, so the
+build copies it from `C:\msys64\mingw64\bin` too. To run the port on another PC, keep both DLLs next to the `.exe`.
+
 In your own build setup, compile the sources with `TD_CGA=1` (CGA) or `TD_CGA=1 TD_HERC=1` (Hercules)
 defined, using `src/platform/gfx_cga.c` instead of `src/platform/gfx.c`.
 
