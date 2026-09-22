@@ -18,6 +18,7 @@ struct Version {
     const char* needs;      // what the game folder must hold, for the status line
     bool dosOptions;        // takes --frame-rate and --bios-keys
     bool monitor;           // takes --monitor
+    bool originalBugs;      // takes --original-bugs
 };
 
 extern const std::array<Version, 4> VERSIONS;
@@ -33,8 +34,9 @@ bool PortInstalled(const Version& v);
 // beside the launcher.
 wxString DefaultGameDir(Family family);
 
-// Whether `dir` holds the version's game file.
-bool GameFilePresent(const Version& v, const wxString& dir);
+// The game file the version would load from `dir` (its name, as found), or an empty string if there is none.
+// The Amiga version also takes an Amiga disk image (.adf) in the folder.
+wxString FindGameFile(const Version& v, const wxString& dir);
 
 struct LaunchOptions {
     wxString gameDir;
@@ -42,6 +44,7 @@ struct LaunchOptions {
     int frameRate = 8;      // --frame-rate: 0 draws as fast as possible
     bool biosKeys = false;  // --bios-keys
     wxString monitor;       // --monitor: green, amber or white
+    bool originalBugs = false;  // --original-bugs: keep the original's bugs
 };
 
 // Starts the version from the launcher's folder. On failure returns false and

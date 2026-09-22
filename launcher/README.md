@@ -11,11 +11,11 @@ It sits in the same folder as the port executables and looks for them there:
 | EGA (16 colours) | `tdport.exe` | `TDEGA.EXE` |
 | CGA (4 colours) | `tdport-cga.exe` | `TDCGA.EXE` |
 | Hercules (monochrome) | `tdport-herc.exe` | `TDCGA.EXE` |
-| Amiga | `tdport-amiga.exe` | `td` |
+| Amiga | `tdport-amiga.exe` | an Amiga disk image (`*.adf`), or `td` from the extracted disk |
 
-A version whose executable is missing is greyed out and marked **Not installed**. The Amiga port doesn't exist
-yet, so its entry is always greyed out for now. Its executable name, game file and default folder are placeholders
-in `versions.cpp`, to be settled when the port exists.
+A version whose executable is missing is greyed out and marked **Not installed**. `tdport-amiga.exe` is built
+with `-DTDPORT_AMIGA=ON`; its game folder holds the Amiga disk image (`.adf`) or the files extracted from it (`td`, `Cars/`, `Pics/`,
+...).
 
 ## The window
 
@@ -29,6 +29,8 @@ in `versions.cpp`, to be settled when the port exists.
     possible). DOS versions only.
   * **Monitor**: green, amber or white phosphor (`--monitor`). Hercules only.
   * **Original keyboard handling**: driving keys act only through key repeat (`--bios-keys`). DOS versions only.
+  * **Original bugs**: keep the original game's bugs instead of the port's fixes (`--original-bugs`; the list is
+    in `port/amiga/README.md`). Amiga only.
 * **Play** starts the version from the launcher's folder with `--game-dir` and those options, then closes the
   launcher. If the version can't be started, a message box says why. Errors inside the game (a missing data file,
   say) are reported by the game itself.
@@ -49,7 +51,7 @@ Debian and Ubuntu: `libwxgtk3.2-dev`). To build it beside the port executables, 
 configuring `tdport`:
 
 ```bash
-cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release -DTDPORT_CGA=ON -DTDPORT_HERCULES=ON -DTDPORT_LAUNCHER=ON
+cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release -DTDPORT_CGA=ON -DTDPORT_HERCULES=ON -DTDPORT_AMIGA=ON -DTDPORT_LAUNCHER=ON
 cmake --build tdport/build
 ```
 

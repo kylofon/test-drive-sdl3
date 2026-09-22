@@ -46,6 +46,7 @@ private:
     wxSpinCtrl* frameRate_ = nullptr;
     wxStaticText* frameRateHint_ = nullptr;
     wxCheckBox* biosKeys_ = nullptr;
+    wxCheckBox* originalBugs_ = nullptr;
     wxStaticText* monitorLabel_ = nullptr;
     wxChoice* monitor_ = nullptr;
     wxButton* play_ = nullptr;

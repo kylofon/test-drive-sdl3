@@ -146,7 +146,13 @@ LauncherDialog::LauncherDialog()
     biosKeys_->SetToolTip(
         "Driving keys act only through the keyboard's key repeat, exactly like the original. "
         "When off, keys act for as long as they are held.");
-    optionsBox->Add(biosKeys_, 0, wxALL, gap);
+    optionsBox->Add(biosKeys_, 0, wxLEFT | wxRIGHT | wxTOP, gap);
+
+    originalBugs_ = new wxCheckBox(ob, wxID_ANY, "Original b&ugs");
+    originalBugs_->SetToolTip(
+        "Keep the original game's bugs, such as the traffic that never appears. "
+        "When off, the port fixes them.");
+    optionsBox->Add(originalBugs_, 0, wxALL, gap);
 
     // Buttons
     auto* buttons = new wxBoxSizer(wxHORIZONTAL);
@@ -176,6 +182,7 @@ LauncherDialog::LauncherDialog()
         wxMax(MIN_SCALE, wxMin(MAX_SCALE, settings::GetInt("Launcher", "Scale", DEFAULT_SCALE))) - MIN_SCALE);
     frameRate_->SetValue(settings::GetInt("Launcher", "FrameRate", DEFAULT_FRAME_RATE));
     biosKeys_->SetValue(settings::GetInt("Launcher", "BiosKeys", 0) != 0);
+    originalBugs_->SetValue(settings::GetInt("Launcher", "OriginalBugs", 0) != 0);
     const wxString monitor = settings::GetString("Launcher", "Monitor", MONITORS[0]);
     monitor_->SetSelection(0);
     for (int i = 0; i < 3; ++i)
@@ -232,12 +239,13 @@ void LauncherDialog::UpdateState() {
             }
 
     const Version& v = Selected();
-    const bool found = GameFilePresent(v, folder_->GetValue());
+    const wxString gameFile = FindGameFile(v, folder_->GetValue());
+    const bool found = !gameFile.empty();
     wxString note;
     if (!any)
         note = "The game isn't installed: no tdport executable is beside the launcher.";
     else if (found)
-        note = wxString::Format("Found %s.", v.gameFile);
+        note = wxString::Format("Found %s.", gameFile);
     else
         note = wxString::Format("This folder needs %s.", v.needs);
     folderIcon_->Show(!any || !found);
@@ -247,6 +255,7 @@ void LauncherDialog::UpdateState() {
     frameRate_->Enable(v.dosOptions);
     frameRateHint_->Enable(v.dosOptions);
     biosKeys_->Enable(v.dosOptions);
+    originalBugs_->Enable(v.originalBugs);
     monitorLabel_->Enable(v.monitor);
     monitor_->Enable(v.monitor);
     play_->Enable(any && found);
@@ -266,6 +275,7 @@ void LauncherDialog::Play() {
     options.scale = scale_->GetSelection() + MIN_SCALE;
     options.frameRate = frameRate_->GetValue();
     options.biosKeys = biosKeys_->GetValue();
+    options.originalBugs = originalBugs_->GetValue();
     options.monitor = MONITORS[wxMax(0, monitor_->GetSelection())];
     wxString error;
     if (!Launch(Selected(), options, error)) {
@@ -286,6 +296,7 @@ void LauncherDialog::Save() {
     settings::SetInt("Launcher", "Scale", scale_->GetSelection() + MIN_SCALE);
     settings::SetInt("Launcher", "FrameRate", frameRate_->GetValue());
     settings::SetInt("Launcher", "BiosKeys", biosKeys_->GetValue() ? 1 : 0);
+    settings::SetInt("Launcher", "OriginalBugs", originalBugs_->GetValue() ? 1 : 0);
     settings::SetString("Launcher", "Monitor", MONITORS[wxMax(0, monitor_->GetSelection())]);
     settings::SaveWindowPosition("Launcher", this);
 }
