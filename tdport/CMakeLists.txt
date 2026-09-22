@@ -49,3 +49,9 @@ endif()
 if(TDPORT_HERCULES)
     tdport_add_variant(tdport-herc gfx_cga.c TD_CGA=1 TD_HERC=1)
 endif()
+
+# The launcher ("Test Drive"), which lets players pick one of the executables above. It needs wxWidgets 3.2.
+option(TDPORT_LAUNCHER "Also build the launcher, Test Drive.exe (wxWidgets)" OFF)
+if(TDPORT_LAUNCHER)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../launcher launcher)
+endif()

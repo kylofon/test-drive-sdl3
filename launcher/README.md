@@ -1,0 +1,73 @@
+# Test Drive launcher
+
+`Test Drive.exe` lets players choose which version of the port to start. It is built with
+[wxWidgets](https://www.wxwidgets.org/) 3.2 from the platform's own controls, so on Windows it looks like any
+Windows dialog: group boxes, radio buttons, push buttons, themed through Common Controls 6, DPI aware.
+
+It sits in the same folder as the port executables and looks for them there:
+
+| Version | Executable | Game file it checks for |
+|---|---|---|
+| EGA (16 colours) | `tdport.exe` | `TDEGA.EXE` |
+| CGA (4 colours) | `tdport-cga.exe` | `TDCGA.EXE` |
+| Hercules (monochrome) | `tdport-herc.exe` | `TDCGA.EXE` |
+| Amiga | `tdport-amiga.exe` | `td` |
+
+A version whose executable is missing is greyed out and marked **Not installed**. The Amiga port doesn't exist
+yet, so its entry is always greyed out for now. Its executable name, game file and default folder are placeholders
+in `versions.cpp`, to be settled when the port exists.
+
+## The window
+
+* **Version**: one of the four above.
+* **Game files**: the folder with the original game's files. The DOS versions share one folder (default `Game`
+  beside the launcher) and the Amiga version has its own (default `Game Amiga`). The line below it says whether
+  the folder has the file the chosen version loads. **Play** stays greyed out until it does.
+* **Options**:
+  * **Window size**: 320 × 240 to 1920 × 1440 (`--scale`, default 960 × 720).
+  * **Frame rate**: the drawing speed while driving (`--frame-rate`, default 8 as in the original, 0 as fast as
+    possible). DOS versions only.
+  * **Monitor**: green, amber or white phosphor (`--monitor`). Hercules only.
+  * **Original keyboard handling**: driving keys act only through key repeat (`--bios-keys`). DOS versions only.
+* **Play** starts the version from the launcher's folder with `--game-dir` and those options, then closes the
+  launcher. If the version can't be started, a message box says why. Errors inside the game (a missing data file,
+  say) are reported by the game itself.
+* **About**: the version, author and links, in the Windows task dialog.
+
+The ports and the game folder are checked again whenever the window is activated, so files copied in while it is
+open show up straight away.
+
+Everything is remembered in `%APPDATA%\Test Drive Launcher\settings.ini` (`~/.config/test-drive-launcher` on
+Linux): the version, both game folders, the options and where the window was. A game folder left at its default
+is stored empty, so it follows the launcher if the whole folder moves. Delete the file to go back to the
+defaults.
+
+## Building
+
+Needs CMake 3.24, a C++17 compiler and wxWidgets 3.2 (MSYS2 `mingw64`: `mingw-w64-x86_64-wxwidgets3.2-msw`;
+Debian and Ubuntu: `libwxgtk3.2-dev`). To build it beside the port executables, add `-DTDPORT_LAUNCHER=ON` when
+configuring `tdport`:
+
+```bash
+cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release -DTDPORT_CGA=ON -DTDPORT_HERCULES=ON -DTDPORT_LAUNCHER=ON
+cmake --build tdport/build
+```
+
+It also builds on its own (`cmake -S launcher -B launcher/build -G Ninja`), but then it has to be copied next to
+the port executables to find them.
+
+On Windows the build copies every DLL the launcher needs beside it (`copy_dlls.cmake`): the two wxWidgets DLLs
+and the MSYS2 libraries they load (libstdc++, libpng, libtiff, ...). Keep them with the `.exe` in a release.
+The C++ runtime of the launcher itself is linked in.
+
+## Files
+
+* `app.cpp`: the wxWidgets application.
+* `launcher.h`, `launcher.cpp`: the window and the About box.
+* `versions.h`, `versions.cpp`: the versions table, the file checks and starting a port.
+* `settings.h`, `settings.cpp`: `settings.ini`.
+* `icon.h`, `icon.cpp`: the app icon, a chequered flag drawn in code. `make_icon.py` (Pillow) writes the same
+  drawing to `app.ico` for Explorer.
+* `app.rc`, `app.manifest`, `app.ico`, `version.h`: icon, visual styles, DPI awareness, version info.
+* `copy_dlls.cmake`: the post-build DLL copy.
+* `CMakeLists.txt`: the build, standalone or from `tdport`.

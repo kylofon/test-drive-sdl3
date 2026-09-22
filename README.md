@@ -56,6 +56,7 @@ that ports `TDCGA.EXE`:
 |---|---|---|
 | `-DTDPORT_CGA=ON` | `tdport-cga.exe` | CGA, 4 colours (`TD.EXE` menu choice 1) |
 | `-DTDPORT_HERCULES=ON` | `tdport-herc.exe` | Hercules monochrome (`TD.EXE` menu choice 3, `tdcga herc`) |
+| `-DTDPORT_LAUNCHER=ON` | `Test Drive.exe` | The launcher (needs wxWidgets 3.2, see [Launcher](#launcher)) |
 
 ```bash
 cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release -DTDPORT_CGA=ON -DTDPORT_HERCULES=ON
@@ -88,6 +89,13 @@ defined, using `src/platform/gfx_cga.c` instead of `src/platform/gfx.c`.
 Alt+Enter toggles fullscreen. The window keeps the 4:3 aspect of the original monitor. The Hercules build
 shows the card's 640×300 picture.
 
+## Launcher
+
+`Test Drive.exe` is a small Windows program for players. You choose a version (EGA, CGA, Hercules and, once it
+is ported, Amiga), the game folder, window size, frame rate, keyboard handling and Hercules monitor colour, then
+**Play**. It starts the matching `tdport` executable from its own folder with those options. Versions whose
+executable isn't there are greyed out. See [`launcher/README.md`](launcher/README.md).
+
 ## Controls (from the original)
 
 * Arrow keys / numeric keypad: steer, accelerate, brake and shift through the gear gate, as in the original.
@@ -116,6 +124,7 @@ See `tdport/PORTING.md` for the architecture and porting rules. In short:
 * `tdport/src/platform/` holds the graphics layers (EGA `gfx.c`, CGA/Hercules `gfx_cga.c`), timer/sound,
   input and resource layers.
 * `tdport/src/game/` holds game flow, scene rendering and simulation, shared by all builds.
+* `launcher/` holds the wxWidgets launcher.
 
 Reverse-engineering tools, specs and file formats are in `tools/`, `port/` and `FORMATS.md`. `port/cga/`
 documents TDCGA.EXE and how it differs from TDEGA.EXE.
