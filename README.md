@@ -56,6 +56,7 @@ that ports `TDCGA.EXE`:
 |---|---|---|
 | `-DTDPORT_CGA=ON` | `tdport-cga.exe` | CGA, 4 colours (`TD.EXE` menu choice 1) |
 | `-DTDPORT_HERCULES=ON` | `tdport-herc.exe` | Hercules monochrome (`TD.EXE` menu choice 3, `tdcga herc`) |
+| `-DTDPORT_AMIGA=ON` | `tdport-amiga.exe` | The Amiga release (`td`); in progress, see [`port/amiga/README.md`](port/amiga/README.md) |
 | `-DTDPORT_LAUNCHER=ON` | `Test Drive.exe` | The launcher (needs wxWidgets 3.2, see [Launcher](#launcher)) |
 
 ```bash
@@ -86,15 +87,34 @@ defined, using `src/platform/gfx_cga.c` instead of `src/platform/gfx.c`.
 | `--check` | Verify that `TDEGA.EXE` (`TDCGA.EXE` for CGA/Hercules) loads, then exit without opening a window |
 | `--monitor COLOUR` | Hercules build only: phosphor colour, `green` (default), `amber` or `white` |
 
+`tdport-amiga.exe` reads the Amiga disk image (`.adf`) directly, or the files extracted from it (`td`, `Cars/`,
+`Pics/`, ...; `tools/adf.py`). `--game-dir` (default `Game Amiga`) is the `.adf` itself, a folder holding it, or
+the folder with the extracted files. It also takes `--scale`, `--check` and `--original-bugs` (keep the
+original's bugs instead of the port's fixes). The whole game is ported: title, car selection, the drive, the gas
+station, results, high scores and the ending. High scores are saved beside the disk image, which is never
+written to.
+
 Alt+Enter toggles fullscreen. The window keeps the 4:3 aspect of the original monitor. The Hercules build
 shows the card's 640×300 picture.
 
 ## Launcher
 
-`Test Drive.exe` is a small Windows program for players. You choose a version (EGA, CGA, Hercules and, once it
-is ported, Amiga), the game folder, window size, frame rate, keyboard handling and Hercules monitor colour, then
+`Test Drive.exe` is a small Windows program for players. You choose a version (EGA, CGA, Hercules or Amiga), the
+game folder, window size, frame rate, keyboard handling, Hercules monitor colour and, for the Amiga, the
+original bugs, then
 **Play**. It starts the matching `tdport` executable from its own folder with those options. Versions whose
 executable isn't there are greyed out. See [`launcher/README.md`](launcher/README.md).
+
+## Third-party content
+
+The Amiga port draws text with a recreation of the Amiga's `topaz.font`, which lives in the Kickstart ROM and
+is not on the game disk:
+
+> The FontStruction "Amiga Topaz" (https://fontstruct.com/fontstructions/show/675155) by Patrick H. Lauke is
+> licensed under a Creative Commons Attribution license (http://creativecommons.org/licenses/by/3.0/).
+
+`tools/gen_font8.py` rasterises it to the 8x8 cells in `tdport/src/amiga/font8.c` (the only change made to it);
+the font archive and its licence are in `licenses/amiga-topaz/`.
 
 ## Controls (from the original)
 
