@@ -36,9 +36,8 @@ slow RAM at F80000-FBFFFF when present, 20 buffers for df0:, then `td >nil: p`.
 | `Songs/Drum`, `Drum2`, `BuzzSynth` | Instrument samples (header like `Sfx`, plus loop fields) |
 | `HighScores` | Text, three lines per entry: name, score, car path |
 
-`Pckd` container: `"Pckd"`, `.L` packed size, `.L` unpacked size, `.W` type (8 or 4 seen), then the packed
-stream. The type-4 streams start with what looks like a Huffman tree (`FF 00 02 00 01 00 04 00 03 ...`).
-Not decoded yet.
+`Pckd` is the DOS `.PES` container big-endian (ARC methods 4 and 8 in use), shape archives have the DOS archive
+layout, and ILBM is standard: see the Amiga section of `FORMATS.md` and `tools/amigares.py`.
 
 ## The executable
 
@@ -117,9 +116,9 @@ with extent, callers/callees, globals read/written, strings, library calls (LVO)
 
 ## Plan
 
-1. **Formats** — decode `Pckd` (both types), the `.Shp` shape/archive layout, ILBM (standard), SMUS and the
-   instrument/sfx headers; write extractors under `tools/` and document them in `FORMATS.md`. Check the car
-   record differences against the DOS field table.
+1. **Formats** — done: `Pckd`, shape archives, shapes, ILBM (`tools/amigares.py`, `FORMATS.md`). Still to do:
+   SMUS and the instrument/sfx headers, the `.SS` script, and the car record differences against the DOS
+   field table.
 2. **Decompilation** — import `work/amiga/td.bin` into Ghidra (68000, base 0x10000, A4 = 0x1FC0E as register
    context, call-table slots labelled) and export a decompile with globals named `D:xxxx`, like
    `port/decomp/tdega_ds.c`.
