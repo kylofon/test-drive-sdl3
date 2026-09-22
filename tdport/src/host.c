@@ -91,7 +91,14 @@ void host_set_frame_source(bool (*compose)(u32 *), int w, int h)
     SDL_SetRenderLogicalPresentation(renderer, VIEW_W(frame_w), VIEW_H(frame_w), SDL_LOGICAL_PRESENTATION_LETTERBOX);
     if (texture) SDL_DestroyTexture(texture);
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, frame_w, frame_h);
-    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+    /* The frame is rarely an integer multiple of the output (Hercules: 640x300 into a 4:3 view, 1.5x by
+     * 2.4x in the default window), and plain nearest sampling then draws some source columns/rows one
+     * output pixel wider than others: a regular beat pattern across the 1-pixel Hercules detail. Pixel-art
+     * sampling keeps texels sharp but antialiases their edges, so every source pixel gets the same size. */
+#if SDL_VERSION_ATLEAST(3, 4, 0)
+    if (!SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_PIXELART))
+#endif
+        SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 }
 
 static Uint64 tick_due_ns(Uint64 n)
