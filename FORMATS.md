@@ -155,3 +155,24 @@ Verified from the disassembly unless noted. DS = image 0xC9A0.
 * 8 entries, each written with `%-20.20s%-20.20s%ld` plus a CRLF.
 * The line after each entry is a `%x` CRC-8 checksum: reflected polynomial 0xB8, seeded with the row number 0–7, computed over the formatted line plus `\n`.
 * Entries with a bad checksum are skipped when the file is loaded.
+
+## Amiga release
+
+The Amiga disk and executable are described in `port/amiga/README.md`. Extract the disk with
+`tools/adf.py`; `tools/amigares.py info|unpack|export` decodes the resources.
+
+* **`Pckd`** is the `.PES` container above with every field big-endian (`"Pckd"`, `u32 packed_len`,
+  `u32 unpacked_len`, `u16 method`, `u16 CRC-16/ARC`). The decoder (td 0x14C9C) handles ARC methods 2 (stored),
+  3 (RLE90), 4 (squeezed) and 8 (crunched); the files use 4 and 8, and all decode with matching CRCs. A file
+  without the magic is loaded as it is (`Pics/Road.Shp`, the ILBM screens).
+* **Shape archives** (`*.Shp`, unpacked) have the resource-archive layout, big-endian. Many entry names match
+  the DOS ones (108 of `Road.Shp`'s 167 are in `XROAD?.PES`), but the art was redrawn: sizes and hot spots differ.
+* **Shape**: `u16 width_bytes, u16 height, s16 hot_x, s16 hot_y, s16 x, s16 y, u16 planes (5), u16 plane_bytes`,
+  then `planes` bitplanes of `plane_bytes` (= width_bytes × height) bytes, MSB = leftmost pixel.
+* **Pictures** are standard IFF ILBM, 320×200, 5 planes, ByteRun1 (title screens, dashboards, spec sheets,
+  gas station, logos, ending). The cracked disk's `Pics/title2` was repainted by the crackers ("Cracked by the
+  Rogues"); the original "Accolade presents" picture is lost.
+* **Car record** `Cars/<car>.B`: the DOS `.BIN` layout with 16-bit fields big-endian, a few values changed.
+* **Samples** (`Sfx/*`): `u32 length, u16 rate_hz`, then signed 8-bit PCM. Music is IFF SMUS (`Songs/*.Iff.Sng`)
+  with raw instrument samples (`Songs/Drum`, `Drum2`, `BuzzSynth`).
+* **`HighScores`**: text, three lines per entry (name, score, car path). **`Cars.txt`**: count, then car paths.
