@@ -1,0 +1,89 @@
+kind,address,name,type,dos_equiv,notes
+func,0x12304,sfx_init,void(void),0x69CF,verified; audio DMA/INT off; ADKCON 0xFF; $70 -> 0x12616; AddIntServer VERTB Sfx VBLInt pri 0x1E
+func,0x123EC,sfx_shutdown,void(void),0x694A,verified; stop all; Delay(5); RemIntServer; restore $70
+func,0x12432,sfx_set_song_channels,void(int mask),,verified; D:1E9E = (~mask & 0xF) << 7; masked channels lose the audio interrupt
+func,0x1246A,play_sample,"void(sample *s, int ch, int vol)",0x8A3E,verified; period = 0x369E99 / rate (rate<100 -> x1000); start_channel(s+6 len ch period vol 1)
+func,0x124C4,start_channel,"void(u8 *data, long len, int ch, int period, int vol, int repeats)",,verified; stops busy channel; record pending; repeats -1 = loop
+func,0x1252A,snd_stop_all,void(void),0x8A08,verified; sfx_stop_channel(0..3)
+func,0x12546,sfx_stop_channel,void(int ch),,verified; DMA off; AUDxVOL 0; stop tick = D:04C2
+func,0x1258E,sfx_channel_busy,int(int ch),0x8A02,verified; -1 if record data pointer set
+func,0x125A6,sfx_set_period_vol,"void(int ch, int period, int vol)",,verified; negative = keep; vol cancels slide
+func,0x125F4,sfx_slide_volume,"void(int ch, int target, long step)",,verified; 16.16 slide run by 0x126AE
+func,0x12616,sfx_audio_int,level-4 autovector handler,,verified; counts repeats; stops channel (PER 0x96 VOL 0 DMA off); not in td_functions.json
+func,0x126AE,sfx_vbl_server,VERTB interrupt server,0x6A1F,verified; tick D:04C2; starts pending channels >= 2 ticks after stop; volume slides
+func,0x1278C,song_init,void(void),0x699E,verified; AddIntServer VERTB Song VBLInt pri 0x20; volume 0x10
+func,0x127F4,song_shutdown,void(void),0x694A,verified; request stop; Delay(3); free instruments; RemIntServer
+func,0x12826,song_load_instruments,"void(char *names[4], int oneshot[4])",,verified; songs/<name> in chip RAM; name <= 10 = copy slot n
+func,0x128FE,song_free_instruments,void(void),,verified
+func,0x12942,song_set_volume,"void(int vol, long step)",,verified; D:1EF8 = vol<<16; D:1EF0 = step (0 = jump)
+func,0x1295E,song_get_volume,int(void),,verified; D:1EF4 high word or 0 when idle
+func,0x12972,song_start,void(u8 *smus),,verified; if installed and music on: request stop + song_setup(d0=6)
+func,0x1299C,song_request_stop,asm,0x89F0,verified; state -> 3; wait loop exits at once
+func,0x129BA,song_setup,"asm (a0 song, a1 inst[4], a2 oneshot[4], d0 base)",,verified; builds duration table D:0710; state 1
+func,0x12A40,song_is_active,int(void),,verified; -1 if state 1 or 2
+func,0x12A54,song_vbl_server,VERTB interrupt server,0x6AA8,verified; SMUS player tick; not in td_functions.json
+func,0x12C98,song_volume_slide,asm,,verified; not in td_functions.json
+func,0x12CDC,smus_find_long,asm (a0 base d0 off d1 limit d2 id),,verified; 2-byte steps; carry = found; not in td_functions.json
+func,0x12CF4,song_play,"void(char *file, char *inst[4], int oneshot[4], int mask, int vol)",0x8A3E,verified; same song already loaded -> fade in 0x8000
+func,0x12DB0,song_stop,void(void),0x89F0,verified; fade 0x5400/tick; busy wait; stop; Delay(2); free
+func,0x12E12,song_play_testdrive,void(void),0x8A3E,verified; TestDrive.Iff.Sng mask 1 vol 0x20; DOS intro sng2 and high-score sng3
+func,0x12E58,song_play_test2,void(void),0x8A3E,verified; Test2.Iff.Sng mask 3 vol 0x16; DOS car-select sng4
+func,0x12E8A,song_play_testgas,void(void),0x8A3E,verified; TestGas.Iff.Sng; DOS gas sng1
+func,0x12EBE,song_play_endsuccess,void(void),,verified; EndSuccess.Iff.Sng; ending (no DOS song)
+func,0x12EF6,song_play_loser,void(void),,verified; Loser.Iff.Sng; no caller
+func,0x26B7A,sfx_load_drive,void(void),0x4792,verified; sfx/Radar TheEngine TheTurbo Squeal Bump (chip)
+func,0x26C02,sfx_free_drive,void(void),,verified; frees the five samples without stopping channels
+func,0x26C50,radar_beep,void(void),0x35C6,verified; if D:0344: play_sample(Radar 0 0x40); DOS beep call at 0x35E2
+func,0x26C70,engine_sound_start,void(void),0x8A0E,verified; Squeal ch1 / TheTurbo ch2 / TheEngine ch3 loops from the header (quirk); engine fade-in 0x3F step 0x7000
+func,0x26D16,engine_sound_fade_out,void(void),0x8A08,verified; ch1-3 slide to 0 step 0x7000
+func,0x26D4E,engine_sound_update,void(void),0x3B1F,verified; per drive frame; engine period 0x249988/max(rpm 800) clamp 0x82..0x708; turbo volume/period
+func,0x26E26,squeal_update,asm,,verified; steady squeal vol D:19BC period 0x166 or chirp envelope D:15FE
+func,0x26EE2,bump_update,asm,,verified; Bump on ch0 if idle and D:0344
+global,D:0344,sfx_enabled,int,DS:643E,verified; init 1; S key; bit 2 of DOS snd_flags
+global,D:0444,sfx_installed,int,,verified
+global,D:0446,sfx_chan,struct[4] x 0x1E,,verified; +0 data +4 stop tick +8 pending +A len words +C period +E vol 16.16 +12 repeats +14 left +16 target +1A step
+global,D:04BE,old_level4_vector,long,,verified
+global,D:04C2,sfx_tick,long,DS:642A,verified; +1 per VBL in sfx server
+global,D:04C6,sfx_dma_set,int,,verified
+global,D:04C8,sfx_saved_intena,int,,verified
+global,D:04CA,song_installed,int,,verified
+global,D:04CC,music_enabled,int,,verified; init 1; M key
+global,D:04CE,song_inst_loaded,int,,verified
+global,D:0500,note_period_table,long[132],DS:6452,verified; 0x369E99/f(note); note 69 = 440 Hz; accessed via D:05F0 + 4*(note-0x3C)
+global,D:0710,note_ticks,int[16],,verified; SMUS duration code -> ticks (96 48 24 12 6 ... 144 72 36 18 9)
+global,D:0732,song_state,int,DS:643D,verified; 0 idle 1 start 2 play 3 stop
+global,D:0734,song_any_active,int,,verified
+global,D:0736,song_data,long,DS:642C,verified; SMUS buffer being played
+global,D:073A,song_track,struct[4] x 0x18,,verified; +0 active +2 inst +6 oneshot +8 size +C data +10 pos +14 count +16 tie
+global,D:08BA,song_dma_on,int,,verified
+global,D:08BC,song_dma_off,int,,verified
+global,D:08BE,smus_tempo,int,,verified; unused
+global,D:08C0,smus_volume,int,,verified; unused
+global,D:08C2,song_buffer,long,,verified; loaded song file
+global,D:08C6,testdrive_inst,char*[4],,verified; BuzzSynth Drum2 Drum 0
+global,D:08D6,testdrive_oneshot,int[4],,verified; 0 1 1 0
+global,D:08DE,song_inst,char*[4],,verified; BuzzSynth 0 Drum 0
+global,D:08EE,song_oneshot,int[4],,verified; 0 0 1 0
+global,D:1E9A,sfx_server_a4,long,,verified
+global,D:1E9E,sfx_int_channels,int,,verified; INTENA bits 7-10 handled by 0x12616
+global,D:1EA0,sfx_vbl_interrupt,struct Interrupt,,verified; pri 0x1E code 0x126AE
+global,D:1EB6,song_server_a4,long,,verified
+global,D:1EBA,song_vbl_interrupt,struct Interrupt,,verified; pri 0x20 code 0x12A54
+global,D:1ED0,song_inst_ptr,long[4],,verified
+global,D:1EE0,song_inst_owned,int[4],,verified
+global,D:1EE8,song_inst_oneshot,int[4],,verified
+global,D:1EF0,song_vol_step,long,,verified; 16.16
+global,D:1EF4,song_volume,long,,verified; 16.16; high word used
+global,D:1EF8,song_vol_target,long,,verified; 16.16; -1 none
+global,D:2E28,song_name,char[],,verified
+global,D:1BAE,sfx_radar,sample*,,verified
+global,D:1BB2,sfx_engine,sample*,,verified
+global,D:1BB6,sfx_turbo,sample*,,verified
+global,D:1BBA,sfx_squeal,sample*,,verified
+global,D:1BBE,sfx_bump,sample*,,verified
+global,D:1BC2,engine_period,int,DS:64FC,verified; channel 3 period
+global,D:15FE,squeal_env,int,DS:08F4,verified; chirp envelope index; -1 off; set 0 / 0xB by 0x207A4
+global,D:19BC,skid_volume,int,DS:64FE,verified; 0..0x40; steady squeal volume
+global,D:19BE,bump_edge,int,,verified use; from D:0D80 via table 0x24A98
+global,D:0D9A,bump_marker,int,,verified use; set by 0x1E6A6/0x1E73A
+global,D:0D72,squeal_mute,int,,likely; demo / finishing zone / D:0D76 >= 0x46

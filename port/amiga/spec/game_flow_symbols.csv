@@ -1,0 +1,140 @@
+kind,address,name,type,dos_equiv,notes
+func,0x163B0,aztec_startup,entry,0xA50C,verified; A4=0x1FC0E; clear BSS D:1E94..; SysBase D:27DC; open dos.library; calls 0x1642A
+func,0x1642A,aztec_main,void(void),0xA50C,verified flow; stdio table; CLI args D:27F4/D:27F0 or WB message; main(argc argv); exit(0)
+func,0x10018,main,int main(int argc char **argv),0x0010,verified; init; argv[1][0] p/t title h scores s select else game car 0; TITLE/SCORES/SELECT/GAME state machine; overlay_unload around run_game
+func,0x1032C,close_cli_window,void(void),,verified; 'p' arg; CloseWindow(IntuitionBase->ActiveWindow) + CloseWorkBench
+func,0x10346,load_cars_txt,void(int load),0x0243,verified; Cars.Txt count 1..29 then lines; load=0 clears count; D:1E94=1 if missing
+func,0x10402,skip_line,char *(char **pp),0x1000,verified; advance past next LF (stops at NUL); also used by the .SS parser 0x1C244
+func,0x10588,copy_protection_check,void(void),0x8DC7,verified flow; disk timing; failure corrupts code and sets D:1E94; drop in port
+func,0x12F28,high_scores,int(long score int car),0x12DB,verified; load; entry if score>0 && >scores[7]; show; save if dirty; credits if D:281A<0; returns 0 or -1
+func,0x12FF0,read_line,char *(char *dst char *src),,verified; copies signed bytes >=0x20; skips one terminator; no length limit
+func,0x13028,scores_load,int(char names[8][40] long scores[8] char cars[8][40]),0x1369,verified; HighScores 3 lines/entry; crc16 init 0x6D62 poly 0x2058; failure clears all and returns 1
+func,0x1313E,scores_save,void(char names[8][40] long scores[8] char cars[8][40]),0x162E,verified; 500-byte buffer; '%s\n%ld\n%s\n' x8 then '%04x\n' crc
+func,0x13250,hs_gfx_init,void(void),0x6C85,verified; topaz 8 -> D:2872; RastPort D:2876 on bitmap A; pen 1 JAM1
+func,0x132E6,hs_gfx_free,void(void),,verified; CloseFont; free D:2876
+func,0x13306,hs_text,void(char *s),0x4BE7,verified; Text(D:2876 s strlen)
+func,0x13330,hs_move,void(int x int y),,verified; Move(D:2876)
+func,0x13354,hs_set_pen,void(int pen),0x6C85,verified; SetAPen(D:2876)
+func,0x1336E,hs_draw_box,void(int x0 int y0 int x1 int y1),0x9530,verified; outline pen 1; pen restored
+func,0x1343A,hs_clear_rect,void(int x0 int y0 int x1 int y1),,verified; RectFill pen 0 JAM1; state restored
+func,0x134F2,hs_cursor,void(void),,verified; COMPLEMENT RectFill pen 0x1F (cx cy-8)-(cx+8 cy+1); toggles
+func,0x135B4,text_input_line,void(char *buf int maxlen),0x92A8,verified; 0x20..0x7E Backspace Return; 6000 VBL idle or Ctrl-C -> empty name; busy loop
+func,0x13708,scores_enter_name,void(long score int car char names[8][40] long scores[8] char cars[8][40]),0x1482,verified; <car>logo ILBM; 17 chars; empty name inserts nothing; 60 VBL then fire release
+func,0x13A9E,credits_show,int(void),0x186E,verified; 24 lines D:0926 pens D:08F6; dissolve; 900 VBL; 0 fire -1 timeout
+func,0x13BD8,scores_show,int(char names[8][40] long scores[8] char cars[8][40]),0x16D7,verified; 'Test Drive Top Scores'; rows 0-3 logo + copper palette; rows 4-7 y=i*10+0x6B; 'Your Score : %ld'; 900 VBL
+func,0x13E86,hs_draw_logo,void(int row char *carPath),0x16D7,verified; '%slogo.Shp' shape 'logo' at (0x10 row*0x23+3) into view A
+func,0x13F32,hs_logo_palette,void(int row char *carPath UCopList *ucl),,verified; row -1 LoadRGB4 D:098E; else CWait row*0x23+1 + 32 CMove from '%sLogo.Pal' or D:098E
+func,0x1406E,crc16,uint(void *buf long len uint init uint poly),0x8D8C,verified; wrapper of 0x14088
+func,0x14088,crc16_core,asm a0 d1 d0 d2,,verified; MSB-first over len>>1 big-endian words
+func,0x1433A,wait_vbl_or_fire,void(int n),,verified; n x (poll_input WaitTOF) unless fire or quit_sticky
+func,0x1436E,quit_sticky,int(void),,verified; D:2822 |= quit_requested
+func,0x14388,results_add_line,void(char *s),0x1CFA,verified; also does 0x1D20 results_scroll per line; 320x24x1 bitmap; ScrollRaster 1px x8; DrawImage at y 0xB8; 6/1 VBL per px; 40/0 VBL per line
+func,0x1444C,results_text,void(long avgSpeed int secs long score int limit),0x1B36,verified; too slow = secs>limit; tiers >0x69 >0x5F >0x41; tips if not too slow
+func,0x147E4,stage_results,void(int car long avgSpeed int secs long score int limit),0x1993,verified; gas station; TestGas; lives+=2; <car>gas ILBM + CMP2 copper split; sign D:0A66[stage]; wait fire
+func,0x14984,blit_shape_to_view,void(Shape *s View *v),0x6D1C,verified; word-aligned blit at shape x y
+func,0x162E0,overlay_unload,void(void *stub),,verified; frees the overlay node of a patched stub and restores its stubs to bsr ovlmgr
+func,0x1C900,run_game,int(int car),0x1030,verified; overlay 2 entry; also DOS run_stage 0x1DC0 loop; drive frame >=5 VBL; returns 1 Ctrl-C else 0
+func,0x1CF76,dealership_ending,void(void),0x38EB,verified; pics/EndGame top 117 rows over cockpit; 300 VBL; note from pics/EndGame.Shp; wait fire
+func,0x1D484,road_drawer_loop,void(void),0x349D,verified; Road Drawer task body; render_frame + 'Pulling into the gas station/dealership...' pen 8 at (0x30 0x55) when D:0B2E; show_view; WaitTOF
+func,0x1D560,stage_score,long(long frames long par int factor),0x125D,verified; factor*1000000/max(frames-par 100) + bonus*100
+func,0x1D5C8,play_again_menu,int(void),0x02BF,verified; 1 same car 0 new car; any stick dir toggles; fire selects; timeout dead (reversed compare)
+func,0x20E70,stage_road_params,void(int stage),0x1F4E,verified; road stream D:1986; end D:1984=len-0x2D; par D:198E; limit D:1992; factor D:1996=stage+4
+func,0x24ACA,stage_load,void(int car),0x4792,verified; first time 'Loading Game...' Road.Shp %s.b %sDash.Shp %sDash; dash views; start Road Drawer
+func,0x24CE4,stage_unload,void(int keep),0x1DC0,verified; stop drawer; DyOffset 0; dash split off; keep=0 frees D:27CE D:27D2 D:276E D:2548
+func,0x24D68,remake_view,void(View *v),,verified; MakeVPort + MrgCop
+func,0x24D8A,dash_palette_split,void(View *v),,verified; copper palette D:24D2 from line 0x75; LoadRGB4 D:19CE above
+func,0x24E52,dash_split_off,void(void),,verified; 0x1FEAE; FreeVPortCopLists A B; remake both
+func,0x24E94,start_road_drawer,void(void),,verified; main pri 4; AddTask 'Road Drawer' pri -1 stack 0x7D0 entry 0x24F9A; starts paused
+func,0x24F3A,stop_road_drawer,void(void),,verified; pause; wait D:2844; Forbid RemTask free; main pri 0; Permit
+func,0x24F9A,road_drawer_entry,task entry,,verified; A4 from 0x24F96; calls 0x1D484; D:2844=-1; not in td_functions.json
+func,0x1AED0,run_intro,int(void),0x037A,see title_select
+func,0x1B8E6,car_select,int(void),0x098C,see title_select
+func,0x1C62E,show_view,void(View *v),,see title_select
+func,0x12E12,song_play_testdrive,void(void),0x8A3E,see platform_audio
+func,0x12E58,song_play_test2,void(void),0x8A3E,see platform_audio
+func,0x12E8A,song_play_testgas,void(void),0x8A3E,see platform_audio
+func,0x12EBE,song_play_endsuccess,void(void),,see platform_audio
+func,0x12DB0,song_stop,void(void),0x89F0,see platform_audio
+func,0x26B7A,sfx_load_drive,void(void),0x4792,see platform_audio
+func,0x26C02,sfx_free_drive,void(void),,see platform_audio
+func,0x26C70,engine_sound_start,void(void),0x8A0E,see platform_audio
+func,0x26D16,engine_sound_fade_out,void(void),0x8A08,see platform_audio
+func,0x117E8,set_task_pri,int(int pri),,see platform_video; SetTaskPri(FindTask(0) pri) returns old
+func,0x10462,poll_input,void(void),,see platform_video; M S keys; P D O in game (D:2814); key 0x12 -> D:0346
+func,0x1042E,blitter_pri_save,void(void),,see platform_video; writes $BFF096 (DMACON typo)
+func,0x1044C,blitter_pri_restore,void(void),,see platform_video
+func,0x10BA8,alloc_chip_buf,void *(long n),,see platform_video; alloc_chip with header {n 8}
+func,0x10CEC,empty_hook,void(void),,empty function called every drive frame
+func,0x1CCF6,drive_state_reset,void(void),0x1F93,see drive_sim; clears 0x1E89A[256] D:0C6E[6] D:0CF2[5] D:0D74..D:0D7A D:0DBE; provisional name
+func,0x1CD72,dash_sprites_update,void(void),,see drive_scene; eases D:24B8/D:24B4; 4 hardware sprites via 0x1F05A; provisional name
+func,0x1D392,render_frame,void(View *v),,see drive_scene; Forbid snapshot of physics; draw road/cockpit; provisional name
+func,0x1FBD8,crash_sequence,void(void),0x392C,see drive_scene; provisional name
+func,0x20D68,car_record_unpack,void(void),0x10E2,see drive_sim; <car>.b -> D:1924..D:1982
+global,D:1E94,g_fatalInit,int,,1 = protection failed or Cars.txt missing -> exit
+global,D:2816,demo_mode,int,DS:0084,attract mode
+global,D:281A,g_selectedCar,int,DS:790A,last played car; -1 none/attract
+global,D:2814,g_inGame,int,,1 during run_game (P D O keys)
+global,D:2818,g_savedTaskPri,int,,restored at exit
+global,D:285E,g_thisTask,Process *,,FindTask(0)
+global,D:285A,g_savedWindowPtr,long,,pr_WindowPtr restored at exit
+global,D:0346,g_abortKey,int,,key 0x12 (likely Ctrl-R); game -> SELECT; car select -> TITLE
+global,D:1910,g_totalScore,long,DS:8098,summed by run_game; shown by scores_show
+global,D:0350,g_numCars,int,DS:0088,Cars.txt count
+global,D:0352,g_carsKeepBuf,int,,always 0; previous Cars.txt buffer dropped
+global,D:1E96,g_carsTxtPtr,char *,DS:7F64,Cars.txt buffer (advanced to its end)
+global,D:2E66,g_carNames,char *[],DS:78F2,car path stems
+global,D:2872,g_hsFont,TextFont *,,topaz 8
+global,D:2876,g_tmpRastPort,RastPort *,,high-score RastPort on bitmap A
+global,D:098E,HS_DEFAULT_PALETTE,uint[32],,000 A75 020 232 ... C30 006
+global,D:0926,CREDITS_TEXT,char *[25],,24 lines + NULL; first 4 lines are the crackers'
+global,D:08F6,CREDITS_PENS,int[24],,1 headings 11 names 0 blank
+global,D:09CE,MSG_L1_FLYING,char *[3],DS:077A,avg > 105
+global,D:09DA,MSG_L1_COOKING,char *[3],DS:0780,avg > 95
+global,D:09E6,MSG_L1_LEARNING,char *[3],DS:0786,avg > 65
+global,D:09F2,MSG_L1_GRANDMA,char *[3],DS:078C,otherwise
+global,D:09FE,MSG_L1_SLOW,char *[3],DS:0792,secs > limit
+global,D:0A0A,MSG_L2_FLYING,char *[3],DS:0798,
+global,D:0A16,MSG_L2_COOKING,char *[3],DS:079E,
+global,D:0A22,MSG_L2_LEARNING,char *[3],DS:07A4,"'' 'third?' ''"
+global,D:0A2E,MSG_L2_GRANDMA,char *[3],DS:07AA,"'second?' '' ''"
+global,D:0A3A,MSG_L2_SLOW,char *[3],DS:07B0,
+global,D:0A46,MSG_TIPS,char *[3],DS:07B6,radar / oncoming traffic / potholes
+global,D:0A52,g_resultsImage,struct Image,,320x16x1; ImageData D:0A5C; PlanePick 1 PlaneOnOff 0
+global,D:0A66,GAS_SIGN_NAMES,long[4],DS:07BC,don john kevn tony (pics/gas.shp)
+global,D:3176,g_resultsRastPort,struct RastPort,,on the 320x24x1 results bitmap
+global,D:2820,g_scrollDelay,int,DS:7B12,1 slow; 0 after fire
+global,D:2822,g_quitSeen,int,,sticky quit for the results screen
+global,D:24C4,g_tooSlow,int,DS:7F44,secs > limit
+global,D:24C6,g_lives,int,DS:78E6,5; -1 crash; 0 fatal crash; +2 gas station
+global,D:24CC,g_stage,int,DS:7B16,0..4; attract starts at 3
+global,D:281E,g_cmp2Line,int,,ILBM CMP2 split line (110 in P911TGas)
+global,D:2FCE,g_cmp2Colors,uint[32],,ILBM CMP2 palette
+global,D:24D2,g_dashPalette,uint[32],,cockpit palette below line 0x75
+global,D:2846,g_dashPaletteSaved,int,,D:24D2 valid
+global,D:1984,g_stageEndPos,int,,road length - 0x2D
+global,D:1986,g_roadStream,char *,DS:6361,stage road data (overlay 2)
+global,D:198A,g_roadTable,void *,,= 0x20F08
+global,D:198E,g_parTime,long,DS:8094,par in drive frames {700 1100 1200 1100 1500}
+global,D:1992,g_stageConstB,long,DS:7F40,time limit in drive frames {3000 2800 3500 4000 4500} (= DS:02B2 x12)
+global,D:1996,g_scoreFactor,int,DS:029E,stage + 4
+global,D:28AE,road_pos,long 16.16,DS:0906,road position; 30.0 at stage start
+global,D:28A6,g_carSpeedFixed,long 16.16,DS:0927,speed; high word mph
+global,D:282E,g_crash,int,DS:0929,crash flag; >1 = fatal (lives 0)
+global,D:2830,g_crashCancel,int,,clears D:282E in the same frame
+global,D:0B2E,g_nearEnd,int,,within 0x50 road units of D:1984
+global,D:191E,gear,int,DS:0A78,see drive_sim; current gear (0 neutral); run_game starts the clock at the first non-zero gear
+global,D:24AE,g_drawerPause,int,,Road Drawer paused (also P key)
+global,D:2844,g_drawerIdle,int,,drawer ack: 1 idle 0 drawing -1 ended
+global,D:28D6,g_drawnFrames,long,,drawer frame counter
+global,D:28EA,g_drawerTask,Task *,,Road Drawer task
+global,D:28E6,g_drawerStack,void *,,2000-byte stack
+global,D:27CE,g_dashShapes,Archive *,,<car>Dash.Shp; non-zero = stage data loaded
+global,D:27D2,g_roadShapes,Archive *,,Pics/Road.Shp
+global,D:2548,g_carRecord,void *,,<car>.b file
+global,D:276E,g_roadBuffer,void *,,alloc_chip_buf(0x7918); 0x1388 in the ending
+global,D:2766,spr_govr,Shape *,DS:102F,GAME OVER shape
+global,D:276A,spr_gvrm,Shape *,DS:1033,GAME OVER mask
+global,D:0D70,g_demoOrEnd,int,,demo || near end (traffic code)
+global,D:19CA,LOADING_PALETTE,uint[2],,000 D04
+global,D:19CE,ROAD_PALETTE,uint[32],,palette above line 0x75 in the drive
+global,D:0C4E,MENU_PALETTE,uint[4],,000 CCC 00D 804

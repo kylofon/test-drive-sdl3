@@ -1,0 +1,368 @@
+kind,address,name,type,dos_equiv,notes
+func,0x10018,main,"int main(int argc, char **argv)",0x0010,see game_flow
+func,0x1032C,close_workbench,void (void),,CloseWindow(ActiveWindow)+CloseWorkBench; argument p only; verified
+func,0x1042E,blit_priority_on,void (void),,Writes $BFF096/reads $BFF002 (no chip selected): no effect; verified
+func,0x1044C,blit_priority_off,void (void),,Writes $BFF096: no effect; verified
+func,0x10462,poll_input,void (void),0x5C24,"One queued key: P pause (drive), M music, S sound, D and O toggles (drive), key 0x12 (Ctrl-R) -> D:0346; verified; row added in the merge (was in the .md table only)"
+func,0x10588,protection_check,void (void),0x8DC7,Long-track + self-CRC check; crack makes it pass; drop in port; verified
+func,0x10632,nop_10632,void (void),,"Empty, no callers; verified"
+func,0x1063A,ilbm_to_view,"void (u8 *iff, View *v)",,view_clear then parse FORM ILBM; verified
+func,0x10692,iff_next_chunk,"void (u8 *base, long *off)",,off = (off+len+9)&~1; verified
+func,0x106BE,ilbm_parse,"void (u8 *form, View *v)",,"BMHD/BODY/CMAP/CMP2, 40000-byte limit; verified"
+func,0x107B4,cmap_to_rgb4,"void (u8 *chunk, u16 pal[32])",,Default fill D:0358 then <=32 triplets to 12-bit; verified
+func,0x1086E,cmp2_to_rgb4,void (u8 *chunk),,"Custom CMP2: split line -> D:281E, palette -> D:2FCE; verified"
+func,0x10906,ilbm_decode_body,"void (BMHD *h, u16 *pal, u8 *body, View *v)",,"ByteRun1 rows into first ViewPort planes, WaitTOF, LoadRGB4 32; verified"
+func,0x109D0,view_dissolve,"void (View *src_or_NULL, View *dst)",0x768B,"8 CPU passes, bit table 01 08 40 02 10 80 04 20; NULL = to black; verified"
+func,0x10AA2,dissolve_pass,"void (int k, int depth, u8 **src, u8 **dst, int clear)",0x768B,Rows in order 7r mod 200; verified
+func,0x10BA8,arena_new,Arena *(long size),,"alloc_chip; size, used=8; verified"
+func,0x10BDC,arena_alloc,"void *(Arena *a, long n)",,Bump allocator; clears D:0360; verified
+func,0x10C28,arena_free_bytes,long (Arena *a),,No callers; verified
+func,0x10C3E,mask_size,long (Shape *s),,wb*h+0x10; verified
+func,0x10C5A,make_mask,"Shape *(Arena *a, Shape *s)",,1-plane OR of all planes; verified
+func,0x10CEC,nop_10cec,void (void),,Empty; called by 0x1C900; verified
+func,0x10CF4,nop_10cf4,void (void),,"Empty, no callers; verified"
+func,0x10D04,nop_10d04,void (void),,"Empty, no callers; verified"
+func,0x10D14,blit_begin,void (void),,"Wait; AMOD=DMOD=0, CON0=0x09F0, CON1=0, masks FFFF; verified"
+func,0x10D3C,blit_nasty_off,asm,,DMACON=0x0400; no callers; verified
+func,0x10D44,blit_wait_hw,asm A6=$DFF000,,10 consecutive BBUSY=0 reads; counters D:0348/D:034C; verified
+func,0x10D66,read_dmaconr,u16 (void),,No callers; verified
+func,0x10D72,blit_clear_rect,asm a0 plane d0 x d1 y d2 wbytes d3 h,0x97D4,"BLTCON0 0x0100, word-aligned; verified"
+func,0x10DBE,blit_fill_rect,asm a0 plane d0 x d1 y d2 wbytes d3 h,0x981E,BLTCON0 0x01FF; verified
+func,0x10E12,shape_pos,"asm a0 shape -> d0,d1",,Shape +8/+0xA; verified
+func,0x10E1C,shape_sub_hot,asm,,"d0-=+4, d1-=+6; verified"
+func,0x10E26,blit_set_dest,void (u8 *planes[5]),0x5128,Copy to D:0BEC; verified
+func,0x10E3A,blit_shape_word,"void (Shape *s, Shape *mask, int x, int y)",0x5DB6,Word-aligned cookie-cut/copy wrapper; verified
+func,0x10E58,blit_shape,"void (Shape *s, Shape *mask, int x, int y)",0x4E05,Pixel-shifted cookie-cut/masked copy wrapper; verified
+func,0x10E78,blit_wait,void (void),,Wrapper of 0x10D44; verified
+func,0x10E88,blit_shape_word_asm,asm a0 s a1 mask d0 x d1 y,0x5DE2,"BLTCON0 0x0FCA or 0x05CC, 5 planes; verified"
+func,0x10F9C,blit_params_ptr,asm -> &D:0362,,"Not in index, no callers; verified"
+func,0x10FA4,set_clip_full,void (void),0x50A1,Clip 0..200 x 0..320; verified
+func,0x10FBC,set_clip,asm d0 top d1 bottom d2 left d3 right,0x50A1,x values & 0xFFF0; verified
+func,0x10FDA,blit_prep_word,asm -> C set if nothing,,Word-aligned clip/params into D:0362; verified
+func,0x110C4,blit_shape_asm,asm a0 s a1 mask d0 x d1 y,0x4E05,"Shift<<12 | 0x0FCA, or 0x07CA + BLTADAT FFFF; verified"
+func,0x111E6,blit_shape_xor,asm a0 s d0 x d1 y,0x806C,"Shift | 0x076A, BLTADAT FFFF: D = C ^ B; verified"
+func,0x112E4,blit_prep_shift,asm -> C set if nothing,,"Shifted clip/params, FWM/LWM tables D:0388/D:03AA; verified"
+func,0x11432,blit_shape_xor_word,asm a0 s d0 x d1 y,0x806C,"0x0B5A D = A ^ C, right edge masked to true clip; verified"
+func,0x11554,open_libraries,void (void),,"intuition -> D:03D0, graphics -> D:03D4; verified"
+func,0x115A0,close_libraries,void (void),,verified
+func,0x115BC,display_init,void (void),0x4D96,"Views A/B, 5x8000-byte planes each, ColorMaps 32; verified"
+func,0x11756,display_shutdown,void (void),0x50FE,"show_view(saved ActiView), free, DMACON 0x8020; verified"
+func,0x117E8,set_task_pri,int (int pri),,SetTaskPri(FindTask(0)); returns old; verified
+func,0x1180E,vbl_install,void (void),0x699E,"Ticks VBLInt pri -80, data &D:03D8; verified"
+func,0x1185C,vbl_remove,void (void),0x694A,RemIntServer(5); verified
+func,0x11872,read_fire_raw,asm -> d0,,~CIAA PRA bit 7; verified
+func,0x11886,read_joy_raw,asm -> d0,,JOY1DAT via D:03DC -> 0..8; verified
+func,0x118B2,vbl_server,interrupt server (A1=&D:03D8),0x6A1F,tick_count++; O-mode gear selection via overlay stubs; verified
+func,0x11954,prot_measure_setup,int (char *volname),0x8DC7,Protection module entry; returns CRC16 of 0x11954..; verified
+func,0x119B6,prot_code_len,long (void),,Clamped to 0x5000; verified
+func,0x119D0,prot_code_start,void *(void),,Returns 0x11954; verified
+func,0x119D8,prot_cleanup,void (void),,verified
+func,0x11A0A,prot_read_track,"int (long cyl, long head)",,Raw MFM read; measurement replaced by constants 0x3E0/0x3E8 on this disk; verified
+func,0x11D3A,prot_measure_gap,asm,,Header decode + patched measurement; verified
+func,0x11D8E,prot_crc,"u16 (void *p, long nwords, long init, long poly)",,CRC-16 MSB first via 0x11DB0; verified
+func,0x11DB0,prot_crc_core,asm,,verified
+func,0x11F52,lmul_signed,asm d0 d1 -> d0,0xC91D,Sign-magnitude 32x32 low 31 bits; verified
+func,0x11F94,fix_mul,asm d0 d1 -> d0,,16.16 signed multiply; verified
+func,0x11FD6,fix_div,asm d0.w d1.w -> d0,,(a<<16)/b; b=0 -> +-0x7FFFFFFF; verified
+func,0x1200E,isqrt,asm d0 -> d0.w,,Newton on |x|; verified
+func,0x12056,abs16,asm,,verified
+func,0x1205E,abs32,asm,,verified
+func,0x12066,ltoa_dec,asm d0 -> a0,,BCD digits to D:03F4; dead; verified
+func,0x12108,sin_deg_fix,asm d0 16.16 deg -> d0,,"Table 0x1216C, interpolated, 0..180; verified"
+func,0x12146,cos_deg,asm d0.w -> d0.w,,Table 0x1216C; verified
+func,0x12224,tan_deg_fix,asm d0.w -> d0,,Table 0x1224C tan(2k deg)*65536; verified
+func,0x13250,text_init,void (void),,"topaz.font 8, RastPort D:2876; verified"
+func,0x132E6,text_shutdown,void (void),,verified
+func,0x13306,text_print,void (char *s),0x4BE7,"Text(rp,s,strlen); verified"
+func,0x13330,text_move,"void (int x, int y)",0x74E3,Move; verified
+func,0x13354,text_set_pen,void (int c),0x6C85,SetAPen; verified
+func,0x1336E,draw_box_outline,"void (int x0, int y0, int x1, int y1)",0x9530,Pen 1 JAM1 Move+4 Draw; verified
+func,0x1343A,erase_rect,"void (int x0, int y0, int x1, int y1)",0x4941,"Pen 0 RectFill, state restored; verified"
+func,0x134F2,text_cursor,void (void),0x9A69,"COMPLEMENT RectFill cx..cx+8, cy-8..cy+1; verified"
+func,0x14984,draw_shape_on_view,"void (Shape *s, View *v)",0x5DE2,"Own position, word-aligned, no mask; verified"
+func,0x149D2,load_file,void *(char *name),0x8A5B,flags 0x10001; verified
+func,0x149E8,load_file_chip,void *(char *name),0x8A5B,flags 0x10003; verified
+func,0x149FE,load_file_flags,"void *(char *name, long flags)",0x9A86,Pckd unpacked; D:24BC/D:2810; 0 on error; verified
+func,0x14C8C,pckd_unpacked_len,long (u8 *hdr),,verified
+func,0x14C9C,pckd_unpack,"void (u8 *pckd, u8 *out)",0x9A86,Methods 2/3/4/8; no checks; verified
+func,0x14D64,huff_read_tree,void (void),0x9C1E,likely
+func,0x14DC6,huff_read_word,int (void),0x9C76,likely
+func,0x14DE0,huff_decode,int (void),0x9C90,likely
+func,0x14E6C,rle90_out,void (u8 c),0x9CF9,verified
+func,0x14ED6,pack_getc,int (void),0x9D64,verified
+func,0x14EF2,pack_putc,void (u8 c),0x9DD3,++count < len: last byte dropped (DOS <=); verified
+func,0x14F0E,lzw_decompress,void (void),0x9E1D,likely
+func,0x1506C,lzw_getcode,int (void),0x9FA2,likely
+func,0x15192,lzw_alloc_tables,void (void),0xA0CF,verified
+func,0x151D6,lzw_free_tables,void (void),0xA111,verified
+func,0x151F2,load_raw,void *(char *name),0x78A5,Dead; protection poke target; verified
+func,0x15208,load_raw_chip,void *(char *name),,Dead; verified
+func,0x1521E,load_raw_flags,"void *(char *name, long flags)",,Dead; verified
+func,0x1530E,rand16,int (void),0xA90E,LCG x0x1AFB+0x1FCCD ^ VHPOSR; verified
+func,0x15344,unpack_byterun1_row,"void (u8 **src, u8 **dst, int n)",,verified
+func,0x153CC,fire_port_init,void (void),,CIAA DDRA &= 0x7F; verified
+func,0x153E4,joy_fire,int (void),0xA12F,-> D:2858; verified
+func,0x153EC,joy_dir,int (void),0xA12F,-> D:2512; verified
+func,0x153F4,joy_read_both,asm,,"Not in index, no callers; verified"
+func,0x15402,read_fire,asm -> d0,,verified
+func,0x15416,read_joy,asm -> d0,,Table 0x1543E; verified
+func,0x1544E,quit_requested,int (void),,Sticky Ctrl-C via Chk_Abort; verified
+func,0x15472,find_shape,"Shape *(Archive *a, long name4)",0x6762,0 when missing; verified
+func,0x15490,find_shape_asm,asm a0 d0 -> a0,,verified
+func,0x154E4,input_init,void (int passmask),0x8AFD,input.device handler pri 127 + console.device; verified
+func,0x155C4,input_shutdown,void (void),,verified
+func,0x15628,get_char,int (void),0x67DD,key_to_ascii(get_key()); verified
+func,0x1563A,key_to_ascii,int (long qual_code),,"RawKeyConvert, 1 char or 0; verified"
+func,0x15698,input_handler,InputEvent *(InputEvent *),,"First event only; queue key-downs, swallow; verified"
+func,0x156EC,key_available,asm -> d0,,verified
+func,0x156F8,get_key,long (void),0x67DD,WaitTOF until key; (qual<<16)|code; verified
+func,0x1574E,view_clear,void (View *v),0x4B98,LoadRGB4 zeros + BltClear per ViewPort; verified
+func,0x1580C,view_copy,"void (View *src, View *dst)",,Palette + BltBitMap; verified
+func,0x1582C,view_copy_palette,"void (View *src, View *dst)",,verified
+func,0x1587C,view_copy_bitmaps,"void (View *src, View *dst)",0x8B08,BltBitMap 0xCC; verified
+func,0x15904,alloc_public,void *(long size),0xA730,"mem_alloc(size,0x10001); verified"
+func,0x1591A,alloc_chip,void *(long size),,"mem_alloc(size,0x10003); verified"
+func,0x15930,mem_alloc,"void *(long size, long flags)",0xA340,"MEMF_CLEAR, MemB/MemE guards, list D:1BDC; verified"
+func,0x159FA,free_mem,int (void *p),0xA37E,-1 = free all; verified
+func,0x15B3E,mem_check,int (void *p),0xA3DF,Dead heap walker; verified
+func,0x15C60,mem_size,long (void *p),,Dead; verified
+func,0x15CAC,raw_putc,asm,,"exec RawPutChar; debug, dead; verified"
+func,0x15CE8,kprintf,"void (char *fmt, ...)",,RawDoFmt debug; dead; verified
+func,0x15CFC,raw_dofmt,asm,,exec RawDoFmt; verified
+func,0x15D1C,toupper,int (int c),0x95D9,verified
+func,0x15D34,tolower,int (int c),,No callers; verified
+func,0x15D4C,sscanf,"int (char *s, char *fmt, ...)",0xAA51,Aztec; verified
+func,0x15D72,_sscanf_getc,int (int unget),,Aztec; verified
+func,0x15DBC,_scanfmt,"int (fn getc, char *fmt, void **args)",0xB32F,Aztec scanf engine; likely
+func,0x160E0,_scan_skipws,int (void),0xB698,Aztec; likely
+func,0x1611A,_scan_int,int (...),0xB698,Aztec; likely
+func,0x1620C,fopen,"FILE *(char *name, char *mode)",0xA6B1,Aztec; verified
+func,0x16236,_openstream,"FILE *(char *name, char *mode, FILE *fp)",0xAD3C,Aztec; likely
+func,0x162A8,fprintf,"int (FILE *fp, char *fmt, ...)",0xA6D7,Aztec; verified
+func,0x162CA,_fprintf_putc,void (int c),,Aztec; verified
+func,0x162E0,ovl_unload,void (void *stub),,"Frees an overlay node, re-stubs; main unloads ov1 and ov2; verified"
+func,0x16396,strchr,"char *(char *s, int c)",,Aztec index(); verified
+func,0x163B0,_start,entry,0xA50C,Aztec startup; verified
+func,0x16422,_stub_init,void (void),,Empty; verified
+func,0x1642A,_main,"void (long alen, char *aptr)",0xB165,"Aztec CLI/WB start, calls main, exit; verified"
+func,0x16566,_cli_parse,void (...),0xC382,argv from command line; likely
+func,0x1670C,strncpy,"char *(char *d, char *s, int n)",0xAAD8,verified
+func,0x1672E,creat,"int (char *name, int mode)",0xB0DF,No callers; likely
+func,0x16746,open,"int (char *name, int flags)",0xA776,Aztec; likely
+func,0x168A4,ovl_load,overlay supervisor,,"Aztec overlay manager: load node, patch stubs to jmp; verified"
+func,0x1691C,ovl_loadseg,asm,,"Seek + LoadSeg(0,seglist,fh) retry loops; Alert 0x0700000C; verified"
+func,0x16986,strcat,"char *(char *d, char *s)",0xC4CD,Enters strncat with 0x7FFF; verified
+func,0x1698C,strncat,"char *(char *d, char *s, int n)",,verified
+func,0x169B0,strcmp,"int (char *a, char *b)",0xAA88,verified
+func,0x169B6,strncmp,"int (char *a, char *b, int n)",,verified
+func,0x169E0,strcpy,"char *(char *d, char *s)",0xC4FE,verified
+func,0x169F0,_lmul,asm d0 d1 -> d0,0xC91D,32x32 multiply; verified
+func,0x16A14,_wb_parse,"void (Process *p, WBStartup *msg)",,icon.library WINDOW tooltype; likely
+func,0x16AC8,sprintf,"int (char *buf, char *fmt, ...)",0xAA00,verified
+func,0x16AF8,_sprintf_putc,int (int c),,verified
+func,0x16B14,printf,"int (char *fmt, ...)",0xA8C7,stdout FILE D:1CF0; verified
+func,0x16B30,_fmt_number,"char *(void *v, int sign, char *end, int size)",0xBE03,likely
+func,0x16BBE,_format,"int (fn putc, char *fmt, void *args)",0xBB73,Aztec printf engine; likely
+func,0x16ED8,_divs32,asm d0/d1 -> d0,0xC87A,Signed long divide; verified
+func,0x16F1A,_modu32,asm,0xC87A,likely
+func,0x16F26,_divu32,asm,0xC87A,likely
+func,0x16F30,_udiv_core,asm,0xC87A,verified
+func,0x16F80,strlen,int (char *s),0xAABD,verified
+func,0x16F92,_printf_putc,void (int c),,verified
+func,0x16FA8,putc,"int (int c, FILE *fp)",,likely
+func,0x16FEA,_putc,"int (int c, FILE *fp)",,likely
+func,0x17026,_flushall,void (void),0xC849,likely
+func,0x1704E,fclose,int (FILE *fp),0xA5B6,verified
+func,0x170D4,_flsbuf,"int (FILE *fp, int c)",0xABE2,likely
+func,0x171B6,_getstream,FILE *(void),0xC523,likely
+func,0x171EE,_getbuf,void (FILE *fp),0xAE3F,likely
+func,0x1724C,_freeall,void (void),,likely
+func,0x1727E,malloc,void *(unsigned long n),0xA730,Aztec AllocMem chain D:24A8; likely
+func,0x172BE,_malloc16,void *(unsigned n),,likely
+func,0x172D2,free,int (void *p),0xA722,likely
+func,0x1731E,isatty,int (int fd),0xC644,likely
+func,0x17376,unlink,int (char *name),0xC55A,likely
+func,0x1739A,write,"int (int fd, void *buf, unsigned n)",0xC70C,verified
+func,0x17418,Chk_Abort,long (void),,"SetSignal(0,0x1000); _abort if Enable_Abort; verified"
+func,0x17448,_abort,void (void),0xA4E3,"Writes ^C, exit(1); verified"
+func,0x17474,exit,void (int code),0xB214,verified
+func,0x17492,_exit,void (int code),0xB22B,verified
+func,0x17580,close,int (int fd),0xA4F8,verified
+func,0x175CE,dos_Close,library glue,,LVO stub; verified
+func,0x175D2,dos_Close_body,library glue,,"body of the dos_Close stub: 0x175CE is jmp 0x175D2(pc); callers enter here too; verified; row added in the merge"
+func,0x175DE,dos_CurrentDir,library glue,,LVO stub; verified
+func,0x175EA,dos_Delay,library glue,0x6C3B,LVO stub; verified
+func,0x175F6,dos_DeleteFile,library glue,,LVO stub; verified
+func,0x17602,dos_Examine,library glue,,LVO stub; verified
+func,0x17606,dos_Examine_body,library glue,,"body of the dos_Examine stub: 0x17602 is jmp 0x17606(pc); callers enter here too; verified; row added in the merge"
+func,0x17614,dos_Input,library glue,,LVO stub; verified
+func,0x1761C,dos_IoErr,library glue,,LVO stub; verified
+func,0x17624,dos_IsInteractive,library glue,,LVO stub; verified
+func,0x17630,dos_Lock,library glue,,LVO stub; verified
+func,0x17634,dos_Lock_body,library glue,,"body of the dos_Lock stub: 0x17630 is jmp 0x17634(pc); callers enter here too; verified; row added in the merge"
+func,0x17642,dos_Open,library glue,,LVO stub; verified
+func,0x17646,dos_Open_body,library glue,,"body of the dos_Open stub: 0x17642 is jmp 0x17646(pc); callers enter here too; verified; row added in the merge"
+func,0x17654,dos_Output,library glue,,LVO stub; verified
+func,0x1765C,dos_Read,library glue,,LVO stub; verified
+func,0x17660,dos_Read_body,library glue,,"body of the dos_Read stub: 0x1765C is jmp 0x17660(pc); callers enter here too; verified; row added in the merge"
+func,0x1766E,dos_Seek,library glue,,LVO stub; verified
+func,0x1767C,dos_UnLock,library glue,,LVO stub; verified
+func,0x17680,dos_UnLock_body,library glue,,"body of the dos_UnLock stub: 0x1767C is jmp 0x17680(pc); callers enter here too; verified; row added in the merge"
+func,0x1768C,dos_Write,library glue,,LVO stub; verified
+func,0x1769A,exec_AddIntServer,library glue,,LVO stub; verified
+func,0x176A8,exec_Alert,library glue,,LVO stub; verified
+func,0x176C0,exec_CloseDevice,library glue,,LVO stub; verified
+func,0x176CC,exec_CloseLibrary,library glue,,LVO stub; verified
+func,0x176D0,exec_CloseLibrary_body,library glue,,"body of the exec_CloseLibrary stub: 0x176CC is jmp 0x176D0(pc); callers enter here too; verified; row added in the merge"
+func,0x176DC,exec_CopyMemQuick,library glue,,LVO stub; verified
+func,0x176EE,CreatePort,library glue,,LVO stub; verified
+func,0x1777A,DeletePort,library glue,,LVO stub; verified
+func,0x177C0,exec_AddPort,library glue,,LVO stub; verified
+func,0x177CC,exec_AllocSignal,library glue,,LVO stub; verified
+func,0x177D8,CreateStdIO,library glue,,LVO stub; verified
+func,0x177EE,DeleteStdIO,library glue,,LVO stub; verified
+func,0x17800,CreateExtIO,library glue,,LVO stub; verified
+func,0x17844,DeleteExtIO,library glue,,LVO stub; verified
+func,0x17880,exec_AllocMem,library glue,,LVO stub; verified
+func,0x17884,exec_AllocMem_body,library glue,,LVO stub; verified
+func,0x17892,exec_AddTask,library glue,,LVO stub; verified
+func,0x178AA,exec_DoIO,library glue,,LVO stub; verified
+func,0x178C0,exec_FindTask,library glue,,LVO stub; verified
+func,0x178C4,exec_FindTask_body,library glue,,"body of the exec_FindTask stub: 0x178C0 is jmp 0x178C4(pc); callers enter here too; verified; row added in the merge"
+func,0x178D0,exec_Forbid,library glue,,LVO stub; verified
+func,0x178D4,exec_Forbid_body,library glue,,"body of the exec_Forbid stub: 0x178D0 is jmp 0x178D4(pc); callers enter here too; verified; row added in the merge"
+func,0x178DC,exec_FreeMem,library glue,,LVO stub; verified
+func,0x178E0,exec_FreeMem_body,library glue,,"body of the exec_FreeMem stub: 0x178DC is jmp 0x178E0(pc); callers enter here too; verified; row added in the merge"
+func,0x178F0,exec_FreeSignal,library glue,,LVO stub; verified
+func,0x178FC,exec_GetMsg,library glue,,LVO stub; verified
+func,0x17908,NewList,library glue,,LVO stub; verified
+func,0x1791A,exec_OpenDevice,library glue,,LVO stub; verified
+func,0x17930,exec_OpenLibrary,library glue,,LVO stub; verified
+func,0x17934,exec_OpenLibrary_body,library glue,,"body of the exec_OpenLibrary stub: 0x17930 is jmp 0x17934(pc); callers enter here too; verified; row added in the merge"
+func,0x17944,exec_Permit,library glue,,LVO stub; verified
+func,0x1794C,exec_RemIntServer,library glue,,LVO stub; verified
+func,0x1795A,exec_RemPort,library glue,,LVO stub; verified
+func,0x17966,exec_RemTask,library glue,,LVO stub; verified
+func,0x17972,exec_ReplyMsg,library glue,,LVO stub; verified
+func,0x1797E,exec_SetSignal,library glue,,LVO stub; verified
+func,0x1798C,exec_SetTaskPri,library glue,,LVO stub; verified
+func,0x1799C,exec_WaitPort,library glue,,LVO stub; verified
+func,0x179A8,gfx_BltBitMap,library glue,,LVO stub; verified
+func,0x179CA,gfx_BltClear,library glue,,LVO stub; verified
+func,0x179DC,gfx_CBump,library glue,,LVO stub; verified
+func,0x179E8,gfx_CloseFont,library glue,,LVO stub; verified
+func,0x179F4,gfx_CMove,library glue,,LVO stub; verified
+func,0x17A06,gfx_CWait,library glue,,LVO stub; verified
+func,0x17A18,gfx_DisownBlitter,library glue,,LVO stub; verified
+func,0x17A20,gfx_Draw,library glue,,LVO stub; verified
+func,0x17A32,gfx_FreeColorMap,library glue,,LVO stub; verified
+func,0x17A3E,gfx_FreeCprList,library glue,,LVO stub; verified
+func,0x17A4A,gfx_FreeVPortCopLists,library glue,,LVO stub; verified
+func,0x17A56,gfx_GetColorMap,library glue,,LVO stub; verified
+func,0x17A62,gfx_InitBitMap,library glue,,LVO stub; verified
+func,0x17A74,gfx_InitRastPort,library glue,,LVO stub; verified
+func,0x17A80,gfx_InitView,library glue,,LVO stub; verified
+func,0x17A8C,gfx_InitVPort,library glue,,LVO stub; verified
+func,0x17A98,gfx_LoadRGB4,library glue,,LVO stub; verified
+func,0x17AB6,gfx_MakeVPort,library glue,,LVO stub; verified
+func,0x17AC4,gfx_Move,library glue,,LVO stub; verified
+func,0x17AD6,gfx_MrgCop,library glue,,LVO stub; verified
+func,0x17AE2,gfx_OpenFont,library glue,,LVO stub; verified
+func,0x17AEE,gfx_OwnBlitter,library glue,,LVO stub; verified
+func,0x17AF6,gfx_RectFill,library glue,,LVO stub; verified
+func,0x17B08,gfx_ScrollRaster,library glue,,LVO stub; verified
+func,0x17B24,gfx_SetAPen,library glue,,LVO stub; verified
+func,0x17B34,gfx_SetBPen,library glue,,LVO stub; verified
+func,0x17B44,gfx_SetDrMd,library glue,,LVO stub; verified
+func,0x17B54,gfx_SetFont,library glue,,LVO stub; verified
+func,0x17B64,gfx_Text,library glue,,LVO stub; verified
+func,0x17B7E,gfx_TextLength,library glue,,LVO stub; verified
+func,0x17B92,gfx_WaitBlit,library glue,,LVO stub; verified
+func,0x17B9A,gfx_WaitTOF,library glue,,LVO stub; verified
+func,0x17BA2,icon_FindToolType,library glue,,LVO stub; verified
+func,0x17BB0,icon_FreeDiskObject,library glue,,LVO stub; verified
+func,0x17BBC,icon_GetDiskObject,library glue,,LVO stub; verified
+func,0x17BC8,int_CloseWindow,library glue,,LVO stub; verified
+func,0x17BD4,int_CloseWorkBench,library glue,,LVO stub; verified
+func,0x17BDC,int_DrawImage,library glue,,LVO stub; verified
+func,0x17BF0,con_RawKeyConvert,library glue,,LVO stub; verified
+global,D:0346,g_abortKey,int,,Ctrl-R (key 0x12) seen; name from title_select
+global,D:0348,blit_busy_spins,long,,Debug counter in blit_wait_hw
+global,D:034C,blit_wait_calls,long,,Debug counter
+global,D:0358,cmap_default,u16[3],,0x02F2 0x0F57 0x022F pre-fill
+global,D:0360,arena_flag,int,,Cleared by arena_alloc; no reader
+global,D:0362,blit_params,struct 0x1E,,"src,mask,doff,size,dmod,bmod,amod,pbytes,lflag,rflag,shift,fwm,lwm"
+global,D:0380,clip_top,int,,Blit clip
+global,D:0382,clip_bottom,int,,Exclusive
+global,D:0384,clip_left,int,,& 0xFFF0
+global,D:0386,clip_right,int,,"& 0xFFF0, exclusive"
+global,D:0388,fwm_table,u16[17],DS:636C,0xFFFF >> n
+global,D:03AA,lwm_table,u16[17],DS:6374,~(0xFFFF >> n)
+global,D:03D0,IntuitionBase,ptr,,
+global,D:03D4,GfxBase,ptr,,
+global,D:03D8,tick_count,u32,DS:642A,"VBL ticks, 50 Hz PAL"
+global,D:03DC,joy_dir_table,u8[16],DS:63A8,JOY1DAT index -> 0..8
+global,D:03EC,vbl_last_dir,int,,O-mode edge detection
+global,D:03F4,ltoa_buf,char[11],,ltoa_dec output; D:03F2 sign
+global,D:0B30,fire_latch,u16,,Set by VBL in O mode / D mode; drive_sim
+global,D:0B34,opt_d,int,DS:08BE,D key toggle
+global,D:0BEC,blit_dest,u8 *[5],,Destination planes
+global,D:1BD2,lzw_tables,ptr,DS:6A3C,
+global,D:1BD6,rand_seed,u16,,
+global,D:1BD8,rand_seeded,int,,
+global,D:1BDA,quit_flag,int,,Sticky Ctrl-C
+global,D:1BDC,mem_list,ptr,,Circular block list
+global,D:1BE0,mem_count,int,,
+global,D:1CDA,_iob,FILE[],,"Aztec FILE table, 0x16 bytes each, to D:1E92"
+global,D:1E92,_numdev,int,,Aztec fd table size
+global,D:1E94,g_startup_error,int,,Cars.txt missing or protection failed
+global,D:1FA8,out_count,u32,DS:7B18,
+global,D:1FB0,unpacked_len,u32,DS:790E,
+global,D:1FB4,pack_inptr,u8 *,DS:78E0,
+global,D:1FB8,pack_outptr,u8 *,,
+global,D:1FBC,rle_state,int,DS:7478,
+global,D:1FBE,packed_left,u32,DS:7B2E,
+global,D:23EC,rle_last,int,,
+global,D:23EE,key_code,u8[10],,Raw key queue
+global,D:23F8,key_qual,u16[10],,Qualifiers
+global,D:240C,key_count,int,,
+global,D:240E,key_max,int,,10
+global,D:2410,input_port,MsgPort *,,
+global,D:2414,con_port,MsgPort *,,
+global,D:2418,input_io,IOStdReq *,,
+global,D:241C,input_irq,Interrupt,,"pri 127, code 0x15698"
+global,D:2482,con_io,IOStdReq *,,
+global,D:2486,key_pass_qual,u16,,0x5C or 0 with p
+global,D:24A8,_malloc_list,ptr,,Aztec malloc
+global,D:24AC,Enable_Abort,int,,
+global,D:24AE,g_paused,int,DS:6424,P pause flag
+global,D:24B0,opt_o,int,DS:0921,O key toggle
+global,D:24BC,g_loadedBuf,ptr,,Last load_file result
+global,D:2512,g_joyDir,int,,Last joy_dir
+global,D:27D6,errno,int,,
+global,D:27D8,_initial_sp,ptr,,
+global,D:27DC,SysBase,ptr,,
+global,D:27E0,DOSBase,ptr,,
+global,D:27E4,_devtab,ptr,,
+global,D:27F0,_argv,char **,,
+global,D:27F4,_argc,int,,
+global,D:2810,g_loadedSize,long,,Size of last load
+global,D:2814,g_inDrive,int,,1 during overlay 2
+global,D:2818,saved_task_pri,int,,
+global,D:281C,saved_bltpri,int,,Garbage from $BFF002
+global,D:281E,cmp2_line,int,,CMP2 split line
+global,D:2858,g_joyFire,int,,Last joy_fire
+global,D:285A,saved_windowptr,long,,
+global,D:285E,this_task,Task *,,
+global,D:2862,saved_task_2A,long,,"tc_ExceptCode, never restored"
+global,D:2866,saved_actiview,View *,,
+global,D:286A,colormapA,ColorMap *,,
+global,D:286E,colormapB,ColorMap *,,
+global,D:2872,text_font,TextFont *,,topaz 8
+global,D:2876,g_tmpRastPort,RastPort *,,Text RastPort; name from title_select
+global,D:28EE,ConsoleDevice,ptr,,
+global,D:28F2,IconBase,ptr,,
+global,D:28FE,rasinfoA,RasInfo,,
+global,D:290A,rasinfoB,RasInfo,,
+global,D:2E12,vbl_irq,Interrupt,,Ticks VBLInt
+global,D:2FCE,cmp2_palette,u16[32],,

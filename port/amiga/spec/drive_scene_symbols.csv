@@ -1,0 +1,234 @@
+kind,address,name,type,dos_equiv,notes
+func,0x1D27E,plot_pixel_set,asm d0 x d1 y,,verified; plane D:0BEC[D:0B60/4]; 0<=x<320 10<=y<D:0B74
+func,0x1D2C2,plot_pixel_clear,asm d0 x d1 y,,verified; as 0x1D27E
+func,0x1D306,mul_scale,asm d0.l=(s16)d0*D:0B62,,verified; signed via neg/mulu
+func,0x1D31A,clamp_word,asm *(s16*)a3 in [d0 d1],,verified
+func,0x1D32A,road_record_at,asm d7 unit -> a2 record,0x2054,verified; record 0 outside stage; 0xFF branch rewrites d7 and D:1984 (unreachable with shipped data); also used by sim
+func,0x1D36C,set_main_window_clip,asm,0x3ACE,verified; D:0B74=0x75 clip y0..0x75 x0..0x140 D:0DDA=0x75
+func,0x1D392,render_frame,void(View *back),0x2013,verified; Forbid snapshot 28A6/28AE/2896/28AA + 12 slots; OwnBlitter; 0x1D9CC; 0x20AF4; part of DOS 0x1DC0 loop
+func,0x1D484,road_drawer_main,task body,0x3AF7,verified; pause handshake D:24AE/D:2844; Pulling into text (0x30 0x55 pens 8/0); show_view; WaitTOF
+func,0x1D97C,clear_window,asm,0x74F4,verified; colour 4 (plane 2 set) rows D:0380..D:0B74
+func,0x1D9C6,queue_reset,asm,,verified; D:0F80=0
+func,0x1D9CC,compose_road_window,asm,0x1DC0,verified; draw order main road clouds objects bugs mirror objects overlays gearbox ticket
+func,0x1DA14,draw_road_main,asm,0x28C5,verified; + DOS 0x2054 project_road_main; 40 rows; y0=160+D:2842
+func,0x1DA72,init_row_scale,asm,,verified; s0=0xFFFF-(-frac*0x170B>>16); weight=(-frac)>>1 or 1
+func,0x1DAA2,draw_road_mirror,asm,0x2F7A,verified; + DOS 0x2478; 30 rows backwards; y0 0x3E s 0x5000 x0 0x118-(lat*5>>4)
+func,0x1DAF6,set_mirror_window_clip,asm,0x33FB,verified; clip x 0xF0..0x140 y 0x1A..0x2B
+func,0x1DD34,row_scale_step,asm,,verified; s*=0xE8F5>>16
+func,0x1DD56,row_y_step,asm,,verified; crest=min; y-=8s+slope*s/4
+func,0x1DD96,row_slope_step,asm,,verified; slope+=pitch*((0x48000-4s)>>4)>>16; clamp D:0B38[row]
+func,0x1E062,queue_slot_car_0,asm,0x28C5,verified; same-dir slot 0 code 0x18 trk; d5 -0xE0
+func,0x1E078,queue_slot_car_1,asm,0x28C5,verified; slot 1 code 0x19 x7r; d5 +0xE0 centre-relative
+func,0x1E08E,queue_slot_car_2,asm,0x28C5,verified; slot 2 code 0x1A vnr
+func,0x1E0A4,queue_slot_car_3,asm,0x28C5,verified; slot 3 code 0x1B sdr
+func,0x1E0B8,queue_slot_car_4,asm,0x28C5,verified; slot 4 code 0x1C sdr
+func,0x1E0CC,queue_police_car,asm,0x28C5,verified; slot 5 code 0x1D cpr; pull-over lateral from D:0D78
+func,0x1E19E,queue_oncoming_cars,asm,0x28C5,verified; codes 0x10..0x14 rig sed vnf sed sed; D:0D28=-0xE0
+func,0x1E216,queue_post,asm,0x28C5,verified; code 0x41 pst every 16 units at left edge rows>6
+func,0x1E230,queue_scenery_wed,asm,0x28C5,verified; table 0x1E47A code 0x30
+func,0x1E276,queue_scenery_rock,asm,0x28C5,verified; table 0x1E4BA code 0x31
+func,0x1E2B0,queue_scenery_lin,asm,0x28C5,verified; table 0x1E4FA code 0x32
+func,0x1E2F8,queue_hazard,asm,0x28C5,verified; x+=2*(obj*s>>16) lane bits included
+func,0x1E314,walk_road_rows,asm,0x2054,verified; per-row loop; + loop of DOS 0x28C5
+func,0x1E5C6,row_widths,asm,,verified; record byte 0 nibbles -> table 0x1E45A (0x140+0x40i); 0xFF keeps
+func,0x1E63A,draw_ticket,asm,0x349D,verified; tick when D:0D74>=0x1E
+func,0x1E65C,draw_lane_marks,asm,,verified; D:0D98 wide if right half>0x224; colour 28 at cx+0x1C0*s dashed
+func,0x1E758,draw_clouds,asm,,verified; Amiga only
+func,0x1E784,blit_clouds,asm,,verified; cldA cldB cld0 cld1 at horizon-{0x11 0x14 0x23 0x26}
+func,0x1E7D2,draw_bugs,asm,,verified; list in code at 0x1E89A; 30 max; >=85 mph; rand&0x3FF
+func,0x1EAE0,move_clouds,asm d0=4*dheading,,verified; -5/-6 px per degree + drift
+func,0x1EB5E,wrap_cloud_x,asm,,verified; [-400 400]
+func,0x1EB78,init_clouds,void(void),,verified
+func,0x1EBA8,wrap_angle_delta,asm,,verified; [-180 180]
+func,0x1EBC4,draw_cockpit_overlays,asm,0x349D,verified; hood roof post mirr radar wheel
+func,0x1EC94,draw_radar_detector,asm,0x35C6,verified; lit D:0DC4 (50) VBL dark 8 VBL; beep 0x26C50 on re-light if level
+func,0x1ED06,draw_steering_wheel,asm,0x35C6,verified; 5 poses XOR whl0..3; per-buffer D:0C4A/D:0C4C swapped
+func,0x1ED64,xor_wheel_pose,asm d0 pose,0x35C6,verified; pose 2 none
+func,0x1ED8A,reset_wheel_state,void(int keep),0x1F4E,verified; keep=0 -> 0xFE0C; D:199E=0x87654321
+func,0x1EDAE,window_rect_stub,asm,,verified; no effect
+func,0x1EF14,cop_move_long,void(UCopList* long reg long value),,verified
+func,0x1EF76,spr_pos_word,int(int h int v0 int v1 int att),,verified
+func,0x1EF90,spr_ctl_word,int(int h int v0 int v1 int att),,verified
+func,0x1EFD4,cop_sprite_pos,void(UCopList* h v0 v1 att n),,verified
+func,0x1F05A,sprite_set_segment,void(int word int h int v0 int v1 int att int n),,verified; v0/v1 minus D:2840
+func,0x1F0DC,sprite_add_segment,void(int h int v0 int v1 int att int n),,verified
+func,0x1F12C,pack_shape_to_sprite,void(Shape* u16* dst int planes int col Shape* mask int mcol),,verified
+func,0x1F27E,shape_to_sprite_segment,void(Shape* int n int planes int col),,verified
+func,0x1F2EA,draw_needle,void(int x int y int which),0x35C6,verified; Draw into 32x51 1-plane bitmap then sprites which/which+1; masked by tcm/spm
+func,0x1F582,position_wheel_marker,void(int x int y),0x35C6,verified; sprite 7 segment 0 4x4 dot
+func,0x1F5BA,sprites_init,void(void),0x4792,verified; 0x7D0 chip; needles 0-3 knob 4-7 dot 7; SPREN
+func,0x1F99A,sprites_free,void(void),,verified
+func,0x1F9FE,shake_dash_sprites,void(void),,verified; only caller dead code 0x20940
+func,0x1FAD4,ucop_sprite_pointers,void(UCopList*),,verified
+func,0x1FB4A,ucop_palette_split,void(UCopList* u16* pal int line),,verified; CWait(line-1 D:0DCC=100)
+func,0x1FBD8,crash_windscreen_sequence,void(void),0x392C,verified; same crack data as DOS; pen 28; Delay(2) per step
+func,0x1FDF4,redraw_cockpit_back,void(void),,verified
+func,0x1FE38,min16,int(int int),,verified
+func,0x1FE54,clamp_rgb4,int(int c int level),,verified
+func,0x1FEAE,fade_out_palette,void(int delay u16* pal2 int line),,verified; 16 steps; also gas station 0x14902
+func,0x20096,fill_row_span,asm a0 plane d4 off d1 x0 d2 x1,0x2E8B,verified; BLTCON0 0x1F0 D=A overwrites first/last words
+func,0x20128,fill_road_row,asm,0x2DEE,verified; trapezoid road p0 shoulders p3 right ground p1; stale step when n=1
+func,0x202A8,fill_left_ground,asm,0x2DEE,verified; colour 6 left dips
+func,0x2031C,draw_centre_line,asm,0x28C5,verified; 2 px colour 5 dashed by unit bit 2 unless wide
+func,0x2034E,draw_horizon_cliff,asm,0x28C5,verified; colour-6 block + clf0
+func,0x203E0,toggle_gear_box,asm,0x351A,verified; XOR gbox per buffer
+func,0x20410,queue_object,asm d0 x d1 y d2 code,0x28C5,verified; 199 max; y clamped to crest
+func,0x20456,draw_object_queue,asm,0x28C5,verified; LIFO; clip at base; cliff before first nearer object
+func,0x20526,draw_obj_lin,asm,,verified; code 0x32
+func,0x20546,draw_obj_rock,asm,,verified; code 0x31
+func,0x20562,draw_obj_wed,asm,,verified; code 0x30
+func,0x20580,draw_obj_post,asm,,verified; code 0x41 pst1-4
+func,0x205A6,scale_index5,asm d4,,verified; ((s+0x1000 sat 0x7FFF)*0x28>>16)&0x1C; s>=0xF000 wraps
+func,0x205BC,scale_index4,asm d4,,verified; rol5 & 0xC
+func,0x205CE,draw_obj_traffic,asm,0x28C5,verified; codes 0x10..0x1D; hysteresis 0xD3FC; police lights
+func,0x206A0,draw_obj_sign_mirror,asm,0x2F7A,verified; pol + rsg0/1
+func,0x206E8,draw_obj_sign,asm,0x28C5,verified; codes 2..0xF pol + sign
+func,0x20740,draw_obj_hazard,asm,0x28C5,verified; rck oil pot gra
+func,0x2090C,detect_pitch_bump,asm,,verified; result consumed only by dead code
+func,0x20940,dash_shake_update,asm,,verified; no caller (dead)
+func,0x2097C,draw_digital_cluster,asm,0x35C6,verified; Corvette; inst sped tach dgt overlays
+func,0x20A88,draw_number,asm d0 a2 a3,0x38CD,verified; up to 3 XOR digits
+func,0x20AF4,update_gauges,asm,0x35C6,verified; analog needles every frame (D:1900 never written); digital per buffer
+func,0x1CD72,update_knob_sprites,void(void),0x351A,verified; main task; glide 4/8 px; close delay 7
+func,0x1CF76,dealership_ending,void(void),0x38EB,verified; EndGame top 117 rows + note
+func,0x246FA,row_heading_step,asm,0x2054,verified; heading+=curve/8 clamp +-0x5A
+func,0x2472A,row_x_step,asm,0x2054,verified; x+=sin(h)*80*s + lateral parallax; heading reseeded below y 0x7D
+func,0x247B2,update_wheel_marker,asm,0x35C6,verified; called from sim 0x24924; clamp +-35 deg
+func,0x24ACA,stage_display_setup,void(int car),0x4792,verified; shapes car dash palette first frames start task; + DOS 0x10E2
+func,0x24CE4,stage_display_shutdown,void(int keep),,verified
+func,0x24D68,remake_view,void(View*),,verified; MakeVPort + MrgCop
+func,0x24D8A,setup_drive_copper,void(View*),,verified; dash palette capture; ucop; road palette D:19CE
+func,0x24E52,fade_out_drive,void(void),,verified
+func,0x24E94,start_road_drawer,void(void),,verified; AddTask Road Drawer pri -1 stack 0x7D0 paused; main pri 4
+func,0x24F3A,stop_road_drawer,void(void),,verified
+func,0x24F9A,road_drawer_entry,task initPC,,verified; not in td_functions.json
+func,0x24FAA,load_cockpit_shapes,void(void),0x4792,verified; Dash.Shp
+func,0x253E6,load_road_shapes,void(void),0x4792,verified; Road.Shp + 0x24FAA
+func,0x25740,load_scenery_shapes,void(void),0x4792,verified; rck oil pot gra
+func,0x259D8,load_sign_shapes,void(void),0x4792,verified; signs rsg pol rpl
+func,0x2627C,load_traffic_shapes,void(void),0x4792,verified; traffic police light bars
+global,D:0B2E,pulling_in,u16,DS:0929,verified; read; 1 near stage end (written by 0x1C900)
+global,D:0B30,gearbox_wanted,u8[2],DS:08BE,verified; per buffer 0xFF shown; written by sim/poll_input/VBL
+global,D:0B32,gearbox_shown,u8[2],,verified; XOR state per buffer
+global,D:0B34,gearbox_hold,u16,DS:08BE,verified; D key toggle (poll_input)
+global,D:0B38,slope_clamp,s8[40],,verified; data 0 0 1 1 2 2 3 5 8 10 15 20 25 30 35 40...
+global,D:0B60,pixel_plane_off,u16,,verified
+global,D:0B62,row_scale,u16,,verified
+global,D:0B64,row_scale2,u16,,verified; write-only
+global,D:0B66,row_y,s32 16.16,,verified
+global,D:0B6A,row_cx,s32 16.16,,verified
+global,D:0B6E,heading_acc,s32 16.16,DS:1873,verified
+global,D:0B72,slope_acc,s16,DS:1875,verified
+global,D:0B74,crest_y,s16,DS:1437,verified
+global,D:0B76,row_index,u16,,verified
+global,D:0BEC,target_planes,ptr[5],,verified; platform_video
+global,D:0C00,right_edge,s16,,verified
+global,D:0C02,left_edge,s16,,verified
+global,D:0C04,first_mask,u16[17],,verified; data
+global,D:0C26,last_mask,u16[17],,verified; data
+global,D:0C4A,wheel_pose_other,s16,DS:1445,verified
+global,D:0C4C,wheel_pose_here,s16,DS:1445,verified
+global,D:0C6E,same_dir_slots,s32[6],DS:096D,verified; sim-owned
+global,D:0CAA,slot_slide,s16[6] stride 4,,verified; sim adds 0x38; render decays
+global,D:0CBE,police_slide,s16,,verified
+global,D:0CC2,slot_lateral,s16[6] stride 4,,verified; written by render read by sim
+global,D:0CF2,oncoming_slots,s32[5],DS:0945,verified; sim-owned
+global,D:0D28,oncoming_lateral,s16[5] stride 4,,verified; written by render
+global,D:0D40,r_same_dir,s32[6],DS:09AD,verified; snapshot
+global,D:0D58,r_oncoming,s32[6],DS:09AD,verified; snapshot
+global,D:0D7C,slot_base_x,s16,,verified
+global,D:0D7E,slot_base_lat,s16,,verified
+global,D:0D82,first_row_weight,u16,,verified
+global,D:0D84,row_centre,s16,,verified
+global,D:0D8C,half_left,u16,,verified
+global,D:0D8E,half_right,u16,,verified
+global,D:0D90,last_left,u16,,verified
+global,D:0D92,last_right,u16,,verified
+global,D:0D94,car_half_left,u16,,verified; read by sim
+global,D:0D96,car_half_right,u16,,verified; read by sim
+global,D:0D98,wide_road,s16,,verified
+global,D:0D9E,cloud_heading,s16,,verified
+global,D:0DA0,cloud_x,s32[4] 16.16,,verified
+global,D:0DC6,radar_dark,u16,,verified
+global,D:0DC8,radar_time,u32,,verified
+global,D:0DCC,palette_split_h,u16,,verified; data 100
+global,D:0DD2,cliff_x,s16,DS:19B7,verified
+global,D:0DD4,cliff_y,s16,DS:19B9,verified
+global,D:0DD6,cliff_scale,u16,,verified
+global,D:0DD8,min_row_y,s16,,verified
+global,D:0DDA,window_bottom,s16,,verified
+global,D:0DDC,prev_left,s16,,verified
+global,D:0DDE,prev_right,s16,,verified
+global,D:0DE0,prev_y,s16,,verified
+global,D:0DE2,step_left,s16,,verified
+global,D:0DE4,step_right,s16,,verified
+global,D:0DE6,left_shoulder_x,s16[row+1],,verified
+global,D:0F78,max_left_x,s16,DS:19C3,verified; init 0xD8F0
+global,D:0F7A,max_left_row,s16,,verified
+global,D:0F7C,shoulder_plane4,u16,,verified; never set
+global,D:0F7E,mirror_flag,s16,,verified
+global,D:0F80,queue_count,s16,,verified
+global,D:0F82,queue_x,s16[199],,verified
+global,D:1112,queue_y,s16[199],,verified
+global,D:12A2,queue_code,s16[199],,verified
+global,D:1432,queue_scale,u16[199],,verified
+global,D:15C2,traffic_size,u16[14] stride 4,,verified
+global,D:15FA,traffic_scale_tmp,u16,,verified
+global,D:15FC,police_flash,u8,,verified
+global,D:1646,crack_count,u16[7],DS:2532,verified; data
+global,D:1654,crack_ptr,ptr[7],DS:2539,verified; data; same values as DOS
+global,D:1900,needle_rpm,u16,DS:0923,verified; never written by 0x20AF4
+global,D:1902,needle_speed,u16,DS:0923,verified
+global,D:1904,gauge_pose,u16,,verified
+global,D:1906,digital_speed,u16[2],DS:0923,verified
+global,D:190A,digital_rpm,u16[2],DS:0923,verified
+global,D:1984,stage_end_unit,s16,DS:092A,verified; sim/0x20E70
+global,D:1998,marker_angle,s32,,verified
+global,D:199C,near_rows_flag,s16,,verified
+global,D:199E,marker_cache,s32,,verified
+global,D:19CA,loading_palette,u16[2],,verified; data 000 D04
+global,D:19CE,road_palette,u16[32],DS:00CC,verified; data
+global,D:24AE,drawer_pause,u16,,verified
+global,D:24B2,knob_target_y,s16,DS:0A83,verified; sim-owned
+global,D:24B4,knob_y,s16,DS:0A7F,verified
+global,D:24B6,knob_target_x,s16,DS:0A81,verified; sim-owned
+global,D:24B8,knob_x,s16,DS:0A7D,verified
+global,D:24BA,knob_close_delay,u16,DS:091F,verified
+global,D:24D2,dash_palette,u16[32],,verified
+global,D:2832,knob_shown_x,s16,,verified
+global,D:2834,knob_shown_y,s16,,verified
+global,D:2836,back_index,u16,,verified
+global,D:283C,pitch_bump_flag,s16,,verified; consumer dead
+global,D:2840,sprite_shake,s16,,verified; 0 (dead writers)
+global,D:2842,horizon_shake,s16,,verified; ViewPort DyOffset (0)
+global,D:2844,drawer_paused_ack,u16,,verified
+global,D:2846,dash_palette_valid,u16,,verified
+global,D:284C,knob_visible,u16,,verified
+global,D:284E,needle_seg,u16,,verified
+global,D:2850,dot_seg,u16,,verified
+global,D:2852,speed_pair_shift,u16,,verified
+global,D:2854,tach_pair_shift,u16,,verified
+global,D:289A,r_lateral,s32,DS:0910,verified; snapshot of D:2896
+global,D:289E,r_speed,s32,DS:0927,verified; snapshot of D:28A6
+global,D:28A2,r_steer,s32,DS:0914,verified; snapshot of D:28AA
+global,D:28BA,r_road_pos,s32,DS:186F,verified; snapshot of D:28AE
+global,D:28D6,drawer_frames,u32,,verified; write-only
+global,D:28DA,needle_shape,ptr,,verified
+global,D:28DE,needle_rp,RastPort*,,verified
+global,D:28E2,needle_bm,BitMap*,,verified
+global,D:28E6,drawer_stack,ptr,,verified
+global,D:28EA,drawer_task,Task*,,verified
+global,D:28F6,knob_seg,u16[4],,verified
+global,D:292E,sprite_next_word,u16[8],,verified
+global,D:2E46,sprite_data,u16*[8],,verified
+global,D:2726,tach_overlay,Shape*,,verified
+global,D:272A,speed_overlay,Shape*,,verified
+global,D:2756,tach_overlay_mask,Shape*,,verified
+global,D:275A,speed_overlay_mask,Shape*,,verified
+global,D:276E,mask_pool,ptr,,verified
+global,D:27CE,dash_shapes,ptr,DS:1383,verified; <car>Dash.Shp
+global,D:27D2,road_shapes,ptr,DS:0F9F,verified; Pics/Road.Shp
+global,D:1A2E,sign_table,Shape**[16],DS:0F9F,verified; data; mask table D:1A6E
+global,D:1A0E,hazard_table,Shape**[4],DS:0F9F,verified; data; mask table D:1A1E
+global,D:1AAE,car_table,Shape**[16],DS:1173,verified; data; mask table D:1AEE
+global,D:1B2E,mirror_car_table,Shape**[16],DS:123B,verified; data; mask table D:1B6E

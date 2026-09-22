@@ -1,0 +1,605 @@
+Amiga td: function coverage by the specs in port/amiga/spec/ (generated in the merge, 2026-09-22)
+
+Function list: port/amiga/td_functions.json (521) + the 17 functions the Ghidra run added (reached only by
+address: VBL/audio servers, input handler, callbacks, task entries, overlay manager, glue reached by jmp) = 538.
+"csv"   = row in port/amiga/symbols.csv (owner spec shown);
+"range" = covered by a range row of the spec table (e.g. protection internals, Aztec runtime helpers), no own row;
+"md"    = described in the spec text/table but no symbol row.
+
+Totals: 538 functions; 503 with a symbol row, 35 in a range row, 0 in the text only, 0 not covered.
+Per owner spec: drive_scene 101, drive_sim 30, game_flow 26, platform_audio 40, platform_video 315, title_select 26
+Per hunk: ov1 24, ov2 144, root 370
+
+== Functions no spec covers ==
+
+None after the merge. Twelve functions were only nominally covered before the merge and got a symbol row here:
+  0x175D2 0x17606 0x17634 0x17646 0x17660 0x17680 0x176D0 0x178C4 0x178D4 0x178E0 0x17934
+      bodies of library-glue stubs (dos Close/Examine/Lock/Open/Read/UnLock, exec CloseLibrary/FindTask/Forbid/
+      FreeMem/OpenLibrary). platform_video named the stub entry (e.g. 0x17642 dos_Open), which is `jmp +2(pc)`
+      to the body the index lists (0x17646); some callers enter the body directly. Added to
+      platform_video_symbols.csv as <stub>_body.
+  0x24A02 a lone `rts` called from draw_road_main 0x1DA14 (drive_sim .md table had it, the CSV did not); added to
+      drive_sim_symbols.csv as nop_24a02.
+  0x10462 poll_input was in the platform_video .md table but not its CSV (it is not an index miss); row added.
+The 35 "range" functions are documented as groups without their own rows: 25 prot_* (0x119A8-0x11D10, the disk
+protection internals the port drops; platform_video §4.16) and 10 c_fix_* (0x11E08-0x11EA6, C-callable wrappers
+of the fixed-point math cores that nothing calls; platform_video §2).
+
+== Spec symbols that are not index functions ==
+
+Rows in symbols.csv whose address is neither in td_functions.json nor in the Ghidra extra list. They are
+secondary entry points, code reached only by a branch, or dead code:
+  0x10F9C blit_params_ptr (platform_video)    returns &D:0362; no callers found (dead)
+  0x153F4 joy_read_both (platform_video)      fire + direction in one call; no callers found (dead)
+  0x15D34 tolower (platform_video)            runtime, no callers found (dead)
+  0x16986 strcat (platform_video)             runtime: sets n = 0x7FFF and branches into strncat 0x1698C
+  0x169B6 strncmp (platform_video)            runtime: second entry of strcmp 0x169B0
+  0x1DB90 traffic_spawn (drive_sim)           asm, reached by bra from the object dispatcher (0x1DC5C)
+  0x1DC08 radar_zone_start (drive_sim)        asm, reached by bra (0x1DC40)
+  0x1DCA0 speed_sign (drive_sim)              asm, reached by bra (0x1DC4E)
+  0x1DD10 pitch_step (drive_sim)              dead code, no caller
+  0x206A0 draw_obj_sign_mirror (drive_scene)  asm, reached by bne (0x206F6)
+  0x20940 dash_shake_update (drive_scene)     dead code, no caller (so 0x1F9FE never runs either)
+amigaidx.py's seeding misses these as well as the 17 Ghidra extras; tools/ was off limits, so it was not changed.
+
+== DOS functions (game_flow / simulation / scene_render) with no Amiga equivalent found ==
+
+72 DOS functions in those three ranges of port/symbols.csv; 57 are named as a DOS equivalent or cited by address
+in an Amiga spec. The other 15:
+  0x1F7B wait_fire_button (scene_render)     no separate routine found; the Amiga waits for fire inline
+                                             (e.g. the ending 0x1CF76, the play-again menu 0x1D5C8)
+  0x23F2 proj_x_main, 0x2421 proj_y_main,    no counterpart: the Amiga renderer walks the rows with a fixed-point
+  0x282C proj_x_mirror, 0x285B proj_y_mirror scale (0x1DD34 row_scale_step, 0x1DD56 row_y_step), no per-point
+                                             divide (drive_scene §3)
+  0x3306 fill_road_scanlines_mirror,         replaced by per-row blitter spans (0x20096 fill_row_span) and the
+  0x339E fill_span_to_mirror,                mirror clip window 0x1DAF6
+  0x3A37 interp_edge_span
+  0x3A18 atan_lookup                         no atan on the Amiga: x uses sin(heading) directly
+  0x39EB sin_deg (scene_render)              closest: root sin_deg 0x12108 (table 0x1216C), a different table
+  0x3AC2 select_screen                       replaced by the two Views and show_view 0x1C62E
+  0x3B1C sim_isr_exit_jmp                    no simulation ISR on the Amiga
+  0x3BB4 sim_input_charkey                   D/O keys are handled by poll_input 0x10462 (root)
+  0x4241 sim_lookahead                       the Amiga processes objects when the car enters a unit, not 40
+                                             units ahead; the 0xFF end test is in road_record 0x1D32A
+  0x493D car_data_ptr                        the record is copied to D:1924..D:1982 by 0x20D68 instead
+
+== Every function ==
+address  hunk extra spec            how    name
+0x10018  root       game_flow       csv    main
+0x1032C  root       platform_video  csv    close_workbench
+0x10346  root       game_flow       csv    load_cars_txt
+0x10402  root       game_flow       csv    skip_line
+0x1042E  root       platform_video  csv    blit_priority_on
+0x1044C  root       platform_video  csv    blit_priority_off
+0x10462  root       platform_video  csv    poll_input
+0x10588  root       platform_video  csv    protection_check
+0x10632  root       platform_video  csv    nop_10632
+0x1063A  root       platform_video  csv    ilbm_to_view
+0x10692  root       platform_video  csv    iff_next_chunk
+0x106BE  root       platform_video  csv    ilbm_parse
+0x107B4  root       platform_video  csv    cmap_to_rgb4
+0x1086E  root       platform_video  csv    cmp2_to_rgb4
+0x10906  root       platform_video  csv    ilbm_decode_body
+0x109D0  root       platform_video  csv    view_dissolve
+0x10AA2  root       platform_video  csv    dissolve_pass
+0x10B22  root       title_select    csv    res_find_list
+0x10BA8  root       platform_video  csv    arena_new
+0x10BDC  root       platform_video  csv    arena_alloc
+0x10C28  root       platform_video  csv    arena_free_bytes
+0x10C3E  root       platform_video  csv    mask_size
+0x10C5A  root       platform_video  csv    make_mask
+0x10CEC  root       game_flow       csv    empty_hook
+0x10CF4  root       platform_video  csv    nop_10cf4
+0x10D04  root       platform_video  csv    nop_10d04
+0x10D14  root       platform_video  csv    blit_begin
+0x10D3C  root       platform_video  csv    blit_nasty_off
+0x10D44  root       platform_video  csv    blit_wait_hw
+0x10D66  root       platform_video  csv    read_dmaconr
+0x10D72  root       platform_video  csv    blit_clear_rect
+0x10DBE  root       platform_video  csv    blit_fill_rect
+0x10E12  root       platform_video  csv    shape_pos
+0x10E1C  root       platform_video  csv    shape_sub_hot
+0x10E26  root       platform_video  csv    blit_set_dest
+0x10E3A  root       platform_video  csv    blit_shape_word
+0x10E58  root       platform_video  csv    blit_shape
+0x10E78  root       platform_video  csv    blit_wait
+0x10E88  root       platform_video  csv    blit_shape_word_asm
+0x10FA4  root       platform_video  csv    set_clip_full
+0x10FBC  root       platform_video  csv    set_clip
+0x10FDA  root       platform_video  csv    blit_prep_word
+0x110C4  root       platform_video  csv    blit_shape_asm
+0x111E6  root       platform_video  csv    blit_shape_xor
+0x112E4  root       platform_video  csv    blit_prep_shift
+0x11432  root       platform_video  csv    blit_shape_xor_word
+0x11554  root       platform_video  csv    open_libraries
+0x115A0  root       platform_video  csv    close_libraries
+0x115BC  root       platform_video  csv    display_init
+0x11756  root       platform_video  csv    display_shutdown
+0x117E8  root       platform_video  csv    set_task_pri
+0x1180E  root       platform_video  csv    vbl_install
+0x1185C  root       platform_video  csv    vbl_remove
+0x11872  root extra platform_video  csv    read_fire_raw
+0x11886  root extra platform_video  csv    read_joy_raw
+0x118B2  root extra platform_video  csv    vbl_server
+0x11954  root       platform_video  csv    prot_measure_setup
+0x119A8  root       platform_video  range  prot_*
+0x119B0  root extra platform_video  range  prot_*
+0x119B6  root       platform_video  csv    prot_code_len
+0x119D0  root       platform_video  csv    prot_code_start
+0x119D8  root       platform_video  csv    prot_cleanup
+0x119F0  root       platform_video  range  prot_*
+0x11A0A  root       platform_video  csv    prot_read_track
+0x11A70  root       platform_video  range  prot_*
+0x11A7E  root       platform_video  range  prot_*
+0x11ABE  root       platform_video  range  prot_*
+0x11B08  root       platform_video  range  prot_*
+0x11B2E  root       platform_video  range  prot_*
+0x11B50  root       platform_video  range  prot_*
+0x11B5A  root       platform_video  range  prot_*
+0x11B66  root       platform_video  range  prot_*
+0x11B70  root       platform_video  range  prot_*
+0x11B7C  root       platform_video  range  prot_*
+0x11B98  root       platform_video  range  prot_*
+0x11B9E  root       platform_video  range  prot_*
+0x11BA2  root       platform_video  range  prot_*
+0x11BEE  root       platform_video  range  prot_*
+0x11C2C  root       platform_video  range  prot_*
+0x11C6A  root       platform_video  range  prot_*
+0x11C78  root       platform_video  range  prot_*
+0x11C9A  root       platform_video  range  prot_*
+0x11C9E  root       platform_video  range  prot_*
+0x11CBC  root       platform_video  range  prot_*
+0x11CD6  root       platform_video  range  prot_*
+0x11D10  root       platform_video  range  prot_*
+0x11D3A  root       platform_video  csv    prot_measure_gap
+0x11D8E  root       platform_video  csv    prot_crc
+0x11DB0  root       platform_video  csv    prot_crc_core
+0x11E08  root       platform_video  range  c_fix_*
+0x11E1C  root       platform_video  range  c_fix_*
+0x11E30  root       platform_video  range  c_fix_*
+0x11E40  root       platform_video  range  c_fix_*
+0x11E50  root       platform_video  range  c_fix_*
+0x11E60  root       platform_video  range  c_fix_*
+0x11E74  root       platform_video  range  c_fix_*
+0x11E86  root       platform_video  range  c_fix_*
+0x11E96  root       platform_video  range  c_fix_*
+0x11EA6  root       platform_video  range  c_fix_*
+0x11F52  root       platform_video  csv    lmul_signed
+0x11F94  root       platform_video  csv    fix_mul
+0x11FD6  root       platform_video  csv    fix_div
+0x1200E  root       platform_video  csv    isqrt
+0x12056  root       platform_video  csv    abs16
+0x1205E  root       platform_video  csv    abs32
+0x12066  root       platform_video  csv    ltoa_dec
+0x12108  root       platform_video  csv    sin_deg_fix
+0x12146  root       platform_video  csv    cos_deg
+0x12224  root       platform_video  csv    tan_deg_fix
+0x12304  root       platform_audio  csv    sfx_init
+0x123EC  root       platform_audio  csv    sfx_shutdown
+0x12432  root       platform_audio  csv    sfx_set_song_channels
+0x1246A  root       platform_audio  csv    play_sample
+0x124C4  root       platform_audio  csv    start_channel
+0x1252A  root       platform_audio  csv    snd_stop_all
+0x12546  root       platform_audio  csv    sfx_stop_channel
+0x1258E  root       platform_audio  csv    sfx_channel_busy
+0x125A6  root       platform_audio  csv    sfx_set_period_vol
+0x125F4  root       platform_audio  csv    sfx_slide_volume
+0x12616  root extra platform_audio  csv    sfx_audio_int
+0x126AE  root extra platform_audio  csv    sfx_vbl_server
+0x1278C  root       platform_audio  csv    song_init
+0x127F4  root       platform_audio  csv    song_shutdown
+0x12826  root       platform_audio  csv    song_load_instruments
+0x128FE  root       platform_audio  csv    song_free_instruments
+0x12942  root       platform_audio  csv    song_set_volume
+0x1295E  root       platform_audio  csv    song_get_volume
+0x12972  root       platform_audio  csv    song_start
+0x1299C  root       platform_audio  csv    song_request_stop
+0x129BA  root       platform_audio  csv    song_setup
+0x12A40  root       platform_audio  csv    song_is_active
+0x12A54  root extra platform_audio  csv    song_vbl_server
+0x12C98  root extra platform_audio  csv    song_volume_slide
+0x12CDC  root extra platform_audio  csv    smus_find_long
+0x12CF4  root       platform_audio  csv    song_play
+0x12DB0  root       platform_audio  csv    song_stop
+0x12E12  root       platform_audio  csv    song_play_testdrive
+0x12E58  root       platform_audio  csv    song_play_test2
+0x12E8A  root       platform_audio  csv    song_play_testgas
+0x12EBE  root       platform_audio  csv    song_play_endsuccess
+0x12EF6  root       platform_audio  csv    song_play_loser
+0x12F28  root       game_flow       csv    high_scores
+0x12FF0  root       game_flow       csv    read_line
+0x13028  root       game_flow       csv    scores_load
+0x1313E  root       game_flow       csv    scores_save
+0x13250  root       platform_video  csv    text_init
+0x132E6  root       platform_video  csv    text_shutdown
+0x13306  root       platform_video  csv    text_print
+0x13330  root       platform_video  csv    text_move
+0x13354  root       platform_video  csv    text_set_pen
+0x1336E  root       platform_video  csv    draw_box_outline
+0x1343A  root       platform_video  csv    erase_rect
+0x134F2  root       platform_video  csv    text_cursor
+0x135B4  root       game_flow       csv    text_input_line
+0x13708  root       game_flow       csv    scores_enter_name
+0x13A9E  root       game_flow       csv    credits_show
+0x13BD8  root       game_flow       csv    scores_show
+0x13E86  root       game_flow       csv    hs_draw_logo
+0x13F32  root       game_flow       csv    hs_logo_palette
+0x1406E  root       game_flow       csv    crc16
+0x14088  root       game_flow       csv    crc16_core
+0x1433A  root       game_flow       csv    wait_vbl_or_fire
+0x1436E  root       game_flow       csv    quit_sticky
+0x14388  root       game_flow       csv    results_add_line
+0x1444C  root       game_flow       csv    results_text
+0x147E4  root       game_flow       csv    stage_results
+0x14984  root       platform_video  csv    draw_shape_on_view
+0x149D2  root       platform_video  csv    load_file
+0x149E8  root       platform_video  csv    load_file_chip
+0x149FE  root       platform_video  csv    load_file_flags
+0x14C8C  root       platform_video  csv    pckd_unpacked_len
+0x14C9C  root       platform_video  csv    pckd_unpack
+0x14D64  root       platform_video  csv    huff_read_tree
+0x14DC6  root       platform_video  csv    huff_read_word
+0x14DE0  root       platform_video  csv    huff_decode
+0x14E6C  root       platform_video  csv    rle90_out
+0x14ED6  root       platform_video  csv    pack_getc
+0x14EF2  root       platform_video  csv    pack_putc
+0x14F0E  root       platform_video  csv    lzw_decompress
+0x1506C  root       platform_video  csv    lzw_getcode
+0x15192  root       platform_video  csv    lzw_alloc_tables
+0x151D6  root       platform_video  csv    lzw_free_tables
+0x151F2  root       platform_video  csv    load_raw
+0x15208  root       platform_video  csv    load_raw_chip
+0x1521E  root       platform_video  csv    load_raw_flags
+0x1530E  root       platform_video  csv    rand16
+0x15344  root       platform_video  csv    unpack_byterun1_row
+0x153CC  root       platform_video  csv    fire_port_init
+0x153E4  root       platform_video  csv    joy_fire
+0x153EC  root       platform_video  csv    joy_dir
+0x15402  root       platform_video  csv    read_fire
+0x15416  root       platform_video  csv    read_joy
+0x1544E  root       platform_video  csv    quit_requested
+0x15472  root       platform_video  csv    find_shape
+0x15490  root       platform_video  csv    find_shape_asm
+0x154E4  root       platform_video  csv    input_init
+0x155C4  root       platform_video  csv    input_shutdown
+0x15628  root       platform_video  csv    get_char
+0x1563A  root       platform_video  csv    key_to_ascii
+0x15698  root extra platform_video  csv    input_handler
+0x156EC  root       platform_video  csv    key_available
+0x156F8  root       platform_video  csv    get_key
+0x1574E  root       platform_video  csv    view_clear
+0x1580C  root       platform_video  csv    view_copy
+0x1582C  root       platform_video  csv    view_copy_palette
+0x1587C  root       platform_video  csv    view_copy_bitmaps
+0x15904  root       platform_video  csv    alloc_public
+0x1591A  root       platform_video  csv    alloc_chip
+0x15930  root       platform_video  csv    mem_alloc
+0x159FA  root       platform_video  csv    free_mem
+0x15B3E  root       platform_video  csv    mem_check
+0x15C60  root       platform_video  csv    mem_size
+0x15CAC  root extra platform_video  csv    raw_putc
+0x15CE8  root       platform_video  csv    kprintf
+0x15CFC  root       platform_video  csv    raw_dofmt
+0x15D1C  root       platform_video  csv    toupper
+0x15D4C  root       platform_video  csv    sscanf
+0x15D72  root       platform_video  csv    _sscanf_getc
+0x15DBC  root       platform_video  csv    _scanfmt
+0x160E0  root       platform_video  csv    _scan_skipws
+0x1611A  root       platform_video  csv    _scan_int
+0x1620C  root       platform_video  csv    fopen
+0x16236  root       platform_video  csv    _openstream
+0x162A8  root       platform_video  csv    fprintf
+0x162CA  root       platform_video  csv    _fprintf_putc
+0x162E0  root       platform_video  csv    ovl_unload
+0x16396  root       platform_video  csv    strchr
+0x163B0  root       platform_video  csv    _start
+0x16422  root       platform_video  csv    _stub_init
+0x1642A  root       platform_video  csv    _main
+0x16566  root       platform_video  csv    _cli_parse
+0x1670C  root       platform_video  csv    strncpy
+0x1672E  root       platform_video  csv    creat
+0x16746  root       platform_video  csv    open
+0x168A4  root extra platform_video  csv    ovl_load
+0x1691C  root extra platform_video  csv    ovl_loadseg
+0x1698C  root       platform_video  csv    strncat
+0x169B0  root       platform_video  csv    strcmp
+0x169E0  root       platform_video  csv    strcpy
+0x169F0  root       platform_video  csv    _lmul
+0x16A14  root       platform_video  csv    _wb_parse
+0x16AC8  root       platform_video  csv    sprintf
+0x16AF8  root       platform_video  csv    _sprintf_putc
+0x16B14  root       platform_video  csv    printf
+0x16B30  root       platform_video  csv    _fmt_number
+0x16BBE  root       platform_video  csv    _format
+0x16ED8  root       platform_video  csv    _divs32
+0x16F1A  root       platform_video  csv    _modu32
+0x16F26  root       platform_video  csv    _divu32
+0x16F30  root       platform_video  csv    _udiv_core
+0x16F80  root       platform_video  csv    strlen
+0x16F92  root       platform_video  csv    _printf_putc
+0x16FA8  root       platform_video  csv    putc
+0x16FEA  root       platform_video  csv    _putc
+0x17026  root       platform_video  csv    _flushall
+0x1704E  root       platform_video  csv    fclose
+0x170D4  root       platform_video  csv    _flsbuf
+0x171B6  root       platform_video  csv    _getstream
+0x171EE  root       platform_video  csv    _getbuf
+0x1724C  root       platform_video  csv    _freeall
+0x1727E  root       platform_video  csv    malloc
+0x172BE  root       platform_video  csv    _malloc16
+0x172D2  root       platform_video  csv    free
+0x1731E  root       platform_video  csv    isatty
+0x17376  root       platform_video  csv    unlink
+0x1739A  root       platform_video  csv    write
+0x17418  root       platform_video  csv    Chk_Abort
+0x17448  root       platform_video  csv    _abort
+0x17474  root       platform_video  csv    exit
+0x17492  root       platform_video  csv    _exit
+0x17580  root       platform_video  csv    close
+0x175CE  root       platform_video  csv    dos_Close
+0x175D2  root       platform_video  csv    dos_Close_body
+0x175DE  root       platform_video  csv    dos_CurrentDir
+0x175EA  root       platform_video  csv    dos_Delay
+0x175F6  root       platform_video  csv    dos_DeleteFile
+0x17602  root       platform_video  csv    dos_Examine
+0x17606  root extra platform_video  csv    dos_Examine_body
+0x17614  root       platform_video  csv    dos_Input
+0x1761C  root       platform_video  csv    dos_IoErr
+0x17624  root       platform_video  csv    dos_IsInteractive
+0x17630  root       platform_video  csv    dos_Lock
+0x17634  root       platform_video  csv    dos_Lock_body
+0x17642  root       platform_video  csv    dos_Open
+0x17646  root       platform_video  csv    dos_Open_body
+0x17654  root       platform_video  csv    dos_Output
+0x1765C  root       platform_video  csv    dos_Read
+0x17660  root extra platform_video  csv    dos_Read_body
+0x1766E  root       platform_video  csv    dos_Seek
+0x1767C  root       platform_video  csv    dos_UnLock
+0x17680  root       platform_video  csv    dos_UnLock_body
+0x1768C  root       platform_video  csv    dos_Write
+0x1769A  root       platform_video  csv    exec_AddIntServer
+0x176A8  root       platform_video  csv    exec_Alert
+0x176C0  root       platform_video  csv    exec_CloseDevice
+0x176CC  root       platform_video  csv    exec_CloseLibrary
+0x176D0  root       platform_video  csv    exec_CloseLibrary_body
+0x176DC  root       platform_video  csv    exec_CopyMemQuick
+0x176EE  root       platform_video  csv    CreatePort
+0x1777A  root       platform_video  csv    DeletePort
+0x177C0  root       platform_video  csv    exec_AddPort
+0x177CC  root       platform_video  csv    exec_AllocSignal
+0x177D8  root       platform_video  csv    CreateStdIO
+0x177EE  root       platform_video  csv    DeleteStdIO
+0x17800  root       platform_video  csv    CreateExtIO
+0x17844  root       platform_video  csv    DeleteExtIO
+0x17880  root       platform_video  csv    exec_AllocMem
+0x17884  root       platform_video  csv    exec_AllocMem_body
+0x17892  root       platform_video  csv    exec_AddTask
+0x178AA  root       platform_video  csv    exec_DoIO
+0x178C0  root       platform_video  csv    exec_FindTask
+0x178C4  root       platform_video  csv    exec_FindTask_body
+0x178D0  root       platform_video  csv    exec_Forbid
+0x178D4  root       platform_video  csv    exec_Forbid_body
+0x178DC  root       platform_video  csv    exec_FreeMem
+0x178E0  root       platform_video  csv    exec_FreeMem_body
+0x178F0  root       platform_video  csv    exec_FreeSignal
+0x178FC  root       platform_video  csv    exec_GetMsg
+0x17908  root       platform_video  csv    NewList
+0x1791A  root       platform_video  csv    exec_OpenDevice
+0x17930  root       platform_video  csv    exec_OpenLibrary
+0x17934  root       platform_video  csv    exec_OpenLibrary_body
+0x17944  root       platform_video  csv    exec_Permit
+0x1794C  root       platform_video  csv    exec_RemIntServer
+0x1795A  root       platform_video  csv    exec_RemPort
+0x17966  root       platform_video  csv    exec_RemTask
+0x17972  root       platform_video  csv    exec_ReplyMsg
+0x1797E  root       platform_video  csv    exec_SetSignal
+0x1798C  root       platform_video  csv    exec_SetTaskPri
+0x1799C  root       platform_video  csv    exec_WaitPort
+0x179A8  root       platform_video  csv    gfx_BltBitMap
+0x179CA  root       platform_video  csv    gfx_BltClear
+0x179DC  root       platform_video  csv    gfx_CBump
+0x179E8  root       platform_video  csv    gfx_CloseFont
+0x179F4  root       platform_video  csv    gfx_CMove
+0x17A06  root       platform_video  csv    gfx_CWait
+0x17A18  root       platform_video  csv    gfx_DisownBlitter
+0x17A20  root       platform_video  csv    gfx_Draw
+0x17A32  root       platform_video  csv    gfx_FreeColorMap
+0x17A3E  root       platform_video  csv    gfx_FreeCprList
+0x17A4A  root       platform_video  csv    gfx_FreeVPortCopLists
+0x17A56  root       platform_video  csv    gfx_GetColorMap
+0x17A62  root       platform_video  csv    gfx_InitBitMap
+0x17A74  root       platform_video  csv    gfx_InitRastPort
+0x17A80  root       platform_video  csv    gfx_InitView
+0x17A8C  root       platform_video  csv    gfx_InitVPort
+0x17A98  root       platform_video  csv    gfx_LoadRGB4
+0x17AAA  root       title_select    csv    gfx_LoadView
+0x17AB6  root       platform_video  csv    gfx_MakeVPort
+0x17AC4  root       platform_video  csv    gfx_Move
+0x17AD6  root       platform_video  csv    gfx_MrgCop
+0x17AE2  root       platform_video  csv    gfx_OpenFont
+0x17AEE  root       platform_video  csv    gfx_OwnBlitter
+0x17AF6  root       platform_video  csv    gfx_RectFill
+0x17B08  root       platform_video  csv    gfx_ScrollRaster
+0x17B24  root       platform_video  csv    gfx_SetAPen
+0x17B34  root       platform_video  csv    gfx_SetBPen
+0x17B44  root       platform_video  csv    gfx_SetDrMd
+0x17B54  root       platform_video  csv    gfx_SetFont
+0x17B64  root       platform_video  csv    gfx_Text
+0x17B7E  root       platform_video  csv    gfx_TextLength
+0x17B92  root       platform_video  csv    gfx_WaitBlit
+0x17B9A  root       platform_video  csv    gfx_WaitTOF
+0x17BA2  root       platform_video  csv    icon_FindToolType
+0x17BB0  root       platform_video  csv    icon_FreeDiskObject
+0x17BBC  root       platform_video  csv    icon_GetDiskObject
+0x17BC8  root       platform_video  csv    int_CloseWindow
+0x17BD4  root       platform_video  csv    int_CloseWorkBench
+0x17BDC  root       platform_video  csv    int_DrawImage
+0x17BF0  root       platform_video  csv    con_RawKeyConvert
+0x1AED0  ov1        title_select    csv    run_intro
+0x1B2B2  ov1        title_select    csv    intro_accolade_bull
+0x1B396  ov1        title_select    csv    intro_testdrive_car
+0x1B62E  ov1        title_select    csv    intro_testdrive_logo
+0x1B8E6  ov1        title_select    csv    car_select
+0x1BA7C  ov1        title_select    csv    showroom_display_init
+0x1BC64  ov1        title_select    csv    showroom_display_free
+0x1BD14  ov1        title_select    csv    car_pics_free_all
+0x1BD9C  ov1        title_select    csv    load_file_retry
+0x1BDCA  ov1        title_select    csv    show_car
+0x1BF40  ov1        title_select    csv    sb_load_ilbm
+0x1BF8E  ov1        title_select    csv    sb_parse_ilbm
+0x1C068  ov1        title_select    csv    sb_decode_body
+0x1C15C  ov1        title_select    csv    colormap_clear
+0x1C190  ov1        title_select    csv    fade_plate_colours
+0x1C22A  ov1        title_select    csv    wait_frames
+0x1C244  ov1        title_select    csv    showroom_drive_away
+0x1C62E  ov1        title_select    csv    show_view
+0x1C682  ov1        title_select    csv    scroll_out_down
+0x1C700  ov1        title_select    csv    scroll_in_up
+0x1C76A  ov1        title_select    csv    scroll_out_up
+0x1C7CC  ov1        title_select    csv    scroll_in_down
+0x1C820  ov1  extra title_select    csv    scroller_task_entry
+0x1C83C  ov1        title_select    csv    start_scroller
+0x1C900  ov2        game_flow       csv    run_game
+0x1CCF6  ov2        drive_sim       csv    traffic_reset
+0x1CD72  ov2        drive_sim       csv    knob_update
+0x1CF76  ov2        drive_scene     csv    dealership_ending
+0x1D27E  ov2        drive_scene     csv    plot_pixel_set
+0x1D2C2  ov2        drive_scene     csv    plot_pixel_clear
+0x1D306  ov2        drive_scene     csv    mul_scale
+0x1D31A  ov2        drive_sim       csv    clamp_word
+0x1D32A  ov2        drive_sim       csv    road_record
+0x1D36C  ov2        drive_scene     csv    set_main_window_clip
+0x1D392  ov2        drive_scene     csv    render_frame
+0x1D484  ov2        drive_scene     csv    road_drawer_main
+0x1D560  ov2        game_flow       csv    stage_score
+0x1D5C8  ov2        game_flow       csv    play_again_menu
+0x1D97C  ov2        drive_scene     csv    clear_window
+0x1D9C6  ov2        drive_scene     csv    queue_reset
+0x1D9CC  ov2        drive_scene     csv    compose_road_window
+0x1DA14  ov2        drive_scene     csv    draw_road_main
+0x1DA72  ov2        drive_scene     csv    init_row_scale
+0x1DAA2  ov2        drive_scene     csv    draw_road_mirror
+0x1DAF6  ov2        drive_scene     csv    set_mirror_window_clip
+0x1DB36  ov2        drive_sim       csv    road_edge_check
+0x1DC2E  ov2        drive_sim       csv    road_object
+0x1DCDC  ov2        drive_sim       csv    heading_step
+0x1DD34  ov2        drive_scene     csv    row_scale_step
+0x1DD56  ov2        drive_scene     csv    row_y_step
+0x1DD96  ov2        drive_scene     csv    row_slope_step
+0x1DDEA  ov2        drive_sim       csv    traffic_update
+0x1E062  ov2        drive_scene     csv    queue_slot_car_0
+0x1E078  ov2        drive_scene     csv    queue_slot_car_1
+0x1E08E  ov2        drive_scene     csv    queue_slot_car_2
+0x1E0A4  ov2        drive_scene     csv    queue_slot_car_3
+0x1E0B8  ov2        drive_scene     csv    queue_slot_car_4
+0x1E0CC  ov2        drive_scene     csv    queue_police_car
+0x1E19E  ov2        drive_scene     csv    queue_oncoming_cars
+0x1E216  ov2        drive_scene     csv    queue_post
+0x1E230  ov2        drive_scene     csv    queue_scenery_wed
+0x1E276  ov2        drive_scene     csv    queue_scenery_rock
+0x1E2B0  ov2        drive_scene     csv    queue_scenery_lin
+0x1E2F8  ov2        drive_scene     csv    queue_hazard
+0x1E314  ov2        drive_scene     csv    walk_road_rows
+0x1E53A  ov2        drive_sim       csv    road_advance
+0x1E5C6  ov2        drive_scene     csv    row_widths
+0x1E63A  ov2        drive_scene     csv    draw_ticket
+0x1E65C  ov2        drive_scene     csv    draw_lane_marks
+0x1E6A6  ov2        drive_sim       csv    shoulder_bump
+0x1E720  ov2        drive_sim       csv    rumble_slow
+0x1E73A  ov2        drive_sim       csv    marker_test
+0x1E758  ov2        drive_scene     csv    draw_clouds
+0x1E784  ov2        drive_scene     csv    blit_clouds
+0x1E7D2  ov2        drive_scene     csv    draw_bugs
+0x1EAE0  ov2        drive_scene     csv    move_clouds
+0x1EB5E  ov2        drive_scene     csv    wrap_cloud_x
+0x1EB78  ov2        drive_scene     csv    init_clouds
+0x1EBA8  ov2        drive_scene     csv    wrap_angle_delta
+0x1EBC4  ov2        drive_scene     csv    draw_cockpit_overlays
+0x1EC1A  ov2        drive_sim       csv    radar_zone
+0x1EC94  ov2        drive_scene     csv    draw_radar_detector
+0x1ED06  ov2        drive_scene     csv    draw_steering_wheel
+0x1ED64  ov2        drive_scene     csv    xor_wheel_pose
+0x1ED8A  ov2        drive_scene     csv    reset_wheel_state
+0x1EDAE  ov2        drive_scene     csv    window_rect_stub
+0x1EDCE  ov2        drive_sim       csv    shift_gear
+0x1EE76  ov2        drive_sim       csv    gate_select
+0x1EF14  ov2        drive_scene     csv    cop_move_long
+0x1EF76  ov2        drive_scene     csv    spr_pos_word
+0x1EF90  ov2        drive_scene     csv    spr_ctl_word
+0x1EFD4  ov2        drive_scene     csv    cop_sprite_pos
+0x1F05A  ov2        drive_scene     csv    sprite_set_segment
+0x1F0DC  ov2        drive_scene     csv    sprite_add_segment
+0x1F12C  ov2        drive_scene     csv    pack_shape_to_sprite
+0x1F27E  ov2        drive_scene     csv    shape_to_sprite_segment
+0x1F2EA  ov2        drive_scene     csv    draw_needle
+0x1F582  ov2        drive_scene     csv    position_wheel_marker
+0x1F5BA  ov2        drive_scene     csv    sprites_init
+0x1F99A  ov2        drive_scene     csv    sprites_free
+0x1F9FE  ov2        drive_scene     csv    shake_dash_sprites
+0x1FAD4  ov2        drive_scene     csv    ucop_sprite_pointers
+0x1FB4A  ov2        drive_scene     csv    ucop_palette_split
+0x1FBD8  ov2        drive_scene     csv    crash_windscreen_sequence
+0x1FDF4  ov2        drive_scene     csv    redraw_cockpit_back
+0x1FE38  ov2        drive_scene     csv    min16
+0x1FE54  ov2        drive_scene     csv    clamp_rgb4
+0x1FEAE  ov2        drive_scene     csv    fade_out_palette
+0x20096  ov2        drive_scene     csv    fill_row_span
+0x20128  ov2        drive_scene     csv    fill_road_row
+0x202A8  ov2        drive_scene     csv    fill_left_ground
+0x2031C  ov2        drive_scene     csv    draw_centre_line
+0x2034E  ov2        drive_scene     csv    draw_horizon_cliff
+0x203E0  ov2        drive_scene     csv    toggle_gear_box
+0x20410  ov2        drive_scene     csv    queue_object
+0x20456  ov2        drive_scene     csv    draw_object_queue
+0x20526  ov2        drive_scene     csv    draw_obj_lin
+0x20546  ov2        drive_scene     csv    draw_obj_rock
+0x20562  ov2        drive_scene     csv    draw_obj_wed
+0x20580  ov2        drive_scene     csv    draw_obj_post
+0x205A6  ov2        drive_scene     csv    scale_index5
+0x205BC  ov2        drive_scene     csv    scale_index4
+0x205CE  ov2        drive_scene     csv    draw_obj_traffic
+0x206E8  ov2        drive_scene     csv    draw_obj_sign
+0x20740  ov2        drive_scene     csv    draw_obj_hazard
+0x2076C  ov2        drive_sim       csv    rpm_from_speed
+0x20780  ov2        drive_sim       csv    speed_from_rpm
+0x207A4  ov2        drive_sim       csv    shift_effects
+0x20826  ov2        drive_sim       csv    engine_update
+0x2090C  ov2        drive_scene     csv    detect_pitch_bump
+0x2097C  ov2        drive_scene     csv    draw_digital_cluster
+0x20A88  ov2        drive_scene     csv    draw_number
+0x20AF4  ov2        drive_scene     csv    update_gauges
+0x20CB0  ov2        drive_sim       csv    sim_controls
+0x20D68  ov2        drive_sim       csv    car_record_copy
+0x20E70  ov2        drive_sim       csv    stage_road_select
+0x246FA  ov2        drive_scene     csv    row_heading_step
+0x2472A  ov2        drive_scene     csv    row_x_step
+0x247B2  ov2        drive_scene     csv    update_wheel_marker
+0x2481C  ov2        drive_sim       csv    curve_integral
+0x2484C  ov2        drive_sim       csv    lateral_physics
+0x24924  ov2        drive_sim       csv    steering
+0x2498E  ov2        drive_sim       csv    steer_steps
+0x249CC  ov2        drive_sim       csv    edge_kicks
+0x24A02  ov2        drive_sim       csv    nop_24a02
+0x24A04  ov2        drive_sim       csv    grip_check
+0x24AA8  ov2        drive_sim       csv    skid_drift
+0x24ACA  ov2        game_flow       csv    stage_load
+0x24CE4  ov2        game_flow       csv    stage_unload
+0x24D68  ov2        drive_scene     csv    remake_view
+0x24D8A  ov2        drive_scene     csv    setup_drive_copper
+0x24E52  ov2        drive_scene     csv    fade_out_drive
+0x24E94  ov2        drive_scene     csv    start_road_drawer
+0x24F3A  ov2        drive_scene     csv    stop_road_drawer
+0x24F9A  ov2  extra drive_scene     csv    road_drawer_entry
+0x24FAA  ov2        drive_scene     csv    load_cockpit_shapes
+0x253E6  ov2        drive_scene     csv    load_road_shapes
+0x25740  ov2        drive_scene     csv    load_scenery_shapes
+0x259D8  ov2        drive_scene     csv    load_sign_shapes
+0x2627C  ov2        drive_scene     csv    load_traffic_shapes
+0x26B7A  ov2        platform_audio  csv    sfx_load_drive
+0x26C02  ov2        platform_audio  csv    sfx_free_drive
+0x26C50  ov2        platform_audio  csv    radar_beep
+0x26C70  ov2        platform_audio  csv    engine_sound_start
+0x26D16  ov2        platform_audio  csv    engine_sound_fade_out
+0x26D4E  ov2        platform_audio  csv    engine_sound_update
+0x26E26  ov2        platform_audio  csv    squeal_update
+0x26EE2  ov2        platform_audio  csv    bump_update

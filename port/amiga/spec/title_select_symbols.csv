@@ -1,0 +1,76 @@
+kind,address,name,type,dos_equiv,notes
+func,0x1AED0,run_intro,int(void),0x037A,verified; overlay 1 entry (stub 0x17E94); Title2+bull+Accolade / Title4+car / Title3 logo+KEYS; -1 complete 1 interrupted
+func,0x1B2B2,intro_accolade_bull,void(Archive *titleCar),0x03F4,verified; bull loop of DOS intro_accolade only; x 0..240 step 4 per VBL; 62 frames
+func,0x1B396,intro_testdrive_car,void(Archive *titleCar),0x051B,verified; 113 VBL pre-delay; window 9 VBL; moving 2 VBL; vel+=15000 x+=vel>>16; DxOffset=-x
+func,0x1B62E,intro_testdrive_logo,void(Archive *titleCar),0x0792,verified; DOS physics on vpA DyOffset=y+0xA0 one step per VBL; then ScrollRaster copy to B and KEYS dissolve
+func,0x1B8E6,car_select,int(void),0x098C,verified; overlay stub 0x17E9C; stick down=next up=prev; fire selects; timeout 6000/540 VBL; returns idx or -1
+func,0x1BA7C,showroom_display_init,void(void),,verified; adds 640x111x2 hires ViewPorts D:2F2E/D:2F56 at line 0x59 under 88-line top ViewPorts
+func,0x1BC64,showroom_display_free,void(void),,verified; restores DHeight 200 and frees sheet planes colormaps copper lists
+func,0x1BD14,car_pics_free_all,void(void),,verified; frees D:300E[20] and D:305E[20]
+func,0x1BD9C,load_file_retry,void *(char *name),,verified; load_file; on failure car_pics_free_all and retry once
+func,0x1BDCA,show_car,void(int idx View *view int dir),0x0AB2,verified; TDScroller scroll-out of front view; load/decode .ST and .SB into view; scroll-in
+func,0x1BF40,sb_load_ilbm,void(long *data View *view),,verified; FORM/ILBM check then 0x1BF8E
+func,0x1BF8E,sb_parse_ilbm,void(char *form View *view),,verified; BMHD/BODY/CMAP walk like root 0x106BE (no CMP2)
+func,0x1C068,sb_decode_body,void(BMHD *bmhd uint *colors char *body View *view),,verified; rows < 0x59 skipped; rows >= 0x59 into hires ViewPort planes; LoadRGB4 32
+func,0x1C15C,colormap_clear,void(ColorMap *cm),,verified
+func,0x1C190,fade_plate_colours,void(void),,verified; colours 29-31 of front top ViewPort: RG cleared blue-1 per pass; 12 VBL per pass
+func,0x1C22A,wait_frames,void(int n),0x6C3B,verified; n x WaitTOF (DOS delay_ticks analogue)
+func,0x1C244,showroom_drive_away,void(int idx),0x0D75,verified; .SS script; Starter ch3; standing 9 VBL; driving 2 VBL vel+=12000; ends on x>=0x140 or D:0346
+func,0x1C62E,show_view,void(View *v),,verified; LoadView + D:24CE/D:24C8/D:24C0/D:287A; also called game-wide via overlay stub 0x17EA4
+func,0x1C682,scroll_out_down,void(View *v),0x0AB2,verified; TDScroller body dir +1; DyOffset 0..0x57 DHeight h-i
+func,0x1C700,scroll_in_up,void(View *v),0x0AB2,verified; dir -1; DyOffset 0x57..0 DHeight h-i
+func,0x1C76A,scroll_out_up,void(View *v),0x0AB2,verified; TDScroller body dir -1; RasInfo RyOffset 0..0x58
+func,0x1C7CC,scroll_in_down,void(View *v),0x0AB2,verified; dir +1; RasInfo RyOffset 0x58..0
+func,0x1C820,scroller_task_entry,task entry,,verified; A4 from D:0B2A; D:288A(D:2886); D:2824=1; not in td_functions.json
+func,0x1C83C,start_scroller,void(int up View *v),,verified; AddTask TDScroller pri 5 stack 0x7D0 initPC 0x1C820
+func,0x10B22,res_find_list,void(Archive *a long *names Shape **out long pool),0x94C7,verified; root; only caller 0x1B396; mode codes 0..5 (1 store 2 mask via 0x10C5A 0 end)
+func,0x17AAA,gfx_LoadView,void(View *v),,verified; root glue graphics LVO -222; only caller 0x1C62E
+global,D:293E,g_viewA,struct View (0x12),,verified; ViewPort &D:2E8E
+global,D:2950,g_viewB,struct View (0x12),,verified; ViewPort &D:2EB6
+global,D:2E8E,g_vpA,struct ViewPort (0x28),,verified; Next/DHeight D:2EA8/DxOffset D:2EAA/DyOffset D:2EAC; RasInfo D:28FE -> BitMap D:2EDE
+global,D:2EB6,g_vpB,struct ViewPort (0x28),,verified; Next/DHeight D:2ED0/DxOffset D:2ED2/DyOffset D:2ED4; RasInfo D:290A -> BitMap D:2F06
+global,D:2EA8,g_vpA_DHeight,int,,verified; 200; 0x58 in the showroom
+global,D:2EAA,g_vpA_DxOffset,int,,verified; -x during drive-offs
+global,D:2EAC,g_vpA_DyOffset,int,,verified; logo drop y+0xA0
+global,D:2ED0,g_vpB_DHeight,int,,verified
+global,D:2ED2,g_vpB_DxOffset,int,,verified
+global,D:2ED4,g_vpB_DyOffset,int,,verified
+global,D:2EDE,g_bitmapA,struct BitMap (0x28),,verified; 320x200x5; planes D:2EE6[5]
+global,D:2F06,g_bitmapB,struct BitMap (0x28),,verified; 320x200x5; planes D:2F0E[5]; ScrollRaster target in 0x1B62E
+global,D:30AE,g_rpA,struct RastPort (0x64),,verified; on bitmap A
+global,D:3112,g_rpB,struct RastPort (0x64),,verified; on bitmap B
+global,D:24CE,g_frontView,View *,,verified; set by show_view
+global,D:24C8,g_backView,View *,,verified; set by show_view
+global,D:24C0,g_frontRastPort,RastPort *,,likely; rp of the shown view (name by structure; users in other specs)
+global,D:287A,g_backRastPort,RastPort *,,likely; rp of the hidden view
+global,D:2F2E,g_sheetVpA,struct ViewPort (0x28),,verified; hires 640x111 DyOffset 0x59 Modes 0x8000
+global,D:2F56,g_sheetVpB,struct ViewPort (0x28),,verified
+global,D:2916,g_sheetRasA,struct RasInfo,,verified; BitMap &D:2F7E
+global,D:2922,g_sheetRasB,struct RasInfo,,verified; BitMap &D:2FA6
+global,D:2F7E,g_sheetBmA,struct BitMap (0x28),,verified; 640x111x2; planes D:2F86[2] 0x22B0 bytes
+global,D:2FA6,g_sheetBmB,struct BitMap (0x28),,verified; planes D:2FAE[2]
+global,D:288E,g_sheetCmA,ColorMap *,,verified; GetColorMap(32)
+global,D:2892,g_sheetCmB,ColorMap *,,verified
+global,D:31DA,g_sheetRpA,struct RastPort,,verified; set up in 0x1BA7C; unused in overlay 1
+global,D:323E,g_sheetRpB,struct RastPort,,verified; unused in overlay 1
+global,D:2876,g_tmpRastPort,RastPort *,,verified; 100-byte temp; shared with high-score code
+global,D:03D8,tick_count,ulong,DS:642A,verified; +1 per VBL (50 Hz); DOS 100 Hz
+global,D:0344,g_sfxOn,int,,verified; S key toggles (0x10462)
+global,D:0346,g_abortKey,int,,likely; set by 0x10462 for key 0x12 (Ctrl-R likely); ends drive-away; car_select returns -1
+global,D:0350,g_numCars,int,DS:0088,verified
+global,D:2E66,g_carNames,char *[],DS:78F2,verified; Cars.txt path stems
+global,D:2816,demo_mode,int,DS:0084,verified; attract; cleared by stick/fire in car_select
+global,D:2512,g_joyDir,int,,verified; 0 none 1 up 2 up-right 3 right 4 down-right 5 down 6 down-left 7 left 8 up-left (0x153EC)
+global,D:2858,g_joyFire,int,,verified; 0x153E4
+global,D:24BC,g_loadedBuf,void *,,verified; last load_file result
+global,D:0A7A,g_titleShapeNames,long[44],DS:0148,verified; frm0-4 rrm0-4 wnd1..wndK wndS wndT wndS wndL..wndR wndR x4 then 0
+global,D:1EFC,g_titleShapes,Shape *[43],,verified; frm D:1EFC rrm D:1F10 wnd D:1F24 (33)
+global,D:03CC,g_blitTag,long,,verified; 4-char tag before blits; never read
+global,D:300E,g_stCache,void *[20],,verified; <car>.ST per car
+global,D:305E,g_sbCache,void *[20],,verified; <car>.SB per car
+global,D:2824,g_scrollerDone,int,,verified; 0 while TDScroller runs
+global,D:287E,g_scrollerStack,void *,,verified; 0x7D0 bytes
+global,D:2882,g_scrollerTask,struct Task *,,verified; 0x5C bytes
+global,D:2886,g_scrollerView,View *,,verified
+global,D:288A,g_scrollerFunc,void (*)(View *),,verified; 0x1C682 or 0x1C76A
+global,D:0B2A,g_savedA4,long,,verified; image 0x1873A; A4 for the task

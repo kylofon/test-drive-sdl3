@@ -1,0 +1,152 @@
+kind,address,name,type,dos_equiv,notes
+func,0x1C900,drive_main,int(int car),0x1DC0,see game_flow; frame = 5 VBL via WaitTOF; clock frames (shown /12 s); exits
+func,0x1CCF6,traffic_reset,void(void),0x1F93,verified; clears traffic slots police counters radar and 0x1E89A[256]
+func,0x1CD72,knob_update,void(void),0x3DDB,verified; knob 4px x / 8px y per frame; clears D:26FC at target; drawing see drive_scene
+func,0x1D31A,clamp_word,asm(d0 lo; d1 hi; a3 *word),,verified
+func,0x1D32A,road_record,asm(d7 unit) -> a2,,verified; &REC[ROAD[unit]]; REC[0] outside stage; 0xFF sets stage_end = unit-45
+func,0x1DB36,road_edge_check,asm,0x40FE,verified; crash if -D:0D94 - x_snap >= -0xDC or D:0D96 - x_snap <= 0xC0; wide road slot0 speed 3/4
+func,0x1DB90,traffic_spawn,asm(a2; d7),0x467D,verified; 40 units ahead; BUG full object byte used as slot index
+func,0x1DC08,radar_zone_start,asm(a2),0x467D,verified; chance test then D:0DBE hi = 1
+func,0x1DC2E,road_object,asm(a2 rec; d7 unit),0x467D,verified; objects handled on entering the unit
+func,0x1DCA0,speed_sign,asm,0x40FE,verified; limit D:0D86[k-5]; all traffic speeds = limit<<16>>6; slot1 x1.25
+func,0x1DCDC,heading_step,asm(a2),,verified; D:28C6 += curve/8 deg wrap 0..359
+func,0x1DD10,pitch_step,asm(a2),,verified; no caller (dead)
+func,0x1DDEA,traffic_update,void(int unit),0x427F,verified; same-dir cars; police FSM (DOS 0x438A); oncoming; collisions; removal (DOS 0x455F)
+func,0x1E53A,road_advance,void(void),0x40FE,verified; units crossed this frame; curve integral; objects
+func,0x1E5C6,row_road_widths,asm,,see drive_scene; row 0 -> D:0D94/D:0D96 (0x140+0x40*nibble of REC[0])
+func,0x1E6A6,shoulder_bump,asm(d7),,verified; marker bump sound flag; rumble slow near edges
+func,0x1E720,rumble_slow,asm,,verified; speed -= 0x3000; rpm from speed unless shifting
+func,0x1E73A,marker_test,asm(d2),,verified; D:0D9A = -1 if 0x4C <= |d2-10| <= 0x70
+func,0x1EC1A,radar_zone,void(long pos),0x455F,verified; >15 mph over limit in zone 5..7 -> police 30 units behind at 0x1B000+stage*0x1000
+func,0x1EC94,radar_lamp,void(void),0x35C6,see drive_scene; lamp min(zone 5); beep via 0x26C50
+func,0x1EDCE,shift_gear,void(int delta),0x3CB8,verified; gear clamp 0..num_gears; knob target; D:26FC = delta != 0
+func,0x1EE76,gate_select,void(int node),0x3CB8,verified; gate mode; gear ratio knob target row/col
+func,0x2076C,rpm_from_speed,asm,0x3FAD,verified; D:191A = (u16)(speed>>8) * ratio; rpm = high word; no idle floor
+func,0x20780,speed_from_rpm,asm,,verified; HI(speed) = (rpm<<8)/ratio
+func,0x207A4,shift_effects,asm,0x3DDB,verified; clutch dump N->1 >4000 rpm halves rpm into speed; 1->2 drop >1600 chirp
+func,0x20826,engine_update,asm,0x3EAA,verified; torque/drag per frame; brake 0x42000; neutral 0x7FFF; free rev +500; advance = speed>>6
+func,0x20CB0,sim_controls,void(void),0x3BEA,verified; over-rev 10 frames; autopilot/demo; fire = shift; pedal; physics; road_pos += advance
+func,0x20D68,car_record_copy,void(void),,verified; car record -> D:1924..D:1982 (DOS car loader 0x10E2)
+func,0x20E70,stage_road_select,void(int stage),0x1F4E,verified; road stream; stage_end = FF index - 45; par tables
+func,0x2481C,curve_integral,asm(a2),,verified; D:19AA += curve * distance
+func,0x2484C,lateral_physics,asm,0x3FE8,verified; curve drift 3/4; steer force; grip; x clamp +-1000; view yaw; lane hold
+func,0x24924,steering,asm,0x3D7D,verified; 1 deg/frame away from road angle; up to 6 back; kicks
+func,0x2498E,steer_steps,asm -> d0..d3,,verified
+func,0x249CC,edge_kicks,asm -> d2 d3,,verified; 0x60000 kicks zeroed near road edges
+func,0x24A02,nop_24a02,void(void),,verified; lone rts called from the renderer (0x1DA14); row added in the merge (was in the .md table only)
+func,0x24A04,grip_check,asm,0x3FE8,verified; hazard grip 80/60/80/75%; skid amount 0..0x40; clamp to grip; speed -= 0x4000
+func,0x24AA8,skid_drift,asm,0x40FE,verified; D:19B4 += skid * car+00A >> 8
+func,0x24ACA,stage_load,void(int car),0x4792,see game_flow; init car_x 0x640000 steer speed heading 0
+func,0x118B2,ticks_vbl_server,VERTB server,,verified; tick_count++; gearbox hide; gate-mode shifting + engine_update per VBL
+func,0x11872,vbl_read_fire,asm -> d0,,verified; CIA-A PRA bit 7 inverted
+func,0x11886,vbl_read_dir,asm -> d0,,verified; JOY1DAT via D:03DC
+func,0x153E4,joy_read_fire,int(void),0x5C24,verified; -> D:2858
+func,0x153EC,joy_read_dir,int(void),0x5C24,verified; JOY1DAT via table 0x1543E -> D:2512
+func,0x1530E,rng_next,int(void),0x8BAF,verified; s = (s*0x1AFB + 0x1FCCD) ^ VHPOSR; seeded from VHPOSR
+func,0x12056,abs_w,asm d0,,verified
+func,0x1205E,abs_l,asm d0,,verified
+func,0x12108,sin_deg,asm(d0 16.16 deg) -> d0,,verified; table 0x1216C interpolated
+func,0x12146,cos_deg,asm(d0 int deg) -> d0,,verified
+func,0x16ED8,ldiv,asm(d0; d1) -> d0,,verified; signed long divide (runtime)
+func,0x247B2,wheel_marker,asm,0x35C6,see drive_scene; angle 2*steer clamp +-35 deg
+func,0x1D484,road_drawer_loop,task,,see drive_scene
+func,0x24F9A,road_drawer_entry,task entry,,see drive_scene
+func,0x1D560,stage_score,long(long frames; long par; int base),,see game_flow
+func,0x1FBD8,crash_sequence,void(void),0x392C,see drive_scene
+global,D:28A6,speed,long 16.16 mph,DS:0927,verified; clamped >= 0
+global,D:28B6,advance,long 16.16 units,,verified; speed >> 6 per frame
+global,D:28AE,road_pos,long 16.16 units,DS:0906,verified; 0x1E0000 at stage start; also DOS DS:0912 sub_unit
+global,D:28CE,road_pos_done,long,DS:0908,verified; -1 = none
+global,D:2896,car_x,long 16.16,DS:0910,verified; + = right (DOS + = left); 0x640000 at load
+global,D:289A,car_x_snap,long,,verified; renderer copy used by road_edge_check
+global,D:28AA,steer,long 16.16 deg,DS:0914,verified; unclamped
+global,D:28C6,heading,long 16.16 deg,,verified; 0..359
+global,D:28CA,pitch_acc,long,,verified; only cleared
+global,D:191A,rpm,word+fraction,DS:091B,verified; high word = rpm
+global,D:191E,gear,int,DS:0A78,verified
+global,D:1920,ratio,int,DS:0916,verified
+global,D:1922,pedal,int,DS:0A79,verified; +1 gas -1 brake; set after physics; used next frame
+global,D:1604,overrev_frames,int,,verified
+global,D:15FE,squeal_env,int,DS:08F4,verified; 0 dump / 0xB 1->2 (see platform_audio)
+global,D:1600,prev_gear,int,,verified
+global,D:1602,prev_shifting,int,,verified
+global,D:26FC,shifting,int,DS:0A7B,verified
+global,D:24B6,knob_target_x,int,DS:0A81,verified
+global,D:24B2,knob_target_y,int,DS:0A83,verified
+global,D:24B8,knob_x,int,DS:0A7D,verified
+global,D:24B4,knob_y,int,DS:0A7F,verified
+global,D:24B0,gate_mode,int,DS:0921,verified; O key
+global,D:03EE,gate_row,int,DS:0920,verified; node = row*4+col
+global,D:03F0,gate_col,int,DS:0920,verified
+global,D:03EC,gate_last_dir,int,,verified
+global,D:0B34,gearbox_always,int,DS:08BE,verified; D key
+global,D:0B30,gearbox_show,byte[2],,verified; per view buffer
+global,D:24BA,gearbox_hide_delay,int,DS:091F,verified; 7 after a shift
+global,D:1916,fire_prev,int,DS:0A77,verified
+global,D:1918,dir_prev,int,,verified
+global,D:19AA,curve_acc,long 16.16,DS:0919,verified; curve * distance this frame
+global,D:0D8A,seg_frac,int,,verified
+global,D:19A2,yaw_force,long,DS:090A,verified
+global,D:19A6,lat_force,long 16.16,,verified; clamped to +-grip
+global,D:19AE,car_x_new,long,,verified
+global,D:19B2,lat_sign,int,,verified
+global,D:19B4,view_yaw,long 16.16,DS:090C,verified; read by renderer 0x2472A
+global,D:19B8,steer_track,long 16.16 deg,,verified; curve/2
+global,D:19BC,skid_amount,int,DS:0924,verified; 0..0x40; squeal volume
+global,D:19BE,bump_edge,int,,verified; {1 0 -1 0}[hazard&3]
+global,D:19C4,steer_prev,long,,verified
+global,D:0B36,steer_lock,int,,verified; never written (dead branch)
+global,D:0D80,hazard_hit,int,DS:09A5,verified; cleared by grip_check
+global,D:0D94,road_left_w,int,,verified use; written by drive_scene 0x1E5C6
+global,D:0D96,road_right_w,int,,verified use; written by drive_scene 0x1E5C6
+global,D:0D9A,bump_flag,int,,verified
+global,D:0D9C,first_unit,int,,verified
+global,D:282E,crash,int,DS:0929,verified; 1 crash 2 hit police (game over)
+global,D:0B2E,near_end,int,DS:0929,verified; stage_end - unit < 0x50
+global,D:0D70,autopilot,int,,verified; demo or near_end
+global,D:0D72,lane_hold,int,,verified; autopilot or cop_tail_frames >= 0x46; x -> 0x50
+global,D:1984,stage_end,int,DS:092A,verified; FF index - 45
+global,D:1986,road_stream,ptr,DS:6361,verified
+global,D:198A,road_records,ptr,DS:2B70,verified; 0x20F08
+global,D:198E,stage_par,long,,verified; 700 1100 1200 1100 1500 (game_flow scoring)
+global,D:1992,stage_par2,long,,verified; 3000 2800 3500 4000 4500 (game_flow)
+global,D:1996,stage_base,int,,verified; stage+4
+global,D:0C6E,sd_pos,long[6],DS:096D,verified; slot 5 = police
+global,D:0C92,sd_speed,long[6],DS:0A1B,verified; init 0xAAAA 0xCAAA 0xEAAA 0x9AAA 0x7AAA 0
+global,D:0CAA,sd_dodge,int[6] stride 4,DS:0A29,verified use; police pushes cars aside
+global,D:0CC2,sd_lane,struct{int lat; int flag}[6],,verified; lat from renderer; flag = placed behind player
+global,D:0CF2,on_pos,long[5],DS:0945,verified
+global,D:0D14,on_speed,long[5],DS:0A1B,verified; init 0xAAAA 0xCAAA 0xEAAA 0xAAAA 0xAAAA
+global,D:0D28,on_lane,struct{int lat; int pad}[5],,verified; lat = -0xE0 from renderer
+global,D:0C82,cop_pos,long,DS:0A2D,verified; = sd_pos[5]
+global,D:0CA6,cop_speed,long,DS:0A25,verified; = sd_speed[5]
+global,D:0CD8,cop_tailing,int,,verified; = sd_lane[5].flag
+global,D:0D76,cop_tail_frames,int,DS:0A28,verified
+global,D:0D78,cop_timer,int,DS:0A27,verified
+global,D:0D7A,cop_mode,int,DS:0A23,verified; 0 chase 10 passing 15 braking
+global,D:0D74,ticket_frames,int,DS:0A23,verified; >0 skips sim_controls; >=0x1E ticket and release
+global,D:0DBE,radar_zone_ctr,long,DS:099D,verified; high word 1..7
+global,D:0DBC,speed_limit,int,DS:0A21,verified; 30/55/65; 0 until first sign
+global,D:0D86,speed_limit_table,u8[3],DS:0A1B,verified; 30 55 65
+global,D:0DC4,radar_blink,int,,verified; constant 0x32
+global,D:1606,drag_table,u8[64],DS:0AC5,verified; identical to DOS
+global,D:1924,car_num_gears,int,DS:268F,verified; car +000
+global,D:1928,car_rev_limit,int,DS:2693,verified; car +004
+global,D:192C,car_grip,int,DS:2697,verified; car +008 (DOS/72.6)
+global,D:192E,car_skid_drift,int,DS:2699,verified; car +00A read as word
+global,D:1936,car_ratios,ptr,DS:26A1,verified; car +012
+global,D:193A,car_knob_xy,ptr,,verified; car +020
+global,D:193E,car_gate_xy,ptr,,verified; car +03C
+global,D:1942,car_gate_next,ptr,,verified; car +07C
+global,D:1946,car_node_gear,ptr,,verified; car +10C
+global,D:194A,car_torque,ptr,,verified; car +11C
+global,D:2816,demo_mode,int,DS:0084,verified
+global,D:24C6,cars_left,int,DS:78E6,verified; 5; 0 on police hit
+global,D:24CC,stage,int,,verified; demo starts at 3
+global,D:2848,sd_enable,int,,verified; set 1 per stage never cleared
+global,D:284A,on_enable,int,,verified; set 1 per stage never cleared
+global,D:2830,no_crash,int,,verified; never written (dead)
+global,D:1BD6,rng_state,int,DS:6520,verified
+global,D:1BD8,rng_seeded,int,,verified
+global,D:2512,joy_dir,int,,verified; see title_select g_joyDir
+global,D:2858,joy_fire,int,,verified; see title_select g_joyFire

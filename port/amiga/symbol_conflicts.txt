@@ -1,0 +1,79 @@
+Amiga td: symbol conflicts found while merging port/amiga/spec/*_symbols.csv into port/amiga/symbols.csv
+(merge of 2026-09-22). "Real conflict" = one address, incompatible meaning or DOS mapping. Different names for the
+same meaning are not listed; they are in the aliases column of symbols.csv (108 rows).
+
+Ownership rule used: the spec whose scope covers the code or data. Root platform code, the Aztec runtime, the
+math helpers and the library glue -> platform_video; sound -> platform_audio; overlay 1 -> title_select; the
+game state machine, stage load/unload, results and high scores -> game_flow; overlay-2 logic and the sim's
+state -> drive_sim; the Road Drawer, display helpers and the globals the renderer writes -> drive_scene.
+
+== Meaning conflicts ==
+
+1. D:191E  game_flow `g_carStarted` ("car has started, frame counting begins") vs drive_sim `gear` (DS:0A78).
+   Resolution: gear. shift_gear 0x1EDCE adds the shift delta to it and clamps it to 0..D:1924 (the car's gear
+   count), 0x207A4 compares it with 1 and 2 and saves it to D:1600, and the engine sound (0x26DA2) tests it.
+   run_game's `tst.w D:191E` at 0x1CA38 latches a local "started" flag, so the clock
+   starts at the first frame with a gear engaged. game_flow.md and game_flow_symbols.csv fixed.
+
+2. D:0B30  platform_video `fire_latch` vs drive_sim `gearbox_show` / drive_scene `gearbox_wanted`.
+   Resolution: gearbox_show. The behaviour platform_video describes (0xFFFF set by the VBL while fire is held in
+   O mode, cleared when fire is up unless D:24BA/D:0B34) is right. The value is the per-view-buffer "draw the
+   gearbox" flag (bytes 0B30/0B31) that overlay 2 tests (0x1CEFA, 0x1D106, 0x1FA6E). platform_video.md table
+   updated.
+
+3. D:283C  drive_scene `bump_flag` had the same name as drive_sim's D:0D9A `bump_flag` (a different flag).
+   Resolution: D:283C renamed `pitch_bump_flag` (drive_scene .md and .csv). It is set by 0x2090C on a pitch
+   change of 3 or more and is read only by the dead 0x20940.
+
+4. D:0DBE  drive_sim `radar_zone` (global) had the same name as function 0x1EC1A `radar_zone`.
+   Resolution: the global is renamed `radar_zone_ctr` (drive_sim .md and .csv).
+
+5. 0x24E52  game_flow `dash_split_off` vs drive_scene `fade_out_drive`. Both describe the same code (0x1FEAE
+   copper split off, FreeVPortCopLists on both Views, remake both); only the name differs.
+   Resolution: owner drive_scene, name kept; game_flow's name is an alias. No meaning conflict.
+
+== DOS-equivalent conflicts ==
+
+6. D:24B2 / D:24B6 (knob targets): drive_scene gave DS:0A7F / DS:0A7D (DOS knob_y / knob_x), drive_sim DS:0A83 /
+   DS:0A81 (DOS knob target y / x). Resolution: drive_sim is right (DOS DS:0A81 = knob_target_x, "DS:0A83 y");
+   drive_scene .csv and .md fixed.
+
+7. D:0C6E (same-direction slots): drive_scene gave DS:0945 (DOS oncoming_list), drive_sim DS:096D (DOS
+   samedir_list). Resolution: DS:096D; drive_scene .csv and .md fixed.
+
+8. D:0B2E (near stage end) and D:282E (crash): both carry DS:0929 (DOS g_stageEvent). D:282E corresponds to
+   event >= 3 (crash) and D:0B2E roughly to event 2 (end of road); the Amiga splits one DOS byte into several
+   flags. Kept as is, noted here.
+
+9. D:19BC  drive_sim DS:0924 (DOS `skidding`) vs platform_audio DS:64FE (DOS skid tone divider). Both are the DOS
+   ends of the same signal (skid state -> sound). Resolution: owner drive_sim, DS:0924; the other is in notes.
+
+10. Functions with two plausible DOS counterparts (owner's kept, the other in notes):
+    0x1530E rand16: platform_video 0xA90E (MSC rand) vs drive_sim 0x8BAF (DOS game RNG rand8). The game uses it
+            the way DOS uses rand8; 0x8BAF is the better functional match. Owner platform_video kept 0xA90E;
+            unresolved whether the column should mean "same role" or "same library function".
+    0x153E4 / 0x153EC joy_fire / joy_dir: platform_video 0xA12F (DOS joy_read) vs drive_sim 0x5C24
+            (input_poll_drive). The Amiga reads the hardware directly; 0xA12F is the hardware-level match.
+    0x1CD72 knob_update: drive_sim 0x3DDB (knob animation) vs drive_scene 0x351A (draw_gear_box). The routine
+            does the animation and positions the sprites, so it covers parts of both.
+    0x1D484 road_drawer_main: drive_scene 0x3AF7 (present_road_buffer) vs game_flow 0x349D
+            (draw_buffer_overlays); the Amiga task body does both.
+    0x1642A _main: platform_video 0xB165 (_cinit) vs game_flow 0xA50C (_astart); the Aztec split differs from MSC.
+    0x14984 draw_shape_on_view: platform_video 0x5DE2 (clipped) vs game_flow 0x6D1C (unclipped). Not
+            re-derived in the merge whether the Amiga routine clips; owner's 0x5DE2 kept (unresolved).
+
+== Cross-spec statements corrected in the merge (not symbol conflicts) ==
+
+11. Overlay residency: title_select said nothing is ever unloaded. main calls 0x162E0 with the overlay-1 stub
+    before each game (0x10270) and the overlay-2 stub after it (0x102A8). Fixed in title_select.md and README.
+
+12. bump_edge D:19BE: platform_audio said "D:0D80 & 3 is 1 or 2". The table at 0x24A98 is {1, 0, -1, 0}, so it
+    is non-zero for D:0D80 & 3 = 0 or 2, i.e. hazard objects 0x20 and 0x22 (drive_sim is right). Fixed in
+    platform_audio.md.
+
+== Unresolved ==
+
+13. Tick rate (not a symbol conflict, but the specs disagree): title_select, game_flow, platform_video and
+    platform_audio assume a 50 Hz (PAL) VBL; drive_sim argues the game was designed for 60 Hz (NTSC). The
+    choice is open; see port/amiga/README.md, "Blocking questions". A cross-reference note was added to each
+    spec.

@@ -20,3 +20,4 @@ __pycache__/
 
 # Game data dumped from TDEGA.EXE (not ours to publish; the port reads the original at runtime)
 /port/spec/tables/
+/port/amiga/decomp/

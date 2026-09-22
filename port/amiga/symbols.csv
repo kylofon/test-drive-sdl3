@@ -1,0 +1,902 @@
+kind,address,name,type,dos_equiv,owner,aliases,notes
+func,0x10018,main,int main(int argc char **argv),0x0010,game_flow,,verified; init; argv[1][0] p/t title h scores s select else game car 0; TITLE/SCORES/SELECT/GAME state machine; overlay_unload around run_game; also in platform_video
+func,0x1032C,close_workbench,void (void),,platform_video,game_flow:close_cli_window,CloseWindow(ActiveWindow)+CloseWorkBench; argument p only; verified; also in game_flow
+func,0x10346,load_cars_txt,void(int load),0x0243,game_flow,,verified; Cars.Txt count 1..29 then lines; load=0 clears count; D:1E94=1 if missing
+func,0x10402,skip_line,char *(char **pp),0x1000,game_flow,,verified; advance past next LF (stops at NUL); also used by the .SS parser 0x1C244
+func,0x1042E,blit_priority_on,void (void),,platform_video,game_flow:blitter_pri_save,Writes $BFF096/reads $BFF002 (no chip selected): no effect; verified; also in game_flow
+func,0x1044C,blit_priority_off,void (void),,platform_video,game_flow:blitter_pri_restore,Writes $BFF096: no effect; verified; also in game_flow
+func,0x10462,poll_input,void (void),0x5C24,platform_video,,"One queued key: P pause (drive), M music, S sound, D and O toggles (drive), key 0x12 (Ctrl-R) -> D:0346; verified; row added in the merge (was in the .md table only); also in game_flow"
+func,0x10588,protection_check,void (void),0x8DC7,platform_video,game_flow:copy_protection_check,Long-track + self-CRC check; crack makes it pass; drop in port; verified; also in game_flow
+func,0x10632,nop_10632,void (void),,platform_video,,"Empty, no callers; verified"
+func,0x1063A,ilbm_to_view,"void (u8 *iff, View *v)",,platform_video,,view_clear then parse FORM ILBM; verified
+func,0x10692,iff_next_chunk,"void (u8 *base, long *off)",,platform_video,,off = (off+len+9)&~1; verified
+func,0x106BE,ilbm_parse,"void (u8 *form, View *v)",,platform_video,,"BMHD/BODY/CMAP/CMP2, 40000-byte limit; verified"
+func,0x107B4,cmap_to_rgb4,"void (u8 *chunk, u16 pal[32])",,platform_video,,Default fill D:0358 then <=32 triplets to 12-bit; verified
+func,0x1086E,cmp2_to_rgb4,void (u8 *chunk),,platform_video,,"Custom CMP2: split line -> D:281E, palette -> D:2FCE; verified"
+func,0x10906,ilbm_decode_body,"void (BMHD *h, u16 *pal, u8 *body, View *v)",,platform_video,,"ByteRun1 rows into first ViewPort planes, WaitTOF, LoadRGB4 32; verified"
+func,0x109D0,view_dissolve,"void (View *src_or_NULL, View *dst)",0x768B,platform_video,,"8 CPU passes, bit table 01 08 40 02 10 80 04 20; NULL = to black; verified"
+func,0x10AA2,dissolve_pass,"void (int k, int depth, u8 **src, u8 **dst, int clear)",0x768B,platform_video,,Rows in order 7r mod 200; verified
+func,0x10B22,res_find_list,void(Archive *a long *names Shape **out long pool),0x94C7,title_select,,verified; root; only caller 0x1B396; mode codes 0..5 (1 store 2 mask via 0x10C5A 0 end)
+func,0x10BA8,arena_new,Arena *(long size),,platform_video,game_flow:alloc_chip_buf,"alloc_chip; size, used=8; verified; also in game_flow"
+func,0x10BDC,arena_alloc,"void *(Arena *a, long n)",,platform_video,,Bump allocator; clears D:0360; verified
+func,0x10C28,arena_free_bytes,long (Arena *a),,platform_video,,No callers; verified
+func,0x10C3E,mask_size,long (Shape *s),,platform_video,,wb*h+0x10; verified
+func,0x10C5A,make_mask,"Shape *(Arena *a, Shape *s)",,platform_video,,1-plane OR of all planes; verified
+func,0x10CEC,empty_hook,void(void),,game_flow,platform_video:nop_10cec,empty function called every drive frame; also in platform_video
+func,0x10CF4,nop_10cf4,void (void),,platform_video,,"Empty, no callers; verified"
+func,0x10D04,nop_10d04,void (void),,platform_video,,"Empty, no callers; verified"
+func,0x10D14,blit_begin,void (void),,platform_video,drive_scene:blit_init,"Wait; AMOD=DMOD=0, CON0=0x09F0, CON1=0, masks FFFF; verified"
+func,0x10D3C,blit_nasty_off,asm,,platform_video,,DMACON=0x0400; no callers; verified
+func,0x10D44,blit_wait_hw,asm A6=$DFF000,,platform_video,,10 consecutive BBUSY=0 reads; counters D:0348/D:034C; verified
+func,0x10D66,read_dmaconr,u16 (void),,platform_video,,No callers; verified
+func,0x10D72,blit_clear_rect,asm a0 plane d0 x d1 y d2 wbytes d3 h,0x97D4,platform_video,drive_scene:blit_rect_clear,"BLTCON0 0x0100, word-aligned; verified"
+func,0x10DBE,blit_fill_rect,asm a0 plane d0 x d1 y d2 wbytes d3 h,0x981E,platform_video,drive_scene:blit_rect_set,BLTCON0 0x01FF; verified
+func,0x10E12,shape_pos,"asm a0 shape -> d0,d1",,platform_video,,Shape +8/+0xA; verified
+func,0x10E1C,shape_sub_hot,asm,,platform_video,drive_scene:sub_hotspot,"d0-=+4, d1-=+6; verified"
+func,0x10E26,blit_set_dest,void (u8 *planes[5]),0x5128,platform_video,drive_scene:set_target,Copy to D:0BEC; verified
+func,0x10E3A,blit_shape_word,"void (Shape *s, Shape *mask, int x, int y)",0x5DB6,platform_video,,Word-aligned cookie-cut/copy wrapper; verified
+func,0x10E58,blit_shape,"void (Shape *s, Shape *mask, int x, int y)",0x4E05,platform_video,,Pixel-shifted cookie-cut/masked copy wrapper; verified
+func,0x10E78,blit_wait,void (void),,platform_video,,Wrapper of 0x10D44; verified
+func,0x10E88,blit_shape_word_asm,asm a0 s a1 mask d0 x d1 y,0x5DE2,platform_video,drive_scene:blit_cookie_aligned,"BLTCON0 0x0FCA or 0x05CC, 5 planes; verified"
+func,0x10F9C,blit_params_ptr,asm -> &D:0362,,platform_video,,"Not in index, no callers; verified"
+func,0x10FA4,set_clip_full,void (void),0x50A1,platform_video,drive_scene:clip_full_screen,Clip 0..200 x 0..320; verified
+func,0x10FBC,set_clip,asm d0 top d1 bottom d2 left d3 right,0x50A1,platform_video,,x values & 0xFFF0; verified
+func,0x10FDA,blit_prep_word,asm -> C set if nothing,,platform_video,,Word-aligned clip/params into D:0362; verified
+func,0x110C4,blit_shape_asm,asm a0 s a1 mask d0 x d1 y,0x4E05,platform_video,drive_scene:blit_cookie,"Shift<<12 | 0x0FCA, or 0x07CA + BLTADAT FFFF; verified"
+func,0x111E6,blit_shape_xor,asm a0 s d0 x d1 y,0x806C,platform_video,drive_scene:blit_xor,"Shift | 0x076A, BLTADAT FFFF: D = C ^ B; verified"
+func,0x112E4,blit_prep_shift,asm -> C set if nothing,,platform_video,,"Shifted clip/params, FWM/LWM tables D:0388/D:03AA; verified"
+func,0x11432,blit_shape_xor_word,asm a0 s d0 x d1 y,0x806C,platform_video,drive_scene:blit_xor_aligned,"0x0B5A D = A ^ C, right edge masked to true clip; verified"
+func,0x11554,open_libraries,void (void),,platform_video,,"intuition -> D:03D0, graphics -> D:03D4; verified"
+func,0x115A0,close_libraries,void (void),,platform_video,,verified
+func,0x115BC,display_init,void (void),0x4D96,platform_video,,"Views A/B, 5x8000-byte planes each, ColorMaps 32; verified"
+func,0x11756,display_shutdown,void (void),0x50FE,platform_video,,"show_view(saved ActiView), free, DMACON 0x8020; verified"
+func,0x117E8,set_task_pri,int (int pri),,platform_video,,SetTaskPri(FindTask(0)); returns old; verified; also in game_flow
+func,0x1180E,vbl_install,void (void),0x699E,platform_video,,"Ticks VBLInt pri -80, data &D:03D8; verified"
+func,0x1185C,vbl_remove,void (void),0x694A,platform_video,,RemIntServer(5); verified
+func,0x11872,read_fire_raw,asm -> d0,,platform_video,drive_sim:vbl_read_fire,~CIAA PRA bit 7; verified; also in drive_sim
+func,0x11886,read_joy_raw,asm -> d0,,platform_video,drive_sim:vbl_read_dir,JOY1DAT via D:03DC -> 0..8; verified; also in drive_sim
+func,0x118B2,vbl_server,interrupt server (A1=&D:03D8),0x6A1F,platform_video,drive_sim:ticks_vbl_server,tick_count++; O-mode gear selection via overlay stubs; verified; also in drive_sim
+func,0x11954,prot_measure_setup,int (char *volname),0x8DC7,platform_video,,Protection module entry; returns CRC16 of 0x11954..; verified
+func,0x119B6,prot_code_len,long (void),,platform_video,,Clamped to 0x5000; verified
+func,0x119D0,prot_code_start,void *(void),,platform_video,,Returns 0x11954; verified
+func,0x119D8,prot_cleanup,void (void),,platform_video,,verified
+func,0x11A0A,prot_read_track,"int (long cyl, long head)",,platform_video,,Raw MFM read; measurement replaced by constants 0x3E0/0x3E8 on this disk; verified
+func,0x11D3A,prot_measure_gap,asm,,platform_video,,Header decode + patched measurement; verified
+func,0x11D8E,prot_crc,"u16 (void *p, long nwords, long init, long poly)",,platform_video,,CRC-16 MSB first via 0x11DB0; verified
+func,0x11DB0,prot_crc_core,asm,,platform_video,,verified
+func,0x11F52,lmul_signed,asm d0 d1 -> d0,0xC91D,platform_video,,Sign-magnitude 32x32 low 31 bits; verified
+func,0x11F94,fix_mul,asm d0 d1 -> d0,,platform_video,,16.16 signed multiply; verified
+func,0x11FD6,fix_div,asm d0.w d1.w -> d0,,platform_video,,(a<<16)/b; b=0 -> +-0x7FFFFFFF; verified
+func,0x1200E,isqrt,asm d0 -> d0.w,,platform_video,,Newton on |x|; verified
+func,0x12056,abs16,asm,,platform_video,drive_sim:abs_w,verified; also in drive_sim
+func,0x1205E,abs32,asm,,platform_video,drive_sim:abs_l,verified; also in drive_sim
+func,0x12066,ltoa_dec,asm d0 -> a0,,platform_video,,BCD digits to D:03F4; dead; verified
+func,0x12108,sin_deg_fix,asm d0 16.16 deg -> d0,,platform_video,drive_sim:sin_deg,"Table 0x1216C, interpolated, 0..180; verified; also in drive_sim"
+func,0x12146,cos_deg,asm d0.w -> d0.w,,platform_video,,Table 0x1216C; verified; also in drive_sim
+func,0x12224,tan_deg_fix,asm d0.w -> d0,,platform_video,,Table 0x1224C tan(2k deg)*65536; verified
+func,0x12304,sfx_init,void(void),0x69CF,platform_audio,,verified; audio DMA/INT off; ADKCON 0xFF; $70 -> 0x12616; AddIntServer VERTB Sfx VBLInt pri 0x1E
+func,0x123EC,sfx_shutdown,void(void),0x694A,platform_audio,,verified; stop all; Delay(5); RemIntServer; restore $70
+func,0x12432,sfx_set_song_channels,void(int mask),,platform_audio,,verified; D:1E9E = (~mask & 0xF) << 7; masked channels lose the audio interrupt
+func,0x1246A,play_sample,"void(sample *s, int ch, int vol)",0x8A3E,platform_audio,,verified; period = 0x369E99 / rate (rate<100 -> x1000); start_channel(s+6 len ch period vol 1)
+func,0x124C4,start_channel,"void(u8 *data, long len, int ch, int period, int vol, int repeats)",,platform_audio,,verified; stops busy channel; record pending; repeats -1 = loop
+func,0x1252A,snd_stop_all,void(void),0x8A08,platform_audio,,verified; sfx_stop_channel(0..3)
+func,0x12546,sfx_stop_channel,void(int ch),,platform_audio,,verified; DMA off; AUDxVOL 0; stop tick = D:04C2
+func,0x1258E,sfx_channel_busy,int(int ch),0x8A02,platform_audio,,verified; -1 if record data pointer set
+func,0x125A6,sfx_set_period_vol,"void(int ch, int period, int vol)",,platform_audio,,verified; negative = keep; vol cancels slide
+func,0x125F4,sfx_slide_volume,"void(int ch, int target, long step)",,platform_audio,,verified; 16.16 slide run by 0x126AE
+func,0x12616,sfx_audio_int,level-4 autovector handler,,platform_audio,,verified; counts repeats; stops channel (PER 0x96 VOL 0 DMA off); not in td_functions.json
+func,0x126AE,sfx_vbl_server,VERTB interrupt server,0x6A1F,platform_audio,,verified; tick D:04C2; starts pending channels >= 2 ticks after stop; volume slides
+func,0x1278C,song_init,void(void),0x699E,platform_audio,,verified; AddIntServer VERTB Song VBLInt pri 0x20; volume 0x10
+func,0x127F4,song_shutdown,void(void),0x694A,platform_audio,,verified; request stop; Delay(3); free instruments; RemIntServer
+func,0x12826,song_load_instruments,"void(char *names[4], int oneshot[4])",,platform_audio,,verified; songs/<name> in chip RAM; name <= 10 = copy slot n
+func,0x128FE,song_free_instruments,void(void),,platform_audio,,verified
+func,0x12942,song_set_volume,"void(int vol, long step)",,platform_audio,,verified; D:1EF8 = vol<<16; D:1EF0 = step (0 = jump)
+func,0x1295E,song_get_volume,int(void),,platform_audio,,verified; D:1EF4 high word or 0 when idle
+func,0x12972,song_start,void(u8 *smus),,platform_audio,,verified; if installed and music on: request stop + song_setup(d0=6)
+func,0x1299C,song_request_stop,asm,0x89F0,platform_audio,,verified; state -> 3; wait loop exits at once
+func,0x129BA,song_setup,"asm (a0 song, a1 inst[4], a2 oneshot[4], d0 base)",,platform_audio,,verified; builds duration table D:0710; state 1
+func,0x12A40,song_is_active,int(void),,platform_audio,,verified; -1 if state 1 or 2
+func,0x12A54,song_vbl_server,VERTB interrupt server,0x6AA8,platform_audio,,verified; SMUS player tick; not in td_functions.json
+func,0x12C98,song_volume_slide,asm,,platform_audio,,verified; not in td_functions.json
+func,0x12CDC,smus_find_long,asm (a0 base d0 off d1 limit d2 id),,platform_audio,,verified; 2-byte steps; carry = found; not in td_functions.json
+func,0x12CF4,song_play,"void(char *file, char *inst[4], int oneshot[4], int mask, int vol)",0x8A3E,platform_audio,,verified; same song already loaded -> fade in 0x8000
+func,0x12DB0,song_stop,void(void),0x89F0,platform_audio,,verified; fade 0x5400/tick; busy wait; stop; Delay(2); free; also in game_flow
+func,0x12E12,song_play_testdrive,void(void),0x8A3E,platform_audio,,verified; TestDrive.Iff.Sng mask 1 vol 0x20; DOS intro sng2 and high-score sng3; also in game_flow
+func,0x12E58,song_play_test2,void(void),0x8A3E,platform_audio,,verified; Test2.Iff.Sng mask 3 vol 0x16; DOS car-select sng4; also in game_flow
+func,0x12E8A,song_play_testgas,void(void),0x8A3E,platform_audio,,verified; TestGas.Iff.Sng; DOS gas sng1; also in game_flow
+func,0x12EBE,song_play_endsuccess,void(void),,platform_audio,,verified; EndSuccess.Iff.Sng; ending (no DOS song); also in game_flow
+func,0x12EF6,song_play_loser,void(void),,platform_audio,,verified; Loser.Iff.Sng; no caller
+func,0x12F28,high_scores,int(long score int car),0x12DB,game_flow,,verified; load; entry if score>0 && >scores[7]; show; save if dirty; credits if D:281A<0; returns 0 or -1
+func,0x12FF0,read_line,char *(char *dst char *src),,game_flow,,verified; copies signed bytes >=0x20; skips one terminator; no length limit
+func,0x13028,scores_load,int(char names[8][40] long scores[8] char cars[8][40]),0x1369,game_flow,,verified; HighScores 3 lines/entry; crc16 init 0x6D62 poly 0x2058; failure clears all and returns 1
+func,0x1313E,scores_save,void(char names[8][40] long scores[8] char cars[8][40]),0x162E,game_flow,,verified; 500-byte buffer; '%s\n%ld\n%s\n' x8 then '%04x\n' crc
+func,0x13250,text_init,void (void),0x6C85,platform_video,game_flow:hs_gfx_init,"topaz.font 8, RastPort D:2876; verified; also in game_flow"
+func,0x132E6,text_shutdown,void (void),,platform_video,game_flow:hs_gfx_free,verified; also in game_flow
+func,0x13306,text_print,void (char *s),0x4BE7,platform_video,game_flow:hs_text,"Text(rp,s,strlen); verified; also in game_flow"
+func,0x13330,text_move,"void (int x, int y)",0x74E3,platform_video,game_flow:hs_move,Move; verified; also in game_flow
+func,0x13354,text_set_pen,void (int c),0x6C85,platform_video,game_flow:hs_set_pen,SetAPen; verified; also in game_flow
+func,0x1336E,draw_box_outline,"void (int x0, int y0, int x1, int y1)",0x9530,platform_video,game_flow:hs_draw_box,Pen 1 JAM1 Move+4 Draw; verified; also in game_flow
+func,0x1343A,erase_rect,"void (int x0, int y0, int x1, int y1)",0x4941,platform_video,game_flow:hs_clear_rect,"Pen 0 RectFill, state restored; verified; also in game_flow"
+func,0x134F2,text_cursor,void (void),0x9A69,platform_video,game_flow:hs_cursor,"COMPLEMENT RectFill cx..cx+8, cy-8..cy+1; verified; also in game_flow"
+func,0x135B4,text_input_line,void(char *buf int maxlen),0x92A8,game_flow,,verified; 0x20..0x7E Backspace Return; 6000 VBL idle or Ctrl-C -> empty name; busy loop
+func,0x13708,scores_enter_name,void(long score int car char names[8][40] long scores[8] char cars[8][40]),0x1482,game_flow,,verified; <car>logo ILBM; 17 chars; empty name inserts nothing; 60 VBL then fire release
+func,0x13A9E,credits_show,int(void),0x186E,game_flow,,verified; 24 lines D:0926 pens D:08F6; dissolve; 900 VBL; 0 fire -1 timeout
+func,0x13BD8,scores_show,int(char names[8][40] long scores[8] char cars[8][40]),0x16D7,game_flow,,verified; 'Test Drive Top Scores'; rows 0-3 logo + copper palette; rows 4-7 y=i*10+0x6B; 'Your Score : %ld'; 900 VBL
+func,0x13E86,hs_draw_logo,void(int row char *carPath),0x16D7,game_flow,,verified; '%slogo.Shp' shape 'logo' at (0x10 row*0x23+3) into view A
+func,0x13F32,hs_logo_palette,void(int row char *carPath UCopList *ucl),,game_flow,,verified; row -1 LoadRGB4 D:098E; else CWait row*0x23+1 + 32 CMove from '%sLogo.Pal' or D:098E
+func,0x1406E,crc16,uint(void *buf long len uint init uint poly),0x8D8C,game_flow,,verified; wrapper of 0x14088
+func,0x14088,crc16_core,asm a0 d1 d0 d2,,game_flow,,verified; MSB-first over len>>1 big-endian words
+func,0x1433A,wait_vbl_or_fire,void(int n),,game_flow,,verified; n x (poll_input WaitTOF) unless fire or quit_sticky
+func,0x1436E,quit_sticky,int(void),,game_flow,,verified; D:2822 |= quit_requested
+func,0x14388,results_add_line,void(char *s),0x1CFA,game_flow,,verified; also does 0x1D20 results_scroll per line; 320x24x1 bitmap; ScrollRaster 1px x8; DrawImage at y 0xB8; 6/1 VBL per px; 40/0 VBL per line
+func,0x1444C,results_text,void(long avgSpeed int secs long score int limit),0x1B36,game_flow,,verified; too slow = secs>limit; tiers >0x69 >0x5F >0x41; tips if not too slow
+func,0x147E4,stage_results,void(int car long avgSpeed int secs long score int limit),0x1993,game_flow,,verified; gas station; TestGas; lives+=2; <car>gas ILBM + CMP2 copper split; sign D:0A66[stage]; wait fire
+func,0x14984,draw_shape_on_view,"void (Shape *s, View *v)",0x5DE2,platform_video,game_flow:blit_shape_to_view,"Own position, word-aligned, no mask; verified; game_flow maps it to blit_copy_own 0x6D1C; also in game_flow"
+func,0x149D2,load_file,void *(char *name),0x8A5B,platform_video,,flags 0x10001; verified
+func,0x149E8,load_file_chip,void *(char *name),0x8A5B,platform_video,,flags 0x10003; verified
+func,0x149FE,load_file_flags,"void *(char *name, long flags)",0x9A86,platform_video,,Pckd unpacked; D:24BC/D:2810; 0 on error; verified
+func,0x14C8C,pckd_unpacked_len,long (u8 *hdr),,platform_video,,verified
+func,0x14C9C,pckd_unpack,"void (u8 *pckd, u8 *out)",0x9A86,platform_video,,Methods 2/3/4/8; no checks; verified
+func,0x14D64,huff_read_tree,void (void),0x9C1E,platform_video,,likely
+func,0x14DC6,huff_read_word,int (void),0x9C76,platform_video,,likely
+func,0x14DE0,huff_decode,int (void),0x9C90,platform_video,,likely
+func,0x14E6C,rle90_out,void (u8 c),0x9CF9,platform_video,,verified
+func,0x14ED6,pack_getc,int (void),0x9D64,platform_video,,verified
+func,0x14EF2,pack_putc,void (u8 c),0x9DD3,platform_video,,++count < len: last byte dropped (DOS <=); verified
+func,0x14F0E,lzw_decompress,void (void),0x9E1D,platform_video,,likely
+func,0x1506C,lzw_getcode,int (void),0x9FA2,platform_video,,likely
+func,0x15192,lzw_alloc_tables,void (void),0xA0CF,platform_video,,verified
+func,0x151D6,lzw_free_tables,void (void),0xA111,platform_video,,verified
+func,0x151F2,load_raw,void *(char *name),0x78A5,platform_video,,Dead; protection poke target; verified
+func,0x15208,load_raw_chip,void *(char *name),,platform_video,,Dead; verified
+func,0x1521E,load_raw_flags,"void *(char *name, long flags)",,platform_video,,Dead; verified
+func,0x1530E,rand16,int (void),0xA90E,platform_video,drive_sim:rng_next,LCG x0x1AFB+0x1FCCD ^ VHPOSR; verified; DOS game RNG is rand8 0x8BAF (drive_sim); 0xA90E is the MSC rand; also in drive_sim
+func,0x15344,unpack_byterun1_row,"void (u8 **src, u8 **dst, int n)",,platform_video,,verified
+func,0x153CC,fire_port_init,void (void),,platform_video,,CIAA DDRA &= 0x7F; verified
+func,0x153E4,joy_fire,int (void),0xA12F,platform_video,drive_sim:joy_read_fire,-> D:2858; verified; drive_sim maps it to input_poll_drive 0x5C24; also in drive_sim
+func,0x153EC,joy_dir,int (void),0xA12F,platform_video,drive_sim:joy_read_dir,-> D:2512; verified; drive_sim maps it to input_poll_drive 0x5C24; also in drive_sim
+func,0x153F4,joy_read_both,asm,,platform_video,,"Not in index, no callers; verified"
+func,0x15402,read_fire,asm -> d0,,platform_video,,verified
+func,0x15416,read_joy,asm -> d0,,platform_video,,Table 0x1543E; verified
+func,0x1544E,quit_requested,int (void),,platform_video,,Sticky Ctrl-C via Chk_Abort; verified
+func,0x15472,find_shape,"Shape *(Archive *a, long name4)",0x6762,platform_video,,0 when missing; verified
+func,0x15490,find_shape_asm,asm a0 d0 -> a0,,platform_video,,verified
+func,0x154E4,input_init,void (int passmask),0x8AFD,platform_video,,input.device handler pri 127 + console.device; verified
+func,0x155C4,input_shutdown,void (void),,platform_video,,verified
+func,0x15628,get_char,int (void),0x67DD,platform_video,,key_to_ascii(get_key()); verified
+func,0x1563A,key_to_ascii,int (long qual_code),,platform_video,,"RawKeyConvert, 1 char or 0; verified"
+func,0x15698,input_handler,InputEvent *(InputEvent *),,platform_video,,"First event only; queue key-downs, swallow; verified"
+func,0x156EC,key_available,asm -> d0,,platform_video,,verified
+func,0x156F8,get_key,long (void),0x67DD,platform_video,,WaitTOF until key; (qual<<16)|code; verified
+func,0x1574E,view_clear,void (View *v),0x4B98,platform_video,,LoadRGB4 zeros + BltClear per ViewPort; verified
+func,0x1580C,view_copy,"void (View *src, View *dst)",,platform_video,,Palette + BltBitMap; verified
+func,0x1582C,view_copy_palette,"void (View *src, View *dst)",,platform_video,,verified
+func,0x1587C,view_copy_bitmaps,"void (View *src, View *dst)",0x8B08,platform_video,,BltBitMap 0xCC; verified
+func,0x15904,alloc_public,void *(long size),0xA730,platform_video,,"mem_alloc(size,0x10001); verified"
+func,0x1591A,alloc_chip,void *(long size),,platform_video,,"mem_alloc(size,0x10003); verified"
+func,0x15930,mem_alloc,"void *(long size, long flags)",0xA340,platform_video,,"MEMF_CLEAR, MemB/MemE guards, list D:1BDC; verified"
+func,0x159FA,free_mem,int (void *p),0xA37E,platform_video,,-1 = free all; verified
+func,0x15B3E,mem_check,int (void *p),0xA3DF,platform_video,,Dead heap walker; verified
+func,0x15C60,mem_size,long (void *p),,platform_video,,Dead; verified
+func,0x15CAC,raw_putc,asm,,platform_video,,"exec RawPutChar; debug, dead; verified"
+func,0x15CE8,kprintf,"void (char *fmt, ...)",,platform_video,,RawDoFmt debug; dead; verified
+func,0x15CFC,raw_dofmt,asm,,platform_video,,exec RawDoFmt; verified
+func,0x15D1C,toupper,int (int c),0x95D9,platform_video,,verified
+func,0x15D34,tolower,int (int c),,platform_video,,No callers; verified
+func,0x15D4C,sscanf,"int (char *s, char *fmt, ...)",0xAA51,platform_video,,Aztec; verified
+func,0x15D72,_sscanf_getc,int (int unget),,platform_video,,Aztec; verified
+func,0x15DBC,_scanfmt,"int (fn getc, char *fmt, void **args)",0xB32F,platform_video,,Aztec scanf engine; likely
+func,0x160E0,_scan_skipws,int (void),0xB698,platform_video,,Aztec; likely
+func,0x1611A,_scan_int,int (...),0xB698,platform_video,,Aztec; likely
+func,0x1620C,fopen,"FILE *(char *name, char *mode)",0xA6B1,platform_video,,Aztec; verified
+func,0x16236,_openstream,"FILE *(char *name, char *mode, FILE *fp)",0xAD3C,platform_video,,Aztec; likely
+func,0x162A8,fprintf,"int (FILE *fp, char *fmt, ...)",0xA6D7,platform_video,,Aztec; verified
+func,0x162CA,_fprintf_putc,void (int c),,platform_video,,Aztec; verified
+func,0x162E0,ovl_unload,void (void *stub),,platform_video,game_flow:overlay_unload,"Frees an overlay node, re-stubs; main unloads ov1 and ov2; verified; also in game_flow"
+func,0x16396,strchr,"char *(char *s, int c)",,platform_video,,Aztec index(); verified
+func,0x163B0,_start,entry,0xA50C,platform_video,game_flow:aztec_startup,Aztec startup; verified; also in game_flow
+func,0x16422,_stub_init,void (void),,platform_video,,Empty; verified
+func,0x1642A,_main,"void (long alen, char *aptr)",0xB165,platform_video,game_flow:aztec_main,"Aztec CLI/WB start, calls main, exit; verified; game_flow maps it to _astart 0xA50C; also in game_flow"
+func,0x16566,_cli_parse,void (...),0xC382,platform_video,,argv from command line; likely
+func,0x1670C,strncpy,"char *(char *d, char *s, int n)",0xAAD8,platform_video,,verified
+func,0x1672E,creat,"int (char *name, int mode)",0xB0DF,platform_video,,No callers; likely
+func,0x16746,open,"int (char *name, int flags)",0xA776,platform_video,,Aztec; likely
+func,0x168A4,ovl_load,overlay supervisor,,platform_video,,"Aztec overlay manager: load node, patch stubs to jmp; verified"
+func,0x1691C,ovl_loadseg,asm,,platform_video,,"Seek + LoadSeg(0,seglist,fh) retry loops; Alert 0x0700000C; verified"
+func,0x16986,strcat,"char *(char *d, char *s)",0xC4CD,platform_video,,Enters strncat with 0x7FFF; verified
+func,0x1698C,strncat,"char *(char *d, char *s, int n)",,platform_video,,verified
+func,0x169B0,strcmp,"int (char *a, char *b)",0xAA88,platform_video,,verified
+func,0x169B6,strncmp,"int (char *a, char *b, int n)",,platform_video,,verified
+func,0x169E0,strcpy,"char *(char *d, char *s)",0xC4FE,platform_video,,verified
+func,0x169F0,_lmul,asm d0 d1 -> d0,0xC91D,platform_video,,32x32 multiply; verified
+func,0x16A14,_wb_parse,"void (Process *p, WBStartup *msg)",,platform_video,,icon.library WINDOW tooltype; likely
+func,0x16AC8,sprintf,"int (char *buf, char *fmt, ...)",0xAA00,platform_video,,verified
+func,0x16AF8,_sprintf_putc,int (int c),,platform_video,,verified
+func,0x16B14,printf,"int (char *fmt, ...)",0xA8C7,platform_video,,stdout FILE D:1CF0; verified
+func,0x16B30,_fmt_number,"char *(void *v, int sign, char *end, int size)",0xBE03,platform_video,,likely
+func,0x16BBE,_format,"int (fn putc, char *fmt, void *args)",0xBB73,platform_video,,Aztec printf engine; likely
+func,0x16ED8,_divs32,asm d0/d1 -> d0,0xC87A,platform_video,drive_sim:ldiv,Signed long divide; verified; also in drive_sim
+func,0x16F1A,_modu32,asm,0xC87A,platform_video,,likely
+func,0x16F26,_divu32,asm,0xC87A,platform_video,,likely
+func,0x16F30,_udiv_core,asm,0xC87A,platform_video,,verified
+func,0x16F80,strlen,int (char *s),0xAABD,platform_video,,verified
+func,0x16F92,_printf_putc,void (int c),,platform_video,,verified
+func,0x16FA8,putc,"int (int c, FILE *fp)",,platform_video,,likely
+func,0x16FEA,_putc,"int (int c, FILE *fp)",,platform_video,,likely
+func,0x17026,_flushall,void (void),0xC849,platform_video,,likely
+func,0x1704E,fclose,int (FILE *fp),0xA5B6,platform_video,,verified
+func,0x170D4,_flsbuf,"int (FILE *fp, int c)",0xABE2,platform_video,,likely
+func,0x171B6,_getstream,FILE *(void),0xC523,platform_video,,likely
+func,0x171EE,_getbuf,void (FILE *fp),0xAE3F,platform_video,,likely
+func,0x1724C,_freeall,void (void),,platform_video,,likely
+func,0x1727E,malloc,void *(unsigned long n),0xA730,platform_video,,Aztec AllocMem chain D:24A8; likely
+func,0x172BE,_malloc16,void *(unsigned n),,platform_video,,likely
+func,0x172D2,free,int (void *p),0xA722,platform_video,,likely
+func,0x1731E,isatty,int (int fd),0xC644,platform_video,,likely
+func,0x17376,unlink,int (char *name),0xC55A,platform_video,,likely
+func,0x1739A,write,"int (int fd, void *buf, unsigned n)",0xC70C,platform_video,,verified
+func,0x17418,Chk_Abort,long (void),,platform_video,,"SetSignal(0,0x1000); _abort if Enable_Abort; verified"
+func,0x17448,_abort,void (void),0xA4E3,platform_video,,"Writes ^C, exit(1); verified"
+func,0x17474,exit,void (int code),0xB214,platform_video,,verified
+func,0x17492,_exit,void (int code),0xB22B,platform_video,,verified
+func,0x17580,close,int (int fd),0xA4F8,platform_video,,verified
+func,0x175CE,dos_Close,library glue,,platform_video,,LVO stub; verified
+func,0x175D2,dos_Close_body,library glue,,platform_video,,body of the dos_Close stub: 0x175CE is jmp 0x175D2(pc); callers enter here too; verified; row added in the merge
+func,0x175DE,dos_CurrentDir,library glue,,platform_video,,LVO stub; verified
+func,0x175EA,dos_Delay,library glue,0x6C3B,platform_video,,LVO stub; verified
+func,0x175F6,dos_DeleteFile,library glue,,platform_video,,LVO stub; verified
+func,0x17602,dos_Examine,library glue,,platform_video,,LVO stub; verified
+func,0x17606,dos_Examine_body,library glue,,platform_video,,body of the dos_Examine stub: 0x17602 is jmp 0x17606(pc); callers enter here too; verified; row added in the merge
+func,0x17614,dos_Input,library glue,,platform_video,,LVO stub; verified
+func,0x1761C,dos_IoErr,library glue,,platform_video,,LVO stub; verified
+func,0x17624,dos_IsInteractive,library glue,,platform_video,,LVO stub; verified
+func,0x17630,dos_Lock,library glue,,platform_video,,LVO stub; verified
+func,0x17634,dos_Lock_body,library glue,,platform_video,,body of the dos_Lock stub: 0x17630 is jmp 0x17634(pc); callers enter here too; verified; row added in the merge
+func,0x17642,dos_Open,library glue,,platform_video,,LVO stub; verified
+func,0x17646,dos_Open_body,library glue,,platform_video,,body of the dos_Open stub: 0x17642 is jmp 0x17646(pc); callers enter here too; verified; row added in the merge
+func,0x17654,dos_Output,library glue,,platform_video,,LVO stub; verified
+func,0x1765C,dos_Read,library glue,,platform_video,,LVO stub; verified
+func,0x17660,dos_Read_body,library glue,,platform_video,,body of the dos_Read stub: 0x1765C is jmp 0x17660(pc); callers enter here too; verified; row added in the merge
+func,0x1766E,dos_Seek,library glue,,platform_video,,LVO stub; verified
+func,0x1767C,dos_UnLock,library glue,,platform_video,,LVO stub; verified
+func,0x17680,dos_UnLock_body,library glue,,platform_video,,body of the dos_UnLock stub: 0x1767C is jmp 0x17680(pc); callers enter here too; verified; row added in the merge
+func,0x1768C,dos_Write,library glue,,platform_video,,LVO stub; verified
+func,0x1769A,exec_AddIntServer,library glue,,platform_video,,LVO stub; verified
+func,0x176A8,exec_Alert,library glue,,platform_video,,LVO stub; verified
+func,0x176C0,exec_CloseDevice,library glue,,platform_video,,LVO stub; verified
+func,0x176CC,exec_CloseLibrary,library glue,,platform_video,,LVO stub; verified
+func,0x176D0,exec_CloseLibrary_body,library glue,,platform_video,,body of the exec_CloseLibrary stub: 0x176CC is jmp 0x176D0(pc); callers enter here too; verified; row added in the merge
+func,0x176DC,exec_CopyMemQuick,library glue,,platform_video,,LVO stub; verified
+func,0x176EE,CreatePort,library glue,,platform_video,,LVO stub; verified
+func,0x1777A,DeletePort,library glue,,platform_video,,LVO stub; verified
+func,0x177C0,exec_AddPort,library glue,,platform_video,,LVO stub; verified
+func,0x177CC,exec_AllocSignal,library glue,,platform_video,,LVO stub; verified
+func,0x177D8,CreateStdIO,library glue,,platform_video,,LVO stub; verified
+func,0x177EE,DeleteStdIO,library glue,,platform_video,,LVO stub; verified
+func,0x17800,CreateExtIO,library glue,,platform_video,,LVO stub; verified
+func,0x17844,DeleteExtIO,library glue,,platform_video,,LVO stub; verified
+func,0x17880,exec_AllocMem,library glue,,platform_video,,LVO stub; verified
+func,0x17884,exec_AllocMem_body,library glue,,platform_video,,LVO stub; verified
+func,0x17892,exec_AddTask,library glue,,platform_video,,LVO stub; verified
+func,0x178AA,exec_DoIO,library glue,,platform_video,,LVO stub; verified
+func,0x178C0,exec_FindTask,library glue,,platform_video,,LVO stub; verified
+func,0x178C4,exec_FindTask_body,library glue,,platform_video,,body of the exec_FindTask stub: 0x178C0 is jmp 0x178C4(pc); callers enter here too; verified; row added in the merge
+func,0x178D0,exec_Forbid,library glue,,platform_video,,LVO stub; verified
+func,0x178D4,exec_Forbid_body,library glue,,platform_video,,body of the exec_Forbid stub: 0x178D0 is jmp 0x178D4(pc); callers enter here too; verified; row added in the merge
+func,0x178DC,exec_FreeMem,library glue,,platform_video,,LVO stub; verified
+func,0x178E0,exec_FreeMem_body,library glue,,platform_video,,body of the exec_FreeMem stub: 0x178DC is jmp 0x178E0(pc); callers enter here too; verified; row added in the merge
+func,0x178F0,exec_FreeSignal,library glue,,platform_video,,LVO stub; verified
+func,0x178FC,exec_GetMsg,library glue,,platform_video,,LVO stub; verified
+func,0x17908,NewList,library glue,,platform_video,,LVO stub; verified
+func,0x1791A,exec_OpenDevice,library glue,,platform_video,,LVO stub; verified
+func,0x17930,exec_OpenLibrary,library glue,,platform_video,,LVO stub; verified
+func,0x17934,exec_OpenLibrary_body,library glue,,platform_video,,body of the exec_OpenLibrary stub: 0x17930 is jmp 0x17934(pc); callers enter here too; verified; row added in the merge
+func,0x17944,exec_Permit,library glue,,platform_video,,LVO stub; verified
+func,0x1794C,exec_RemIntServer,library glue,,platform_video,,LVO stub; verified
+func,0x1795A,exec_RemPort,library glue,,platform_video,,LVO stub; verified
+func,0x17966,exec_RemTask,library glue,,platform_video,,LVO stub; verified
+func,0x17972,exec_ReplyMsg,library glue,,platform_video,,LVO stub; verified
+func,0x1797E,exec_SetSignal,library glue,,platform_video,,LVO stub; verified
+func,0x1798C,exec_SetTaskPri,library glue,,platform_video,,LVO stub; verified
+func,0x1799C,exec_WaitPort,library glue,,platform_video,,LVO stub; verified
+func,0x179A8,gfx_BltBitMap,library glue,,platform_video,,LVO stub; verified
+func,0x179CA,gfx_BltClear,library glue,,platform_video,,LVO stub; verified
+func,0x179DC,gfx_CBump,library glue,,platform_video,,LVO stub; verified
+func,0x179E8,gfx_CloseFont,library glue,,platform_video,,LVO stub; verified
+func,0x179F4,gfx_CMove,library glue,,platform_video,,LVO stub; verified
+func,0x17A06,gfx_CWait,library glue,,platform_video,,LVO stub; verified
+func,0x17A18,gfx_DisownBlitter,library glue,,platform_video,,LVO stub; verified
+func,0x17A20,gfx_Draw,library glue,,platform_video,,LVO stub; verified
+func,0x17A32,gfx_FreeColorMap,library glue,,platform_video,,LVO stub; verified
+func,0x17A3E,gfx_FreeCprList,library glue,,platform_video,,LVO stub; verified
+func,0x17A4A,gfx_FreeVPortCopLists,library glue,,platform_video,,LVO stub; verified
+func,0x17A56,gfx_GetColorMap,library glue,,platform_video,,LVO stub; verified
+func,0x17A62,gfx_InitBitMap,library glue,,platform_video,,LVO stub; verified
+func,0x17A74,gfx_InitRastPort,library glue,,platform_video,,LVO stub; verified
+func,0x17A80,gfx_InitView,library glue,,platform_video,,LVO stub; verified
+func,0x17A8C,gfx_InitVPort,library glue,,platform_video,,LVO stub; verified
+func,0x17A98,gfx_LoadRGB4,library glue,,platform_video,,LVO stub; verified
+func,0x17AAA,gfx_LoadView,void(View *v),,title_select,,verified; root glue graphics LVO -222; only caller 0x1C62E
+func,0x17AB6,gfx_MakeVPort,library glue,,platform_video,,LVO stub; verified
+func,0x17AC4,gfx_Move,library glue,,platform_video,,LVO stub; verified
+func,0x17AD6,gfx_MrgCop,library glue,,platform_video,,LVO stub; verified
+func,0x17AE2,gfx_OpenFont,library glue,,platform_video,,LVO stub; verified
+func,0x17AEE,gfx_OwnBlitter,library glue,,platform_video,,LVO stub; verified
+func,0x17AF6,gfx_RectFill,library glue,,platform_video,,LVO stub; verified
+func,0x17B08,gfx_ScrollRaster,library glue,,platform_video,,LVO stub; verified
+func,0x17B24,gfx_SetAPen,library glue,,platform_video,,LVO stub; verified
+func,0x17B34,gfx_SetBPen,library glue,,platform_video,,LVO stub; verified
+func,0x17B44,gfx_SetDrMd,library glue,,platform_video,,LVO stub; verified
+func,0x17B54,gfx_SetFont,library glue,,platform_video,,LVO stub; verified
+func,0x17B64,gfx_Text,library glue,,platform_video,,LVO stub; verified
+func,0x17B7E,gfx_TextLength,library glue,,platform_video,,LVO stub; verified
+func,0x17B92,gfx_WaitBlit,library glue,,platform_video,,LVO stub; verified
+func,0x17B9A,gfx_WaitTOF,library glue,,platform_video,,LVO stub; verified
+func,0x17BA2,icon_FindToolType,library glue,,platform_video,,LVO stub; verified
+func,0x17BB0,icon_FreeDiskObject,library glue,,platform_video,,LVO stub; verified
+func,0x17BBC,icon_GetDiskObject,library glue,,platform_video,,LVO stub; verified
+func,0x17BC8,int_CloseWindow,library glue,,platform_video,,LVO stub; verified
+func,0x17BD4,int_CloseWorkBench,library glue,,platform_video,,LVO stub; verified
+func,0x17BDC,int_DrawImage,library glue,,platform_video,,LVO stub; verified
+func,0x17BF0,con_RawKeyConvert,library glue,,platform_video,,LVO stub; verified
+func,0x1AED0,run_intro,int(void),0x037A,title_select,,verified; overlay 1 entry (stub 0x17E94); Title2+bull+Accolade / Title4+car / Title3 logo+KEYS; -1 complete 1 interrupted; also in game_flow
+func,0x1B2B2,intro_accolade_bull,void(Archive *titleCar),0x03F4,title_select,,verified; bull loop of DOS intro_accolade only; x 0..240 step 4 per VBL; 62 frames
+func,0x1B396,intro_testdrive_car,void(Archive *titleCar),0x051B,title_select,,verified; 113 VBL pre-delay; window 9 VBL; moving 2 VBL; vel+=15000 x+=vel>>16; DxOffset=-x
+func,0x1B62E,intro_testdrive_logo,void(Archive *titleCar),0x0792,title_select,,verified; DOS physics on vpA DyOffset=y+0xA0 one step per VBL; then ScrollRaster copy to B and KEYS dissolve
+func,0x1B8E6,car_select,int(void),0x098C,title_select,,verified; overlay stub 0x17E9C; stick down=next up=prev; fire selects; timeout 6000/540 VBL; returns idx or -1; also in game_flow
+func,0x1BA7C,showroom_display_init,void(void),,title_select,,verified; adds 640x111x2 hires ViewPorts D:2F2E/D:2F56 at line 0x59 under 88-line top ViewPorts
+func,0x1BC64,showroom_display_free,void(void),,title_select,,verified; restores DHeight 200 and frees sheet planes colormaps copper lists
+func,0x1BD14,car_pics_free_all,void(void),,title_select,,verified; frees D:300E[20] and D:305E[20]
+func,0x1BD9C,load_file_retry,void *(char *name),,title_select,,verified; load_file; on failure car_pics_free_all and retry once
+func,0x1BDCA,show_car,void(int idx View *view int dir),0x0AB2,title_select,,verified; TDScroller scroll-out of front view; load/decode .ST and .SB into view; scroll-in
+func,0x1BF40,sb_load_ilbm,void(long *data View *view),,title_select,,verified; FORM/ILBM check then 0x1BF8E
+func,0x1BF8E,sb_parse_ilbm,void(char *form View *view),,title_select,,verified; BMHD/BODY/CMAP walk like root 0x106BE (no CMP2)
+func,0x1C068,sb_decode_body,void(BMHD *bmhd uint *colors char *body View *view),,title_select,,verified; rows < 0x59 skipped; rows >= 0x59 into hires ViewPort planes; LoadRGB4 32
+func,0x1C15C,colormap_clear,void(ColorMap *cm),,title_select,,verified
+func,0x1C190,fade_plate_colours,void(void),,title_select,,verified; colours 29-31 of front top ViewPort: RG cleared blue-1 per pass; 12 VBL per pass
+func,0x1C22A,wait_frames,void(int n),0x6C3B,title_select,,verified; n x WaitTOF (DOS delay_ticks analogue)
+func,0x1C244,showroom_drive_away,void(int idx),0x0D75,title_select,,verified; .SS script; Starter ch3; standing 9 VBL; driving 2 VBL vel+=12000; ends on x>=0x140 or D:0346
+func,0x1C62E,show_view,void(View *v),,title_select,,verified; LoadView + D:24CE/D:24C8/D:24C0/D:287A; also called game-wide via overlay stub 0x17EA4; also in game_flow
+func,0x1C682,scroll_out_down,void(View *v),0x0AB2,title_select,,verified; TDScroller body dir +1; DyOffset 0..0x57 DHeight h-i
+func,0x1C700,scroll_in_up,void(View *v),0x0AB2,title_select,,verified; dir -1; DyOffset 0x57..0 DHeight h-i
+func,0x1C76A,scroll_out_up,void(View *v),0x0AB2,title_select,,verified; TDScroller body dir -1; RasInfo RyOffset 0..0x58
+func,0x1C7CC,scroll_in_down,void(View *v),0x0AB2,title_select,,verified; dir +1; RasInfo RyOffset 0x58..0
+func,0x1C820,scroller_task_entry,task entry,,title_select,,verified; A4 from D:0B2A; D:288A(D:2886); D:2824=1; not in td_functions.json
+func,0x1C83C,start_scroller,void(int up View *v),,title_select,,verified; AddTask TDScroller pri 5 stack 0x7D0 initPC 0x1C820
+func,0x1C900,run_game,int(int car),0x1030,game_flow,drive_sim:drive_main,verified; overlay 2 entry; also DOS run_stage 0x1DC0 loop; drive frame >=5 VBL; returns 1 Ctrl-C else 0; also in drive_sim
+func,0x1CCF6,traffic_reset,void(void),0x1F93,drive_sim,game_flow:drive_state_reset,verified; clears traffic slots police counters radar and 0x1E89A[256]; also in game_flow
+func,0x1CD72,knob_update,void(void),0x3DDB,drive_sim,game_flow:dash_sprites_update drive_scene:update_knob_sprites,verified; knob 4px x / 8px y per frame; clears D:26FC at target; drawing see drive_scene; drive_scene maps the sprite part to draw_gear_box 0x351A; also in drive_scene game_flow
+func,0x1CF76,dealership_ending,void(void),0x38EB,drive_scene,,verified; EndGame top 117 rows + note; also in game_flow
+func,0x1D27E,plot_pixel_set,asm d0 x d1 y,,drive_scene,,verified; plane D:0BEC[D:0B60/4]; 0<=x<320 10<=y<D:0B74
+func,0x1D2C2,plot_pixel_clear,asm d0 x d1 y,,drive_scene,,verified; as 0x1D27E
+func,0x1D306,mul_scale,asm d0.l=(s16)d0*D:0B62,,drive_scene,,verified; signed via neg/mulu
+func,0x1D31A,clamp_word,asm(d0 lo; d1 hi; a3 *word),,drive_sim,,verified; also in drive_scene
+func,0x1D32A,road_record,asm(d7 unit) -> a2,0x2054,drive_sim,drive_scene:road_record_at,verified; &REC[ROAD[unit]]; REC[0] outside stage; 0xFF sets stage_end = unit-45; also in drive_scene
+func,0x1D36C,set_main_window_clip,asm,0x3ACE,drive_scene,,verified; D:0B74=0x75 clip y0..0x75 x0..0x140 D:0DDA=0x75
+func,0x1D392,render_frame,void(View *back),0x2013,drive_scene,,verified; Forbid snapshot 28A6/28AE/2896/28AA + 12 slots; OwnBlitter; 0x1D9CC; 0x20AF4; part of DOS 0x1DC0 loop; also in game_flow
+func,0x1D484,road_drawer_main,task body,0x3AF7,drive_scene,game_flow:road_drawer_loop drive_sim:road_drawer_loop,verified; pause handshake D:24AE/D:2844; Pulling into text (0x30 0x55 pens 8/0); show_view; WaitTOF; game_flow maps it to draw_buffer_overlays 0x349D; also in drive_sim game_flow
+func,0x1D560,stage_score,long(long frames long par int factor),0x125D,game_flow,,verified; factor*1000000/max(frames-par 100) + bonus*100; also in drive_sim
+func,0x1D5C8,play_again_menu,int(void),0x02BF,game_flow,,verified; 1 same car 0 new car; any stick dir toggles; fire selects; timeout dead (reversed compare)
+func,0x1D97C,clear_window,asm,0x74F4,drive_scene,,verified; colour 4 (plane 2 set) rows D:0380..D:0B74
+func,0x1D9C6,queue_reset,asm,,drive_scene,,verified; D:0F80=0
+func,0x1D9CC,compose_road_window,asm,0x1DC0,drive_scene,,verified; draw order main road clouds objects bugs mirror objects overlays gearbox ticket
+func,0x1DA14,draw_road_main,asm,0x28C5,drive_scene,,verified; + DOS 0x2054 project_road_main; 40 rows; y0=160+D:2842
+func,0x1DA72,init_row_scale,asm,,drive_scene,,verified; s0=0xFFFF-(-frac*0x170B>>16); weight=(-frac)>>1 or 1
+func,0x1DAA2,draw_road_mirror,asm,0x2F7A,drive_scene,,verified; + DOS 0x2478; 30 rows backwards; y0 0x3E s 0x5000 x0 0x118-(lat*5>>4)
+func,0x1DAF6,set_mirror_window_clip,asm,0x33FB,drive_scene,,verified; clip x 0xF0..0x140 y 0x1A..0x2B
+func,0x1DB36,road_edge_check,asm,0x40FE,drive_sim,,verified; crash if -D:0D94 - x_snap >= -0xDC or D:0D96 - x_snap <= 0xC0; wide road slot0 speed 3/4
+func,0x1DB90,traffic_spawn,asm(a2; d7),0x467D,drive_sim,,verified; 40 units ahead; BUG full object byte used as slot index
+func,0x1DC08,radar_zone_start,asm(a2),0x467D,drive_sim,,verified; chance test then D:0DBE hi = 1
+func,0x1DC2E,road_object,asm(a2 rec; d7 unit),0x467D,drive_sim,,verified; objects handled on entering the unit
+func,0x1DCA0,speed_sign,asm,0x40FE,drive_sim,,verified; limit D:0D86[k-5]; all traffic speeds = limit<<16>>6; slot1 x1.25
+func,0x1DCDC,heading_step,asm(a2),,drive_sim,,verified; D:28C6 += curve/8 deg wrap 0..359
+func,0x1DD10,pitch_step,asm(a2),,drive_sim,,verified; no caller (dead)
+func,0x1DD34,row_scale_step,asm,,drive_scene,,verified; s*=0xE8F5>>16
+func,0x1DD56,row_y_step,asm,,drive_scene,,verified; crest=min; y-=8s+slope*s/4
+func,0x1DD96,row_slope_step,asm,,drive_scene,,verified; slope+=pitch*((0x48000-4s)>>4)>>16; clamp D:0B38[row]
+func,0x1DDEA,traffic_update,void(int unit),0x427F,drive_sim,,verified; same-dir cars; police FSM (DOS 0x438A); oncoming; collisions; removal (DOS 0x455F)
+func,0x1E062,queue_slot_car_0,asm,0x28C5,drive_scene,,verified; same-dir slot 0 code 0x18 trk; d5 -0xE0
+func,0x1E078,queue_slot_car_1,asm,0x28C5,drive_scene,,verified; slot 1 code 0x19 x7r; d5 +0xE0 centre-relative
+func,0x1E08E,queue_slot_car_2,asm,0x28C5,drive_scene,,verified; slot 2 code 0x1A vnr
+func,0x1E0A4,queue_slot_car_3,asm,0x28C5,drive_scene,,verified; slot 3 code 0x1B sdr
+func,0x1E0B8,queue_slot_car_4,asm,0x28C5,drive_scene,,verified; slot 4 code 0x1C sdr
+func,0x1E0CC,queue_police_car,asm,0x28C5,drive_scene,,verified; slot 5 code 0x1D cpr; pull-over lateral from D:0D78
+func,0x1E19E,queue_oncoming_cars,asm,0x28C5,drive_scene,,verified; codes 0x10..0x14 rig sed vnf sed sed; D:0D28=-0xE0
+func,0x1E216,queue_post,asm,0x28C5,drive_scene,,verified; code 0x41 pst every 16 units at left edge rows>6
+func,0x1E230,queue_scenery_wed,asm,0x28C5,drive_scene,,verified; table 0x1E47A code 0x30
+func,0x1E276,queue_scenery_rock,asm,0x28C5,drive_scene,,verified; table 0x1E4BA code 0x31
+func,0x1E2B0,queue_scenery_lin,asm,0x28C5,drive_scene,,verified; table 0x1E4FA code 0x32
+func,0x1E2F8,queue_hazard,asm,0x28C5,drive_scene,,verified; x+=2*(obj*s>>16) lane bits included
+func,0x1E314,walk_road_rows,asm,0x2054,drive_scene,,verified; per-row loop; + loop of DOS 0x28C5
+func,0x1E53A,road_advance,void(void),0x40FE,drive_sim,,verified; units crossed this frame; curve integral; objects
+func,0x1E5C6,row_widths,asm,,drive_scene,drive_sim:row_road_widths,verified; record byte 0 nibbles -> table 0x1E45A (0x140+0x40i); 0xFF keeps; also in drive_sim
+func,0x1E63A,draw_ticket,asm,0x349D,drive_scene,,verified; tick when D:0D74>=0x1E
+func,0x1E65C,draw_lane_marks,asm,,drive_scene,,verified; D:0D98 wide if right half>0x224; colour 28 at cx+0x1C0*s dashed
+func,0x1E6A6,shoulder_bump,asm(d7),,drive_sim,,verified; marker bump sound flag; rumble slow near edges
+func,0x1E720,rumble_slow,asm,,drive_sim,,verified; speed -= 0x3000; rpm from speed unless shifting
+func,0x1E73A,marker_test,asm(d2),,drive_sim,,verified; D:0D9A = -1 if 0x4C <= |d2-10| <= 0x70
+func,0x1E758,draw_clouds,asm,,drive_scene,,verified; Amiga only
+func,0x1E784,blit_clouds,asm,,drive_scene,,verified; cldA cldB cld0 cld1 at horizon-{0x11 0x14 0x23 0x26}
+func,0x1E7D2,draw_bugs,asm,,drive_scene,,verified; list in code at 0x1E89A; 30 max; >=85 mph; rand&0x3FF
+func,0x1EAE0,move_clouds,asm d0=4*dheading,,drive_scene,,verified; -5/-6 px per degree + drift
+func,0x1EB5E,wrap_cloud_x,asm,,drive_scene,,verified; [-400 400]
+func,0x1EB78,init_clouds,void(void),,drive_scene,,verified
+func,0x1EBA8,wrap_angle_delta,asm,,drive_scene,,verified; [-180 180]
+func,0x1EBC4,draw_cockpit_overlays,asm,0x349D,drive_scene,,verified; hood roof post mirr radar wheel
+func,0x1EC1A,radar_zone,void(long pos),0x455F,drive_sim,,verified; >15 mph over limit in zone 5..7 -> police 30 units behind at 0x1B000+stage*0x1000
+func,0x1EC94,draw_radar_detector,asm,0x35C6,drive_scene,drive_sim:radar_lamp,verified; lit D:0DC4 (50) VBL dark 8 VBL; beep 0x26C50 on re-light if level; also in drive_sim
+func,0x1ED06,draw_steering_wheel,asm,0x35C6,drive_scene,,verified; 5 poses XOR whl0..3; per-buffer D:0C4A/D:0C4C swapped
+func,0x1ED64,xor_wheel_pose,asm d0 pose,0x35C6,drive_scene,,verified; pose 2 none
+func,0x1ED8A,reset_wheel_state,void(int keep),0x1F4E,drive_scene,,verified; keep=0 -> 0xFE0C; D:199E=0x87654321
+func,0x1EDAE,window_rect_stub,asm,,drive_scene,,verified; no effect
+func,0x1EDCE,shift_gear,void(int delta),0x3CB8,drive_sim,,verified; gear clamp 0..num_gears; knob target; D:26FC = delta != 0
+func,0x1EE76,gate_select,void(int node),0x3CB8,drive_sim,,verified; gate mode; gear ratio knob target row/col
+func,0x1EF14,cop_move_long,void(UCopList* long reg long value),,drive_scene,,verified
+func,0x1EF76,spr_pos_word,int(int h int v0 int v1 int att),,drive_scene,,verified
+func,0x1EF90,spr_ctl_word,int(int h int v0 int v1 int att),,drive_scene,,verified
+func,0x1EFD4,cop_sprite_pos,void(UCopList* h v0 v1 att n),,drive_scene,,verified
+func,0x1F05A,sprite_set_segment,void(int word int h int v0 int v1 int att int n),,drive_scene,,verified; v0/v1 minus D:2840
+func,0x1F0DC,sprite_add_segment,void(int h int v0 int v1 int att int n),,drive_scene,,verified
+func,0x1F12C,pack_shape_to_sprite,void(Shape* u16* dst int planes int col Shape* mask int mcol),,drive_scene,,verified
+func,0x1F27E,shape_to_sprite_segment,void(Shape* int n int planes int col),,drive_scene,,verified
+func,0x1F2EA,draw_needle,void(int x int y int which),0x35C6,drive_scene,,verified; Draw into 32x51 1-plane bitmap then sprites which/which+1; masked by tcm/spm
+func,0x1F582,position_wheel_marker,void(int x int y),0x35C6,drive_scene,,verified; sprite 7 segment 0 4x4 dot
+func,0x1F5BA,sprites_init,void(void),0x4792,drive_scene,,verified; 0x7D0 chip; needles 0-3 knob 4-7 dot 7; SPREN
+func,0x1F99A,sprites_free,void(void),,drive_scene,,verified
+func,0x1F9FE,shake_dash_sprites,void(void),,drive_scene,,verified; only caller dead code 0x20940
+func,0x1FAD4,ucop_sprite_pointers,void(UCopList*),,drive_scene,,verified
+func,0x1FB4A,ucop_palette_split,void(UCopList* u16* pal int line),,drive_scene,,verified; CWait(line-1 D:0DCC=100)
+func,0x1FBD8,crash_windscreen_sequence,void(void),0x392C,drive_scene,game_flow:crash_sequence drive_sim:crash_sequence,verified; same crack data as DOS; pen 28; Delay(2) per step; also in drive_sim game_flow
+func,0x1FDF4,redraw_cockpit_back,void(void),,drive_scene,,verified
+func,0x1FE38,min16,int(int int),,drive_scene,,verified
+func,0x1FE54,clamp_rgb4,int(int c int level),,drive_scene,,verified
+func,0x1FEAE,fade_out_palette,void(int delay u16* pal2 int line),,drive_scene,,verified; 16 steps; also gas station 0x14902
+func,0x20096,fill_row_span,asm a0 plane d4 off d1 x0 d2 x1,0x2E8B,drive_scene,,verified; BLTCON0 0x1F0 D=A overwrites first/last words
+func,0x20128,fill_road_row,asm,0x2DEE,drive_scene,,verified; trapezoid road p0 shoulders p3 right ground p1; stale step when n=1
+func,0x202A8,fill_left_ground,asm,0x2DEE,drive_scene,,verified; colour 6 left dips
+func,0x2031C,draw_centre_line,asm,0x28C5,drive_scene,,verified; 2 px colour 5 dashed by unit bit 2 unless wide
+func,0x2034E,draw_horizon_cliff,asm,0x28C5,drive_scene,,verified; colour-6 block + clf0
+func,0x203E0,toggle_gear_box,asm,0x351A,drive_scene,,verified; XOR gbox per buffer
+func,0x20410,queue_object,asm d0 x d1 y d2 code,0x28C5,drive_scene,,verified; 199 max; y clamped to crest
+func,0x20456,draw_object_queue,asm,0x28C5,drive_scene,,verified; LIFO; clip at base; cliff before first nearer object
+func,0x20526,draw_obj_lin,asm,,drive_scene,,verified; code 0x32
+func,0x20546,draw_obj_rock,asm,,drive_scene,,verified; code 0x31
+func,0x20562,draw_obj_wed,asm,,drive_scene,,verified; code 0x30
+func,0x20580,draw_obj_post,asm,,drive_scene,,verified; code 0x41 pst1-4
+func,0x205A6,scale_index5,asm d4,,drive_scene,,verified; ((s+0x1000 sat 0x7FFF)*0x28>>16)&0x1C; s>=0xF000 wraps
+func,0x205BC,scale_index4,asm d4,,drive_scene,,verified; rol5 & 0xC
+func,0x205CE,draw_obj_traffic,asm,0x28C5,drive_scene,,verified; codes 0x10..0x1D; hysteresis 0xD3FC; police lights
+func,0x206A0,draw_obj_sign_mirror,asm,0x2F7A,drive_scene,,verified; pol + rsg0/1
+func,0x206E8,draw_obj_sign,asm,0x28C5,drive_scene,,verified; codes 2..0xF pol + sign
+func,0x20740,draw_obj_hazard,asm,0x28C5,drive_scene,,verified; rck oil pot gra
+func,0x2076C,rpm_from_speed,asm,0x3FAD,drive_sim,,verified; D:191A = (u16)(speed>>8) * ratio; rpm = high word; no idle floor
+func,0x20780,speed_from_rpm,asm,,drive_sim,,verified; HI(speed) = (rpm<<8)/ratio
+func,0x207A4,shift_effects,asm,0x3DDB,drive_sim,,verified; clutch dump N->1 >4000 rpm halves rpm into speed; 1->2 drop >1600 chirp
+func,0x20826,engine_update,asm,0x3EAA,drive_sim,,verified; torque/drag per frame; brake 0x42000; neutral 0x7FFF; free rev +500; advance = speed>>6
+func,0x2090C,detect_pitch_bump,asm,,drive_scene,,verified; result consumed only by dead code
+func,0x20940,dash_shake_update,asm,,drive_scene,,verified; no caller (dead)
+func,0x2097C,draw_digital_cluster,asm,0x35C6,drive_scene,,verified; Corvette; inst sped tach dgt overlays
+func,0x20A88,draw_number,asm d0 a2 a3,0x38CD,drive_scene,,verified; up to 3 XOR digits
+func,0x20AF4,update_gauges,asm,0x35C6,drive_scene,,verified; analog needles every frame (D:1900 never written); digital per buffer
+func,0x20CB0,sim_controls,void(void),0x3BEA,drive_sim,,verified; over-rev 10 frames; autopilot/demo; fire = shift; pedal; physics; road_pos += advance
+func,0x20D68,car_record_copy,void(void),0x10E2,drive_sim,game_flow:car_record_unpack,verified; car record -> D:1924..D:1982 (DOS car loader 0x10E2); also in game_flow
+func,0x20E70,stage_road_select,void(int stage),0x1F4E,drive_sim,game_flow:stage_road_params,verified; road stream; stage_end = FF index - 45; par tables; also in game_flow
+func,0x246FA,row_heading_step,asm,0x2054,drive_scene,,verified; heading+=curve/8 clamp +-0x5A
+func,0x2472A,row_x_step,asm,0x2054,drive_scene,,verified; x+=sin(h)*80*s + lateral parallax; heading reseeded below y 0x7D
+func,0x247B2,update_wheel_marker,asm,0x35C6,drive_scene,drive_sim:wheel_marker,verified; called from sim 0x24924; clamp +-35 deg; also in drive_sim
+func,0x2481C,curve_integral,asm(a2),,drive_sim,,verified; D:19AA += curve * distance
+func,0x2484C,lateral_physics,asm,0x3FE8,drive_sim,,verified; curve drift 3/4; steer force; grip; x clamp +-1000; view yaw; lane hold
+func,0x24924,steering,asm,0x3D7D,drive_sim,,verified; 1 deg/frame away from road angle; up to 6 back; kicks
+func,0x2498E,steer_steps,asm -> d0..d3,,drive_sim,,verified
+func,0x249CC,edge_kicks,asm -> d2 d3,,drive_sim,,verified; 0x60000 kicks zeroed near road edges
+func,0x24A02,nop_24a02,void(void),,drive_sim,,verified; lone rts called from the renderer (0x1DA14); row added in the merge (was in the .md table only)
+func,0x24A04,grip_check,asm,0x3FE8,drive_sim,,verified; hazard grip 80/60/80/75%; skid amount 0..0x40; clamp to grip; speed -= 0x4000
+func,0x24AA8,skid_drift,asm,0x40FE,drive_sim,,verified; D:19B4 += skid * car+00A >> 8
+func,0x24ACA,stage_load,void(int car),0x4792,game_flow,drive_scene:stage_display_setup,verified; first time 'Loading Game...' Road.Shp %s.b %sDash.Shp %sDash; dash views; start Road Drawer; also in drive_scene drive_sim
+func,0x24CE4,stage_unload,void(int keep),0x1DC0,game_flow,drive_scene:stage_display_shutdown,verified; stop drawer; DyOffset 0; dash split off; keep=0 frees D:27CE D:27D2 D:276E D:2548; also in drive_scene
+func,0x24D68,remake_view,void(View*),,drive_scene,,verified; MakeVPort + MrgCop; also in game_flow
+func,0x24D8A,setup_drive_copper,void(View*),,drive_scene,game_flow:dash_palette_split,verified; dash palette capture; ucop; road palette D:19CE; also in game_flow
+func,0x24E52,fade_out_drive,void(void),,drive_scene,game_flow:dash_split_off,verified; also in game_flow
+func,0x24E94,start_road_drawer,void(void),,drive_scene,,verified; AddTask Road Drawer pri -1 stack 0x7D0 paused; main pri 4; also in game_flow
+func,0x24F3A,stop_road_drawer,void(void),,drive_scene,,verified; also in game_flow
+func,0x24F9A,road_drawer_entry,task initPC,,drive_scene,,verified; not in td_functions.json; also in drive_sim game_flow
+func,0x24FAA,load_cockpit_shapes,void(void),0x4792,drive_scene,,verified; Dash.Shp
+func,0x253E6,load_road_shapes,void(void),0x4792,drive_scene,,verified; Road.Shp + 0x24FAA
+func,0x25740,load_scenery_shapes,void(void),0x4792,drive_scene,,verified; rck oil pot gra
+func,0x259D8,load_sign_shapes,void(void),0x4792,drive_scene,,verified; signs rsg pol rpl
+func,0x2627C,load_traffic_shapes,void(void),0x4792,drive_scene,,verified; traffic police light bars
+func,0x26B7A,sfx_load_drive,void(void),0x4792,platform_audio,,verified; sfx/Radar TheEngine TheTurbo Squeal Bump (chip); also in game_flow
+func,0x26C02,sfx_free_drive,void(void),,platform_audio,,verified; frees the five samples without stopping channels; also in game_flow
+func,0x26C50,radar_beep,void(void),0x35C6,platform_audio,,verified; if D:0344: play_sample(Radar 0 0x40); DOS beep call at 0x35E2
+func,0x26C70,engine_sound_start,void(void),0x8A0E,platform_audio,,verified; Squeal ch1 / TheTurbo ch2 / TheEngine ch3 loops from the header (quirk); engine fade-in 0x3F step 0x7000; also in game_flow
+func,0x26D16,engine_sound_fade_out,void(void),0x8A08,platform_audio,,verified; ch1-3 slide to 0 step 0x7000; also in game_flow
+func,0x26D4E,engine_sound_update,void(void),0x3B1F,platform_audio,,verified; per drive frame; engine period 0x249988/max(rpm 800) clamp 0x82..0x708; turbo volume/period
+func,0x26E26,squeal_update,asm,,platform_audio,,verified; steady squeal vol D:19BC period 0x166 or chirp envelope D:15FE
+func,0x26EE2,bump_update,asm,,platform_audio,,verified; Bump on ch0 if idle and D:0344
+global,D:0344,sfx_enabled,int,DS:643E,platform_audio,title_select:g_sfxOn,verified; init 1; S key; bit 2 of DOS snd_flags; also in title_select
+global,D:0346,g_abortKey,int,,platform_video,,Ctrl-R (key 0x12) seen; name from title_select; also in game_flow title_select
+global,D:0348,blit_busy_spins,long,,platform_video,,Debug counter in blit_wait_hw
+global,D:034C,blit_wait_calls,long,,platform_video,,Debug counter
+global,D:0350,g_numCars,int,DS:0088,game_flow,,Cars.txt count; also in title_select
+global,D:0352,g_carsKeepBuf,int,,game_flow,,always 0; previous Cars.txt buffer dropped
+global,D:0358,cmap_default,u16[3],,platform_video,,0x02F2 0x0F57 0x022F pre-fill
+global,D:0360,arena_flag,int,,platform_video,,Cleared by arena_alloc; no reader
+global,D:0362,blit_params,struct 0x1E,,platform_video,,"src,mask,doff,size,dmod,bmod,amod,pbytes,lflag,rflag,shift,fwm,lwm"
+global,D:0380,clip_top,int,,platform_video,,Blit clip
+global,D:0382,clip_bottom,int,,platform_video,,Exclusive
+global,D:0384,clip_left,int,,platform_video,,& 0xFFF0
+global,D:0386,clip_right,int,,platform_video,,"& 0xFFF0, exclusive"
+global,D:0388,fwm_table,u16[17],DS:636C,platform_video,,0xFFFF >> n
+global,D:03AA,lwm_table,u16[17],DS:6374,platform_video,,~(0xFFFF >> n)
+global,D:03CC,g_blitTag,long,,title_select,,verified; 4-char tag before blits; never read
+global,D:03D0,IntuitionBase,ptr,,platform_video,,
+global,D:03D4,GfxBase,ptr,,platform_video,,
+global,D:03D8,tick_count,u32,DS:642A,platform_video,,"VBL ticks, 50 Hz PAL; also in title_select"
+global,D:03DC,joy_dir_table,u8[16],DS:63A8,platform_video,,JOY1DAT index -> 0..8
+global,D:03EC,vbl_last_dir,int,,platform_video,drive_sim:gate_last_dir,O-mode edge detection; also in drive_sim
+global,D:03EE,gate_row,int,DS:0920,drive_sim,,verified; node = row*4+col
+global,D:03F0,gate_col,int,DS:0920,drive_sim,,verified
+global,D:03F4,ltoa_buf,char[11],,platform_video,,ltoa_dec output; D:03F2 sign
+global,D:0444,sfx_installed,int,,platform_audio,,verified
+global,D:0446,sfx_chan,struct[4] x 0x1E,,platform_audio,,verified; +0 data +4 stop tick +8 pending +A len words +C period +E vol 16.16 +12 repeats +14 left +16 target +1A step
+global,D:04BE,old_level4_vector,long,,platform_audio,,verified
+global,D:04C2,sfx_tick,long,DS:642A,platform_audio,,verified; +1 per VBL in sfx server
+global,D:04C6,sfx_dma_set,int,,platform_audio,,verified
+global,D:04C8,sfx_saved_intena,int,,platform_audio,,verified
+global,D:04CA,song_installed,int,,platform_audio,,verified
+global,D:04CC,music_enabled,int,,platform_audio,,verified; init 1; M key
+global,D:04CE,song_inst_loaded,int,,platform_audio,,verified
+global,D:0500,note_period_table,long[132],DS:6452,platform_audio,,verified; 0x369E99/f(note); note 69 = 440 Hz; accessed via D:05F0 + 4*(note-0x3C)
+global,D:0710,note_ticks,int[16],,platform_audio,,verified; SMUS duration code -> ticks (96 48 24 12 6 ... 144 72 36 18 9)
+global,D:0732,song_state,int,DS:643D,platform_audio,,verified; 0 idle 1 start 2 play 3 stop
+global,D:0734,song_any_active,int,,platform_audio,,verified
+global,D:0736,song_data,long,DS:642C,platform_audio,,verified; SMUS buffer being played
+global,D:073A,song_track,struct[4] x 0x18,,platform_audio,,verified; +0 active +2 inst +6 oneshot +8 size +C data +10 pos +14 count +16 tie
+global,D:08BA,song_dma_on,int,,platform_audio,,verified
+global,D:08BC,song_dma_off,int,,platform_audio,,verified
+global,D:08BE,smus_tempo,int,,platform_audio,,verified; unused
+global,D:08C0,smus_volume,int,,platform_audio,,verified; unused
+global,D:08C2,song_buffer,long,,platform_audio,,verified; loaded song file
+global,D:08C6,testdrive_inst,char*[4],,platform_audio,,verified; BuzzSynth Drum2 Drum 0
+global,D:08D6,testdrive_oneshot,int[4],,platform_audio,,verified; 0 1 1 0
+global,D:08DE,song_inst,char*[4],,platform_audio,,verified; BuzzSynth 0 Drum 0
+global,D:08EE,song_oneshot,int[4],,platform_audio,,verified; 0 0 1 0
+global,D:08F6,CREDITS_PENS,int[24],,game_flow,,1 headings 11 names 0 blank
+global,D:0926,CREDITS_TEXT,char *[25],,game_flow,,24 lines + NULL; first 4 lines are the crackers'
+global,D:098E,HS_DEFAULT_PALETTE,uint[32],,game_flow,,000 A75 020 232 ... C30 006
+global,D:09CE,MSG_L1_FLYING,char *[3],DS:077A,game_flow,,avg > 105
+global,D:09DA,MSG_L1_COOKING,char *[3],DS:0780,game_flow,,avg > 95
+global,D:09E6,MSG_L1_LEARNING,char *[3],DS:0786,game_flow,,avg > 65
+global,D:09F2,MSG_L1_GRANDMA,char *[3],DS:078C,game_flow,,otherwise
+global,D:09FE,MSG_L1_SLOW,char *[3],DS:0792,game_flow,,secs > limit
+global,D:0A0A,MSG_L2_FLYING,char *[3],DS:0798,game_flow,,
+global,D:0A16,MSG_L2_COOKING,char *[3],DS:079E,game_flow,,
+global,D:0A22,MSG_L2_LEARNING,char *[3],DS:07A4,game_flow,,'' 'third?' ''
+global,D:0A2E,MSG_L2_GRANDMA,char *[3],DS:07AA,game_flow,,'second?' '' ''
+global,D:0A3A,MSG_L2_SLOW,char *[3],DS:07B0,game_flow,,
+global,D:0A46,MSG_TIPS,char *[3],DS:07B6,game_flow,,radar / oncoming traffic / potholes
+global,D:0A52,g_resultsImage,struct Image,,game_flow,,320x16x1; ImageData D:0A5C; PlanePick 1 PlaneOnOff 0
+global,D:0A66,GAS_SIGN_NAMES,long[4],DS:07BC,game_flow,,don john kevn tony (pics/gas.shp)
+global,D:0A7A,g_titleShapeNames,long[44],DS:0148,title_select,,verified; frm0-4 rrm0-4 wnd1..wndK wndS wndT wndS wndL..wndR wndR x4 then 0
+global,D:0B2A,g_savedA4,long,,title_select,,verified; image 0x1873A; A4 for the task
+global,D:0B2E,near_end,int,DS:0929,drive_sim,game_flow:g_nearEnd drive_scene:pulling_in,verified; stage_end - unit < 0x50; also in drive_scene game_flow
+global,D:0B30,gearbox_show,byte[2],DS:08BE,drive_sim,drive_scene:gearbox_wanted platform_video:fire_latch,verified; per view buffer; also in drive_scene platform_video
+global,D:0B32,gearbox_shown,u8[2],,drive_scene,,verified; XOR state per buffer
+global,D:0B34,gearbox_always,int,DS:08BE,drive_sim,drive_scene:gearbox_hold platform_video:opt_d,verified; D key; also in drive_scene platform_video
+global,D:0B36,steer_lock,int,,drive_sim,,verified; never written (dead branch)
+global,D:0B38,slope_clamp,s8[40],,drive_scene,,verified; data 0 0 1 1 2 2 3 5 8 10 15 20 25 30 35 40...
+global,D:0B60,pixel_plane_off,u16,,drive_scene,,verified
+global,D:0B62,row_scale,u16,,drive_scene,,verified
+global,D:0B64,row_scale2,u16,,drive_scene,,verified; write-only
+global,D:0B66,row_y,s32 16.16,,drive_scene,,verified
+global,D:0B6A,row_cx,s32 16.16,,drive_scene,,verified
+global,D:0B6E,heading_acc,s32 16.16,DS:1873,drive_scene,,verified
+global,D:0B72,slope_acc,s16,DS:1875,drive_scene,,verified
+global,D:0B74,crest_y,s16,DS:1437,drive_scene,,verified
+global,D:0B76,row_index,u16,,drive_scene,,verified
+global,D:0BEC,blit_dest,u8 *[5],,platform_video,drive_scene:target_planes,Destination planes; also in drive_scene
+global,D:0C00,right_edge,s16,,drive_scene,,verified
+global,D:0C02,left_edge,s16,,drive_scene,,verified
+global,D:0C04,first_mask,u16[17],,drive_scene,,verified; data
+global,D:0C26,last_mask,u16[17],,drive_scene,,verified; data
+global,D:0C4A,wheel_pose_other,s16,DS:1445,drive_scene,,verified
+global,D:0C4C,wheel_pose_here,s16,DS:1445,drive_scene,,verified
+global,D:0C4E,MENU_PALETTE,uint[4],,game_flow,,000 CCC 00D 804
+global,D:0C6E,sd_pos,long[6],DS:096D,drive_sim,drive_scene:same_dir_slots,verified; slot 5 = police; also in drive_scene
+global,D:0C82,cop_pos,long,DS:0A2D,drive_sim,,verified; = sd_pos[5]
+global,D:0C92,sd_speed,long[6],DS:0A1B,drive_sim,,verified; init 0xAAAA 0xCAAA 0xEAAA 0x9AAA 0x7AAA 0
+global,D:0CA6,cop_speed,long,DS:0A25,drive_sim,,verified; = sd_speed[5]
+global,D:0CAA,sd_dodge,int[6] stride 4,DS:0A29,drive_sim,drive_scene:slot_slide,verified use; police pushes cars aside; also in drive_scene
+global,D:0CBE,police_slide,s16,,drive_scene,,verified
+global,D:0CC2,sd_lane,struct{int lat; int flag}[6],,drive_sim,drive_scene:slot_lateral,verified; lat from renderer; flag = placed behind player; also in drive_scene
+global,D:0CD8,cop_tailing,int,,drive_sim,,verified; = sd_lane[5].flag
+global,D:0CF2,on_pos,long[5],DS:0945,drive_sim,drive_scene:oncoming_slots,verified; also in drive_scene
+global,D:0D14,on_speed,long[5],DS:0A1B,drive_sim,,verified; init 0xAAAA 0xCAAA 0xEAAA 0xAAAA 0xAAAA
+global,D:0D28,on_lane,struct{int lat; int pad}[5],,drive_sim,drive_scene:oncoming_lateral,verified; lat = -0xE0 from renderer; also in drive_scene
+global,D:0D40,r_same_dir,s32[6],DS:09AD,drive_scene,,verified; snapshot
+global,D:0D58,r_oncoming,s32[6],DS:09AD,drive_scene,,verified; snapshot
+global,D:0D70,autopilot,int,,drive_sim,game_flow:g_demoOrEnd,verified; demo or near_end; also in game_flow
+global,D:0D72,lane_hold,int,,drive_sim,platform_audio:squeal_mute,verified; autopilot or cop_tail_frames >= 0x46; x -> 0x50; also in platform_audio
+global,D:0D74,ticket_frames,int,DS:0A23,drive_sim,,verified; >0 skips sim_controls; >=0x1E ticket and release
+global,D:0D76,cop_tail_frames,int,DS:0A28,drive_sim,,verified
+global,D:0D78,cop_timer,int,DS:0A27,drive_sim,,verified
+global,D:0D7A,cop_mode,int,DS:0A23,drive_sim,,verified; 0 chase 10 passing 15 braking
+global,D:0D7C,slot_base_x,s16,,drive_scene,,verified
+global,D:0D7E,slot_base_lat,s16,,drive_scene,,verified
+global,D:0D80,hazard_hit,int,DS:09A5,drive_sim,,verified; cleared by grip_check
+global,D:0D82,first_row_weight,u16,,drive_scene,,verified
+global,D:0D84,row_centre,s16,,drive_scene,,verified
+global,D:0D86,speed_limit_table,u8[3],DS:0A1B,drive_sim,,verified; 30 55 65
+global,D:0D8A,seg_frac,int,,drive_sim,,verified
+global,D:0D8C,half_left,u16,,drive_scene,,verified
+global,D:0D8E,half_right,u16,,drive_scene,,verified
+global,D:0D90,last_left,u16,,drive_scene,,verified
+global,D:0D92,last_right,u16,,drive_scene,,verified
+global,D:0D94,car_half_left,u16,,drive_scene,drive_sim:road_left_w,verified; read by sim; also in drive_sim
+global,D:0D96,car_half_right,u16,,drive_scene,drive_sim:road_right_w,verified; read by sim; also in drive_sim
+global,D:0D98,wide_road,s16,,drive_scene,,verified
+global,D:0D9A,bump_flag,int,,drive_sim,platform_audio:bump_marker,verified; also in platform_audio
+global,D:0D9C,first_unit,int,,drive_sim,,verified
+global,D:0D9E,cloud_heading,s16,,drive_scene,,verified
+global,D:0DA0,cloud_x,s32[4] 16.16,,drive_scene,,verified
+global,D:0DBC,speed_limit,int,DS:0A21,drive_sim,,verified; 30/55/65; 0 until first sign
+global,D:0DBE,radar_zone_ctr,long,DS:099D,drive_sim,,verified; high word 1..7
+global,D:0DC4,radar_blink,int,,drive_sim,,verified; constant 0x32
+global,D:0DC6,radar_dark,u16,,drive_scene,,verified
+global,D:0DC8,radar_time,u32,,drive_scene,,verified
+global,D:0DCC,palette_split_h,u16,,drive_scene,,verified; data 100
+global,D:0DD2,cliff_x,s16,DS:19B7,drive_scene,,verified
+global,D:0DD4,cliff_y,s16,DS:19B9,drive_scene,,verified
+global,D:0DD6,cliff_scale,u16,,drive_scene,,verified
+global,D:0DD8,min_row_y,s16,,drive_scene,,verified
+global,D:0DDA,window_bottom,s16,,drive_scene,,verified
+global,D:0DDC,prev_left,s16,,drive_scene,,verified
+global,D:0DDE,prev_right,s16,,drive_scene,,verified
+global,D:0DE0,prev_y,s16,,drive_scene,,verified
+global,D:0DE2,step_left,s16,,drive_scene,,verified
+global,D:0DE4,step_right,s16,,drive_scene,,verified
+global,D:0DE6,left_shoulder_x,s16[row+1],,drive_scene,,verified
+global,D:0F78,max_left_x,s16,DS:19C3,drive_scene,,verified; init 0xD8F0
+global,D:0F7A,max_left_row,s16,,drive_scene,,verified
+global,D:0F7C,shoulder_plane4,u16,,drive_scene,,verified; never set
+global,D:0F7E,mirror_flag,s16,,drive_scene,,verified
+global,D:0F80,queue_count,s16,,drive_scene,,verified
+global,D:0F82,queue_x,s16[199],,drive_scene,,verified
+global,D:1112,queue_y,s16[199],,drive_scene,,verified
+global,D:12A2,queue_code,s16[199],,drive_scene,,verified
+global,D:1432,queue_scale,u16[199],,drive_scene,,verified
+global,D:15C2,traffic_size,u16[14] stride 4,,drive_scene,,verified
+global,D:15FA,traffic_scale_tmp,u16,,drive_scene,,verified
+global,D:15FC,police_flash,u8,,drive_scene,,verified
+global,D:15FE,squeal_env,int,DS:08F4,drive_sim,,verified; 0 dump / 0xB 1->2 (see platform_audio); also in platform_audio
+global,D:1600,prev_gear,int,,drive_sim,,verified
+global,D:1602,prev_shifting,int,,drive_sim,,verified
+global,D:1604,overrev_frames,int,,drive_sim,,verified
+global,D:1606,drag_table,u8[64],DS:0AC5,drive_sim,,verified; identical to DOS
+global,D:1646,crack_count,u16[7],DS:2532,drive_scene,,verified; data
+global,D:1654,crack_ptr,ptr[7],DS:2539,drive_scene,,verified; data; same values as DOS
+global,D:1900,needle_rpm,u16,DS:0923,drive_scene,,verified; never written by 0x20AF4
+global,D:1902,needle_speed,u16,DS:0923,drive_scene,,verified
+global,D:1904,gauge_pose,u16,,drive_scene,,verified
+global,D:1906,digital_speed,u16[2],DS:0923,drive_scene,,verified
+global,D:190A,digital_rpm,u16[2],DS:0923,drive_scene,,verified
+global,D:1910,g_totalScore,long,DS:8098,game_flow,,summed by run_game; shown by scores_show
+global,D:1916,fire_prev,int,DS:0A77,drive_sim,,verified
+global,D:1918,dir_prev,int,,drive_sim,,verified
+global,D:191A,rpm,word+fraction,DS:091B,drive_sim,,verified; high word = rpm
+global,D:191E,gear,int,DS:0A78,drive_sim,,verified; also in game_flow
+global,D:1920,ratio,int,DS:0916,drive_sim,,verified
+global,D:1922,pedal,int,DS:0A79,drive_sim,,verified; +1 gas -1 brake; set after physics; used next frame
+global,D:1924,car_num_gears,int,DS:268F,drive_sim,,verified; car +000
+global,D:1928,car_rev_limit,int,DS:2693,drive_sim,,verified; car +004
+global,D:192C,car_grip,int,DS:2697,drive_sim,,verified; car +008 (DOS/72.6)
+global,D:192E,car_skid_drift,int,DS:2699,drive_sim,,verified; car +00A read as word
+global,D:1936,car_ratios,ptr,DS:26A1,drive_sim,,verified; car +012
+global,D:193A,car_knob_xy,ptr,,drive_sim,,verified; car +020
+global,D:193E,car_gate_xy,ptr,,drive_sim,,verified; car +03C
+global,D:1942,car_gate_next,ptr,,drive_sim,,verified; car +07C
+global,D:1946,car_node_gear,ptr,,drive_sim,,verified; car +10C
+global,D:194A,car_torque,ptr,,drive_sim,,verified; car +11C
+global,D:1984,stage_end,int,DS:092A,drive_sim,game_flow:g_stageEndPos drive_scene:stage_end_unit,verified; FF index - 45; also in drive_scene game_flow
+global,D:1986,road_stream,ptr,DS:6361,drive_sim,game_flow:g_roadStream,verified; also in game_flow
+global,D:198A,road_records,ptr,DS:2B70,drive_sim,game_flow:g_roadTable,verified; 0x20F08; also in game_flow
+global,D:198E,g_parTime,long,DS:8094,game_flow,drive_sim:stage_par,par in drive frames {700 1100 1200 1100 1500}; also in drive_sim
+global,D:1992,g_stageConstB,long,DS:7F40,game_flow,drive_sim:stage_par2,time limit in drive frames {3000 2800 3500 4000 4500} (= DS:02B2 x12); also in drive_sim
+global,D:1996,g_scoreFactor,int,DS:029E,game_flow,drive_sim:stage_base,stage + 4; also in drive_sim
+global,D:1998,marker_angle,s32,,drive_scene,,verified
+global,D:199C,near_rows_flag,s16,,drive_scene,,verified
+global,D:199E,marker_cache,s32,,drive_scene,,verified
+global,D:19A2,yaw_force,long,DS:090A,drive_sim,,verified
+global,D:19A6,lat_force,long 16.16,,drive_sim,,verified; clamped to +-grip
+global,D:19AA,curve_acc,long 16.16,DS:0919,drive_sim,,verified; curve * distance this frame
+global,D:19AE,car_x_new,long,,drive_sim,,verified
+global,D:19B2,lat_sign,int,,drive_sim,,verified
+global,D:19B4,view_yaw,long 16.16,DS:090C,drive_sim,,verified; read by renderer 0x2472A
+global,D:19B8,steer_track,long 16.16 deg,,drive_sim,,verified; curve/2
+global,D:19BC,skid_amount,int,DS:0924,drive_sim,platform_audio:skid_volume,verified; 0..0x40; squeal volume; platform_audio: DOS DS:64FE (skid tone divider); also in platform_audio
+global,D:19BE,bump_edge,int,,drive_sim,,verified; {1 0 -1 0}[hazard&3]; also in platform_audio
+global,D:19C4,steer_prev,long,,drive_sim,,verified
+global,D:19CA,loading_palette,u16[2],,drive_scene,game_flow:LOADING_PALETTE,verified; data 000 D04; also in game_flow
+global,D:19CE,road_palette,u16[32],DS:00CC,drive_scene,game_flow:ROAD_PALETTE,verified; data; also in game_flow
+global,D:1A0E,hazard_table,Shape**[4],DS:0F9F,drive_scene,,verified; data; mask table D:1A1E
+global,D:1A2E,sign_table,Shape**[16],DS:0F9F,drive_scene,,verified; data; mask table D:1A6E
+global,D:1AAE,car_table,Shape**[16],DS:1173,drive_scene,,verified; data; mask table D:1AEE
+global,D:1B2E,mirror_car_table,Shape**[16],DS:123B,drive_scene,,verified; data; mask table D:1B6E
+global,D:1BAE,sfx_radar,sample*,,platform_audio,,verified
+global,D:1BB2,sfx_engine,sample*,,platform_audio,,verified
+global,D:1BB6,sfx_turbo,sample*,,platform_audio,,verified
+global,D:1BBA,sfx_squeal,sample*,,platform_audio,,verified
+global,D:1BBE,sfx_bump,sample*,,platform_audio,,verified
+global,D:1BC2,engine_period,int,DS:64FC,platform_audio,,verified; channel 3 period
+global,D:1BD2,lzw_tables,ptr,DS:6A3C,platform_video,,
+global,D:1BD6,rand_seed,u16,DS:6520,platform_video,drive_sim:rng_state,; also in drive_sim
+global,D:1BD8,rand_seeded,int,,platform_video,drive_sim:rng_seeded,; also in drive_sim
+global,D:1BDA,quit_flag,int,,platform_video,,Sticky Ctrl-C
+global,D:1BDC,mem_list,ptr,,platform_video,,Circular block list
+global,D:1BE0,mem_count,int,,platform_video,,
+global,D:1CDA,_iob,FILE[],,platform_video,,"Aztec FILE table, 0x16 bytes each, to D:1E92"
+global,D:1E92,_numdev,int,,platform_video,,Aztec fd table size
+global,D:1E94,g_fatalInit,int,,game_flow,platform_video:g_startup_error,1 = protection failed or Cars.txt missing -> exit; also in platform_video
+global,D:1E96,g_carsTxtPtr,char *,DS:7F64,game_flow,,Cars.txt buffer (advanced to its end)
+global,D:1E9A,sfx_server_a4,long,,platform_audio,,verified
+global,D:1E9E,sfx_int_channels,int,,platform_audio,,verified; INTENA bits 7-10 handled by 0x12616
+global,D:1EA0,sfx_vbl_interrupt,struct Interrupt,,platform_audio,,verified; pri 0x1E code 0x126AE
+global,D:1EB6,song_server_a4,long,,platform_audio,,verified
+global,D:1EBA,song_vbl_interrupt,struct Interrupt,,platform_audio,,verified; pri 0x20 code 0x12A54
+global,D:1ED0,song_inst_ptr,long[4],,platform_audio,,verified
+global,D:1EE0,song_inst_owned,int[4],,platform_audio,,verified
+global,D:1EE8,song_inst_oneshot,int[4],,platform_audio,,verified
+global,D:1EF0,song_vol_step,long,,platform_audio,,verified; 16.16
+global,D:1EF4,song_volume,long,,platform_audio,,verified; 16.16; high word used
+global,D:1EF8,song_vol_target,long,,platform_audio,,verified; 16.16; -1 none
+global,D:1EFC,g_titleShapes,Shape *[43],,title_select,,verified; frm D:1EFC rrm D:1F10 wnd D:1F24 (33)
+global,D:1FA8,out_count,u32,DS:7B18,platform_video,,
+global,D:1FB0,unpacked_len,u32,DS:790E,platform_video,,
+global,D:1FB4,pack_inptr,u8 *,DS:78E0,platform_video,,
+global,D:1FB8,pack_outptr,u8 *,,platform_video,,
+global,D:1FBC,rle_state,int,DS:7478,platform_video,,
+global,D:1FBE,packed_left,u32,DS:7B2E,platform_video,,
+global,D:23EC,rle_last,int,,platform_video,,
+global,D:23EE,key_code,u8[10],,platform_video,,Raw key queue
+global,D:23F8,key_qual,u16[10],,platform_video,,Qualifiers
+global,D:240C,key_count,int,,platform_video,,
+global,D:240E,key_max,int,,platform_video,,10
+global,D:2410,input_port,MsgPort *,,platform_video,,
+global,D:2414,con_port,MsgPort *,,platform_video,,
+global,D:2418,input_io,IOStdReq *,,platform_video,,
+global,D:241C,input_irq,Interrupt,,platform_video,,"pri 127, code 0x15698"
+global,D:2482,con_io,IOStdReq *,,platform_video,,
+global,D:2486,key_pass_qual,u16,,platform_video,,0x5C or 0 with p
+global,D:24A8,_malloc_list,ptr,,platform_video,,Aztec malloc
+global,D:24AC,Enable_Abort,int,,platform_video,,
+global,D:24AE,drawer_pause,u16,DS:6424,drive_scene,game_flow:g_drawerPause platform_video:g_paused,verified; also in game_flow platform_video
+global,D:24B0,gate_mode,int,DS:0921,drive_sim,platform_video:opt_o,verified; O key; also in platform_video
+global,D:24B2,knob_target_y,int,DS:0A83,drive_sim,,verified; also in drive_scene
+global,D:24B4,knob_y,int,DS:0A7F,drive_sim,,verified; also in drive_scene
+global,D:24B6,knob_target_x,int,DS:0A81,drive_sim,,verified; also in drive_scene
+global,D:24B8,knob_x,int,DS:0A7D,drive_sim,,verified; also in drive_scene
+global,D:24BA,gearbox_hide_delay,int,DS:091F,drive_sim,drive_scene:knob_close_delay,verified; 7 after a shift; also in drive_scene
+global,D:24BC,g_loadedBuf,ptr,,platform_video,,Last load_file result; also in title_select
+global,D:24C0,g_frontRastPort,RastPort *,,title_select,,likely; rp of the shown view (name by structure; users in other specs)
+global,D:24C4,g_tooSlow,int,DS:7F44,game_flow,,secs > limit
+global,D:24C6,g_lives,int,DS:78E6,game_flow,drive_sim:cars_left,5; -1 crash; 0 fatal crash; +2 gas station; also in drive_sim
+global,D:24C8,g_backView,View *,,title_select,,verified; set by show_view
+global,D:24CC,g_stage,int,DS:7B16,game_flow,drive_sim:stage,0..4; attract starts at 3; also in drive_sim
+global,D:24CE,g_frontView,View *,,title_select,,verified; set by show_view
+global,D:24D2,dash_palette,u16[32],,drive_scene,game_flow:g_dashPalette,verified; also in game_flow
+global,D:2512,g_joyDir,int,,platform_video,drive_sim:joy_dir,Last joy_dir; also in drive_sim title_select
+global,D:2548,g_carRecord,void *,,game_flow,,<car>.b file
+global,D:26FC,shifting,int,DS:0A7B,drive_sim,,verified
+global,D:2726,tach_overlay,Shape*,,drive_scene,,verified
+global,D:272A,speed_overlay,Shape*,,drive_scene,,verified
+global,D:2756,tach_overlay_mask,Shape*,,drive_scene,,verified
+global,D:275A,speed_overlay_mask,Shape*,,drive_scene,,verified
+global,D:2766,spr_govr,Shape *,DS:102F,game_flow,,GAME OVER shape
+global,D:276A,spr_gvrm,Shape *,DS:1033,game_flow,,GAME OVER mask
+global,D:276E,mask_pool,ptr,,drive_scene,game_flow:g_roadBuffer,verified; also in game_flow
+global,D:27CE,dash_shapes,ptr,DS:1383,drive_scene,game_flow:g_dashShapes,verified; <car>Dash.Shp; also in game_flow
+global,D:27D2,road_shapes,ptr,DS:0F9F,drive_scene,game_flow:g_roadShapes,verified; Pics/Road.Shp; also in game_flow
+global,D:27D6,errno,int,,platform_video,,
+global,D:27D8,_initial_sp,ptr,,platform_video,,
+global,D:27DC,SysBase,ptr,,platform_video,,
+global,D:27E0,DOSBase,ptr,,platform_video,,
+global,D:27E4,_devtab,ptr,,platform_video,,
+global,D:27F0,_argv,char **,,platform_video,,
+global,D:27F4,_argc,int,,platform_video,,
+global,D:2810,g_loadedSize,long,,platform_video,,Size of last load
+global,D:2814,g_inGame,int,,game_flow,platform_video:g_inDrive,1 during run_game (P D O keys); also in platform_video
+global,D:2816,demo_mode,int,DS:0084,game_flow,,attract mode; also in drive_sim title_select
+global,D:2818,saved_task_pri,int,,platform_video,game_flow:g_savedTaskPri,; also in game_flow
+global,D:281A,g_selectedCar,int,DS:790A,game_flow,,last played car; -1 none/attract
+global,D:281C,saved_bltpri,int,,platform_video,,Garbage from $BFF002
+global,D:281E,cmp2_line,int,,platform_video,game_flow:g_cmp2Line,CMP2 split line; also in game_flow
+global,D:2820,g_scrollDelay,int,DS:7B12,game_flow,,1 slow; 0 after fire
+global,D:2822,g_quitSeen,int,,game_flow,,sticky quit for the results screen
+global,D:2824,g_scrollerDone,int,,title_select,,verified; 0 while TDScroller runs
+global,D:282E,crash,int,DS:0929,drive_sim,game_flow:g_crash,verified; 1 crash 2 hit police (game over); also in game_flow
+global,D:2830,no_crash,int,,drive_sim,game_flow:g_crashCancel,verified; never written (dead); also in game_flow
+global,D:2832,knob_shown_x,s16,,drive_scene,,verified
+global,D:2834,knob_shown_y,s16,,drive_scene,,verified
+global,D:2836,back_index,u16,,drive_scene,,verified
+global,D:283C,pitch_bump_flag,s16,,drive_scene,,verified; consumer dead
+global,D:2840,sprite_shake,s16,,drive_scene,,verified; 0 (dead writers)
+global,D:2842,horizon_shake,s16,,drive_scene,,verified; ViewPort DyOffset (0)
+global,D:2844,drawer_paused_ack,u16,,drive_scene,game_flow:g_drawerIdle,verified; also in game_flow
+global,D:2846,dash_palette_valid,u16,,drive_scene,game_flow:g_dashPaletteSaved,verified; also in game_flow
+global,D:2848,sd_enable,int,,drive_sim,,verified; set 1 per stage never cleared
+global,D:284A,on_enable,int,,drive_sim,,verified; set 1 per stage never cleared
+global,D:284C,knob_visible,u16,,drive_scene,,verified
+global,D:284E,needle_seg,u16,,drive_scene,,verified
+global,D:2850,dot_seg,u16,,drive_scene,,verified
+global,D:2852,speed_pair_shift,u16,,drive_scene,,verified
+global,D:2854,tach_pair_shift,u16,,drive_scene,,verified
+global,D:2858,g_joyFire,int,,platform_video,drive_sim:joy_fire,Last joy_fire; also in drive_sim title_select
+global,D:285A,saved_windowptr,long,,platform_video,game_flow:g_savedWindowPtr,; also in game_flow
+global,D:285E,this_task,Task *,,platform_video,game_flow:g_thisTask,; also in game_flow
+global,D:2862,saved_task_2A,long,,platform_video,,"tc_ExceptCode, never restored"
+global,D:2866,saved_actiview,View *,,platform_video,,
+global,D:286A,colormapA,ColorMap *,,platform_video,,
+global,D:286E,colormapB,ColorMap *,,platform_video,,
+global,D:2872,text_font,TextFont *,,platform_video,game_flow:g_hsFont,topaz 8; also in game_flow
+global,D:2876,g_tmpRastPort,RastPort *,,platform_video,,Text RastPort; name from title_select; also in game_flow title_select
+global,D:287A,g_backRastPort,RastPort *,,title_select,,likely; rp of the hidden view
+global,D:287E,g_scrollerStack,void *,,title_select,,verified; 0x7D0 bytes
+global,D:2882,g_scrollerTask,struct Task *,,title_select,,verified; 0x5C bytes
+global,D:2886,g_scrollerView,View *,,title_select,,verified
+global,D:288A,g_scrollerFunc,void (*)(View *),,title_select,,verified; 0x1C682 or 0x1C76A
+global,D:288E,g_sheetCmA,ColorMap *,,title_select,,verified; GetColorMap(32)
+global,D:2892,g_sheetCmB,ColorMap *,,title_select,,verified
+global,D:2896,car_x,long 16.16,DS:0910,drive_sim,,verified; + = right (DOS + = left); 0x640000 at load
+global,D:289A,r_lateral,s32,DS:0910,drive_scene,drive_sim:car_x_snap,verified; snapshot of D:2896; also in drive_sim
+global,D:289E,r_speed,s32,DS:0927,drive_scene,,verified; snapshot of D:28A6
+global,D:28A2,r_steer,s32,DS:0914,drive_scene,,verified; snapshot of D:28AA
+global,D:28A6,speed,long 16.16 mph,DS:0927,drive_sim,game_flow:g_carSpeedFixed,verified; clamped >= 0; also in game_flow
+global,D:28AA,steer,long 16.16 deg,DS:0914,drive_sim,,verified; unclamped
+global,D:28AE,road_pos,long 16.16 units,DS:0906,drive_sim,,verified; 0x1E0000 at stage start; also DOS DS:0912 sub_unit; also in game_flow
+global,D:28B6,advance,long 16.16 units,,drive_sim,,verified; speed >> 6 per frame
+global,D:28BA,r_road_pos,s32,DS:186F,drive_scene,,verified; snapshot of D:28AE
+global,D:28C6,heading,long 16.16 deg,,drive_sim,,verified; 0..359
+global,D:28CA,pitch_acc,long,,drive_sim,,verified; only cleared
+global,D:28CE,road_pos_done,long,DS:0908,drive_sim,,verified; -1 = none
+global,D:28D6,drawer_frames,u32,,drive_scene,game_flow:g_drawnFrames,verified; write-only; also in game_flow
+global,D:28DA,needle_shape,ptr,,drive_scene,,verified
+global,D:28DE,needle_rp,RastPort*,,drive_scene,,verified
+global,D:28E2,needle_bm,BitMap*,,drive_scene,,verified
+global,D:28E6,drawer_stack,ptr,,drive_scene,game_flow:g_drawerStack,verified; also in game_flow
+global,D:28EA,drawer_task,Task*,,drive_scene,game_flow:g_drawerTask,verified; also in game_flow
+global,D:28EE,ConsoleDevice,ptr,,platform_video,,
+global,D:28F2,IconBase,ptr,,platform_video,,
+global,D:28F6,knob_seg,u16[4],,drive_scene,,verified
+global,D:28FE,rasinfoA,RasInfo,,platform_video,,
+global,D:290A,rasinfoB,RasInfo,,platform_video,,
+global,D:2916,g_sheetRasA,struct RasInfo,,title_select,,verified; BitMap &D:2F7E
+global,D:2922,g_sheetRasB,struct RasInfo,,title_select,,verified; BitMap &D:2FA6
+global,D:292E,sprite_next_word,u16[8],,drive_scene,,verified
+global,D:293E,g_viewA,struct View (0x12),,title_select,,verified; ViewPort &D:2E8E
+global,D:2950,g_viewB,struct View (0x12),,title_select,,verified; ViewPort &D:2EB6
+global,D:2E12,vbl_irq,Interrupt,,platform_video,,Ticks VBLInt
+global,D:2E28,song_name,char[],,platform_audio,,verified
+global,D:2E46,sprite_data,u16*[8],,drive_scene,,verified
+global,D:2E66,g_carNames,char *[],DS:78F2,game_flow,,car path stems; also in title_select
+global,D:2E8E,g_vpA,struct ViewPort (0x28),,title_select,,verified; Next/DHeight D:2EA8/DxOffset D:2EAA/DyOffset D:2EAC; RasInfo D:28FE -> BitMap D:2EDE
+global,D:2EA8,g_vpA_DHeight,int,,title_select,,verified; 200; 0x58 in the showroom
+global,D:2EAA,g_vpA_DxOffset,int,,title_select,,verified; -x during drive-offs
+global,D:2EAC,g_vpA_DyOffset,int,,title_select,,verified; logo drop y+0xA0
+global,D:2EB6,g_vpB,struct ViewPort (0x28),,title_select,,verified; Next/DHeight D:2ED0/DxOffset D:2ED2/DyOffset D:2ED4; RasInfo D:290A -> BitMap D:2F06
+global,D:2ED0,g_vpB_DHeight,int,,title_select,,verified
+global,D:2ED2,g_vpB_DxOffset,int,,title_select,,verified
+global,D:2ED4,g_vpB_DyOffset,int,,title_select,,verified
+global,D:2EDE,g_bitmapA,struct BitMap (0x28),,title_select,,verified; 320x200x5; planes D:2EE6[5]
+global,D:2F06,g_bitmapB,struct BitMap (0x28),,title_select,,verified; 320x200x5; planes D:2F0E[5]; ScrollRaster target in 0x1B62E
+global,D:2F2E,g_sheetVpA,struct ViewPort (0x28),,title_select,,verified; hires 640x111 DyOffset 0x59 Modes 0x8000
+global,D:2F56,g_sheetVpB,struct ViewPort (0x28),,title_select,,verified
+global,D:2F7E,g_sheetBmA,struct BitMap (0x28),,title_select,,verified; 640x111x2; planes D:2F86[2] 0x22B0 bytes
+global,D:2FA6,g_sheetBmB,struct BitMap (0x28),,title_select,,verified; planes D:2FAE[2]
+global,D:2FCE,cmp2_palette,u16[32],,platform_video,game_flow:g_cmp2Colors,; also in game_flow
+global,D:300E,g_stCache,void *[20],,title_select,,verified; <car>.ST per car
+global,D:305E,g_sbCache,void *[20],,title_select,,verified; <car>.SB per car
+global,D:30AE,g_rpA,struct RastPort (0x64),,title_select,,verified; on bitmap A
+global,D:3112,g_rpB,struct RastPort (0x64),,title_select,,verified; on bitmap B
+global,D:3176,g_resultsRastPort,struct RastPort,,game_flow,,on the 320x24x1 results bitmap
+global,D:31DA,g_sheetRpA,struct RastPort,,title_select,,verified; set up in 0x1BA7C; unused in overlay 1
+global,D:323E,g_sheetRpB,struct RastPort,,title_select,,verified; unused in overlay 1
