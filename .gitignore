@@ -1,4 +1,5 @@
 # Original game and third-party tools (not redistributable / downloaded)
+*.adf
 /Game/
 /DOSBOX/
 /_tools/
