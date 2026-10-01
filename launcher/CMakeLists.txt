@@ -24,6 +24,7 @@ endif()
 add_executable(tdlauncher WIN32
     app.cpp
     icon.cpp
+    keys.cpp
     launcher.cpp
     settings.cpp
     versions.cpp

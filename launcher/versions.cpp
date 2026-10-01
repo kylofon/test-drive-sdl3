@@ -62,6 +62,7 @@ bool Launch(const Version& v, const LaunchOptions& o, wxString& error) {
     }
     if (v.monitor && !o.monitor.empty()) args.insert(args.end(), {"--monitor", o.monitor});
     if (v.originalBugs && o.originalBugs) args.push_back("--original-bugs");
+    if (!o.keys.empty()) args.insert(args.end(), {"--keys", o.keys});
 
     std::vector<std::wstring> wide;
     for (const wxString& a : args) wide.push_back(a.ToStdWstring());

@@ -5,12 +5,16 @@
 #include <wx/button.h>
 #include <wx/checkbox.h>
 #include <wx/choice.h>
+#include <wx/dialog.h>
 #include <wx/dirdlg.h>
 #include <wx/filename.h>
 #include <wx/hyperlink.h>
+#include <wx/menu.h>
 #include <wx/msgdlg.h>
+#include <wx/panel.h>
 #include <wx/radiobut.h>
 #include <wx/settings.h>
+#include <wx/simplebook.h>
 #include <wx/sizer.h>
 #include <wx/spinctrl.h>
 #include <wx/statbmp.h>
@@ -34,6 +38,9 @@ namespace {
 const char* const WEBSITE = "https://kkania.com";
 const char* const SOURCE = "https://github.com/kylofon/test-drive-sdl3";
 const char* const SUPPORT = "https://buymeacoffee.com/krzysztofkania";
+
+const int ID_KEY_BINDINGS = wxID_HIGHEST + 1, ID_ABOUT = wxID_HIGHEST + 2;
+enum Page { PAGE_MAIN, PAGE_KEYS };
 
 const int MIN_SCALE = 1, MAX_SCALE = 6, DEFAULT_SCALE = 3;
 const int DEFAULT_FRAME_RATE = 8;
@@ -65,14 +72,65 @@ wxStaticText* GreyText(wxWindow* parent, const wxString& text = wxEmptyString) {
 
 }  // namespace
 
-LauncherDialog::LauncherDialog()
-    : wxDialog(nullptr, wxID_ANY, APP_TITLE, wxDefaultPosition, wxDefaultSize,
-               wxDEFAULT_DIALOG_STYLE | wxMINIMIZE_BOX) {
+LauncherFrame::LauncherFrame()
+    : wxFrame(nullptr, wxID_ANY, APP_TITLE, wxDefaultPosition, wxDefaultSize,
+              wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)) {
     SetIcons(AppIcons());
+    topmost_ = settings::GetInt("Preferences", "AlwaysOnTop", 0) != 0;
+    if (topmost_) SetWindowStyleFlag(GetWindowStyleFlag() | wxSTAY_ON_TOP);
+    bindings_ = keys::Load();
+    edited_ = bindings_;
+
+    // The launcher and, in its place while it is open, Key Bindings.
+    book_ = new wxSimplebook(this);
+    book_->AddPage(CreateMainPage(book_), "Game");
+    book_->AddPage(CreateKeysPage(book_), "Key Bindings");
+    auto* all = new wxBoxSizer(wxVERTICAL);
+    all->Add(book_, 1, wxEXPAND);
+    SetSizer(all);
+    CreateMenus();
+
+    // Settings from the last run.
+    for (Family f : {Family::Dos, Family::Amiga}) FolderOf(f) = settings::GetString("Launcher", FolderKey(f), "");
+    scale_->SetSelection(
+        wxMax(MIN_SCALE, wxMin(MAX_SCALE, settings::GetInt("Launcher", "Scale", DEFAULT_SCALE))) - MIN_SCALE);
+    frameRate_->SetValue(settings::GetInt("Launcher", "FrameRate", DEFAULT_FRAME_RATE));
+    biosKeys_->SetValue(settings::GetInt("Launcher", "BiosKeys", 0) != 0);
+    originalBugs_->SetValue(settings::GetInt("Launcher", "OriginalBugs", 0) != 0);
+    const wxString monitor = settings::GetString("Launcher", "Monitor", MONITORS[0]);
+    monitor_->SetSelection(0);
+    for (int i = 0; i < 3; ++i)
+        if (monitor == MONITORS[i]) monitor_->SetSelection(i);
+    const wxString key = settings::GetString("Launcher", "Version", VERSIONS[0].key);
+    for (size_t i = 0; i < VERSIONS.size(); ++i)
+        if (key == VERSIONS[i].key) selected_ = i;
+    for (Family f : {Family::Dos, Family::Amiga})
+        if (FolderOf(f).empty()) FolderOf(f) = DefaultGameDir(f);
+    radios_[selected_]->SetValue(true);
+    folder_->ChangeValue(FolderOf(Selected().family));
+    ShowEditedKeys();
+    loading_ = false;
+    UpdateState();
+
+    Bind(wxEVT_ACTIVATE, [this](wxActivateEvent& event) {
+        if (event.GetActive()) UpdateState();  // files may have been copied in meanwhile
+        event.Skip();
+    });
+    Bind(wxEVT_CLOSE_WINDOW, [this](wxCloseEvent&) {
+        Save();
+        Destroy();
+    });
+
+    FitPage();
+    if (!settings::RestoreWindowPosition("Launcher", this)) Centre();
+}
+
+wxWindow* LauncherFrame::CreateMainPage(wxWindow* parent) {
+    auto* page = new wxPanel(parent);
     const int margin = FromDIP(12), gap = FromDIP(8), small = FromDIP(4);
 
     // Version
-    auto* versionBox = new wxStaticBoxSizer(wxVERTICAL, this, "Version");
+    auto* versionBox = new wxStaticBoxSizer(wxVERTICAL, page, "Version");
     wxWindow* vb = versionBox->GetStaticBox();
     auto* versionGrid = new wxFlexGridSizer(2, small, FromDIP(16));
     for (size_t i = 0; i < VERSIONS.size(); ++i) {
@@ -88,7 +146,7 @@ LauncherDialog::LauncherDialog()
     versionBox->Add(versionGrid, 0, wxALL, gap);
 
     // Game files
-    auto* folderBox = new wxStaticBoxSizer(wxVERTICAL, this, "Game files");
+    auto* folderBox = new wxStaticBoxSizer(wxVERTICAL, page, "Game files");
     wxWindow* fb = folderBox->GetStaticBox();
     auto* folderRow = new wxBoxSizer(wxHORIZONTAL);
     auto* folderLabel = new wxStaticText(fb, wxID_ANY, "&Folder:");
@@ -113,7 +171,7 @@ LauncherDialog::LauncherDialog()
     browse->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { Browse(); });
 
     // Options
-    auto* optionsBox = new wxStaticBoxSizer(wxVERTICAL, this, "Options");
+    auto* optionsBox = new wxStaticBoxSizer(wxVERTICAL, page, "Options");
     wxWindow* ob = optionsBox->GetStaticBox();
     auto* grid = new wxFlexGridSizer(2, gap, gap);
     grid->Add(new wxStaticText(ob, wxID_ANY, "Window &size:"), 0, wxALIGN_CENTER_VERTICAL);
@@ -156,16 +214,12 @@ LauncherDialog::LauncherDialog()
 
     // Buttons
     auto* buttons = new wxBoxSizer(wxHORIZONTAL);
-    auto* about = new wxButton(this, wxID_ABOUT, "&About");
-    play_ = new wxButton(this, wxID_ANY, "&Play");
-    auto* close = new wxButton(this, wxID_CLOSE, "Close");
-    buttons->Add(about);
+    play_ = new wxButton(page, wxID_ANY, "&Play");
+    auto* close = new wxButton(page, wxID_CLOSE, "Close");
     buttons->AddStretchSpacer();
     buttons->Add(play_, 0, wxRIGHT, gap);
     buttons->Add(close);
     play_->SetDefault();
-    SetEscapeId(wxID_CLOSE);
-    about->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { About(); });
     play_->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { Play(); });
     close->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { Close(); });
 
@@ -174,43 +228,125 @@ LauncherDialog::LauncherDialog()
     all->Add(folderBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
     all->Add(optionsBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
     all->Add(buttons, 0, wxEXPAND | wxALL, margin);
-    SetSizer(all);
-
-    // Settings from the last run.
-    for (Family f : {Family::Dos, Family::Amiga}) FolderOf(f) = settings::GetString("Launcher", FolderKey(f), "");
-    scale_->SetSelection(
-        wxMax(MIN_SCALE, wxMin(MAX_SCALE, settings::GetInt("Launcher", "Scale", DEFAULT_SCALE))) - MIN_SCALE);
-    frameRate_->SetValue(settings::GetInt("Launcher", "FrameRate", DEFAULT_FRAME_RATE));
-    biosKeys_->SetValue(settings::GetInt("Launcher", "BiosKeys", 0) != 0);
-    originalBugs_->SetValue(settings::GetInt("Launcher", "OriginalBugs", 0) != 0);
-    const wxString monitor = settings::GetString("Launcher", "Monitor", MONITORS[0]);
-    monitor_->SetSelection(0);
-    for (int i = 0; i < 3; ++i)
-        if (monitor == MONITORS[i]) monitor_->SetSelection(i);
-    const wxString key = settings::GetString("Launcher", "Version", VERSIONS[0].key);
-    for (size_t i = 0; i < VERSIONS.size(); ++i)
-        if (key == VERSIONS[i].key) selected_ = i;
-    for (Family f : {Family::Dos, Family::Amiga})
-        if (FolderOf(f).empty()) FolderOf(f) = DefaultGameDir(f);
-    radios_[selected_]->SetValue(true);
-    folder_->ChangeValue(FolderOf(Selected().family));
-    loading_ = false;
-    UpdateState();
-
-    Bind(wxEVT_ACTIVATE, [this](wxActivateEvent& event) {
-        if (event.GetActive()) UpdateState();  // files may have been copied in meanwhile
-        event.Skip();
-    });
-    Bind(wxEVT_CLOSE_WINDOW, [this](wxCloseEvent&) {
-        Save();
-        Destroy();
-    });
-
-    Fit();
-    if (!settings::RestoreWindowPosition("Launcher", this)) Centre();
+    page->SetSizer(all);
+    return page;
 }
 
-void LauncherDialog::Select(size_t index) {
+wxWindow* LauncherFrame::CreateKeysPage(wxWindow* parent) {
+    auto* page = new wxPanel(parent);
+    const int margin = FromDIP(12), gap = FromDIP(8), small = FromDIP(4);
+
+    auto* intro = GreyText(page, "The menus and the name entry keep the game's own keys. Actions marked DOS or "
+                                 "Amiga are only in those versions.");
+
+    // A box per group with a label, a key button and the versions of each action. Driving shares its column
+    // with the keys that can't be changed.
+    wxStaticBoxSizer* boxes[keys::GROUP_COUNT];
+    wxFlexGridSizer* grids[keys::GROUP_COUNT];
+    for (int g = 0; g < keys::GROUP_COUNT; ++g) {
+        boxes[g] = new wxStaticBoxSizer(wxVERTICAL, page, keys::GROUP_TITLES[g]);
+        grids[g] = new wxFlexGridSizer(3, small, gap);
+        grids[g]->AddGrowableCol(1);
+        boxes[g]->Add(grids[g], 0, wxEXPAND | wxALL, gap);
+    }
+    for (int i = 0; i < keys::ACTION_COUNT; ++i) {
+        const keys::Action& a = keys::ACTIONS[i];
+        wxWindow* box = boxes[a.group]->GetStaticBox();
+        grids[a.group]->Add(new wxStaticText(box, wxID_ANY, a.label), 0, wxALIGN_CENTER_VERTICAL);
+        auto* button = new wxButton(box, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(FromDIP(120), -1));
+        button->Bind(wxEVT_BUTTON, [this, i](wxCommandEvent&) { ChangeKey(i); });
+        grids[a.group]->Add(button, 0, wxEXPAND);
+        grids[a.group]->Add(GreyText(box, keys::VersionsNote(a.versions)), 0, wxALIGN_CENTER_VERTICAL);
+        keyButtons_.push_back(button);
+    }
+    auto* fixedBox = new wxStaticBoxSizer(wxVERTICAL, page, "Keys that keep their job");
+    wxWindow* xb = fixedBox->GetStaticBox();
+    auto* fixedGrid = new wxFlexGridSizer(2, small, FromDIP(16));
+    for (int i = 0; i < keys::FIXED_COUNT; ++i) {
+        fixedGrid->Add(new wxStaticText(xb, wxID_ANY, keys::FIXED[i].keys));
+        fixedGrid->Add(GreyText(xb, keys::FIXED[i].what));
+    }
+    fixedBox->Add(fixedGrid, 0, wxALL, gap);
+
+    auto* first = new wxBoxSizer(wxVERTICAL);
+    first->Add(boxes[keys::DRIVING], 0, wxEXPAND);
+    first->Add(fixedBox, 0, wxEXPAND | wxTOP, margin);
+    auto* columns = new wxBoxSizer(wxHORIZONTAL);
+    columns->Add(first, 0, wxEXPAND);
+    columns->Add(boxes[keys::GAME], 0, wxEXPAND | wxLEFT, margin);
+
+    auto* buttons = new wxBoxSizer(wxHORIZONTAL);
+    auto* defaults = new wxButton(page, wxID_ANY, "&Default");
+    defaults->SetToolTip("Put every key back as the game has it.");
+    auto* apply = new wxButton(page, wxID_APPLY, "&Apply");
+    apply->SetToolTip("Keep these keys and go back.");
+    auto* cancel = new wxButton(page, wxID_CANCEL, "Cancel");
+    cancel->SetToolTip("Go back without changing the keys.");
+    buttons->Add(defaults);
+    buttons->AddStretchSpacer();
+    buttons->Add(apply, 0, wxRIGHT, gap);
+    buttons->Add(cancel);
+    defaults->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
+        edited_ = keys::Defaults();
+        ShowEditedKeys();
+    });
+    apply->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
+        bindings_ = edited_;
+        keys::Save(bindings_);
+        CloseKeys();
+    });
+    cancel->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { CloseKeys(); });
+
+    auto* all = new wxBoxSizer(wxVERTICAL);
+    all->Add(intro, 0, wxLEFT | wxRIGHT | wxTOP, margin);
+    all->Add(columns, 1, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
+    all->Add(buttons, 0, wxEXPAND | wxALL, margin);
+    page->SetSizer(all);
+    return page;
+}
+
+void LauncherFrame::CreateMenus() {
+    auto* file = new wxMenu;
+    file->Append(wxID_PREFERENCES, wxString::FromUTF8("&Preferences…"));
+    file->AppendSeparator();
+    file->Append(wxID_EXIT, "E&xit\tAlt+F4");
+    auto* settingsMenu = new wxMenu;
+    settingsMenu->Append(ID_KEY_BINDINGS, wxString::FromUTF8("&Key Bindings…"));
+
+    auto* bar = new wxMenuBar;
+    bar->Append(file, "&File");
+    bar->Append(settingsMenu, "&Game settings");
+#ifndef __WXMSW__
+    auto* about = new wxMenu;
+    about->Append(ID_ABOUT, wxString::FromUTF8("&About ") + APP_TITLE + wxString::FromUTF8("…"));
+    bar->Append(about, "A&bout");
+#endif
+    SetMenuBar(bar);
+#ifdef __WXMSW__
+    // A top-level About item that acts straight away, which wxWidgets menus
+    // can't express; MSWWindowProc handles its command.
+    const HMENU native = static_cast<HMENU>(bar->GetHMenu());
+    AppendMenuW(native, MF_STRING, ID_ABOUT, L"A&bout");
+    DrawMenuBar(static_cast<HWND>(GetHWND()));
+#endif
+
+    Bind(wxEVT_MENU, [this](wxCommandEvent&) { Close(); }, wxID_EXIT);
+    Bind(wxEVT_MENU, [this](wxCommandEvent&) { Preferences(); }, wxID_PREFERENCES);
+    Bind(wxEVT_MENU, [this](wxCommandEvent&) { OpenKeys(); }, ID_KEY_BINDINGS);
+    Bind(wxEVT_MENU, [this](wxCommandEvent&) { About(); }, ID_ABOUT);
+}
+
+#ifdef __WXMSW__
+WXLRESULT LauncherFrame::MSWWindowProc(WXUINT msg, WXWPARAM wParam, WXLPARAM lParam) {
+    if (msg == WM_COMMAND && LOWORD(wParam) == ID_ABOUT && lParam == 0) {
+        CallAfter([this] { About(); });
+        return 0;
+    }
+    return wxFrame::MSWWindowProc(msg, wParam, lParam);
+}
+#endif
+
+void LauncherFrame::Select(size_t index) {
     const Family was = Selected().family;
     selected_ = index;
     radios_[index]->SetValue(true);
@@ -222,7 +358,7 @@ void LauncherDialog::Select(size_t index) {
     UpdateState();
 }
 
-void LauncherDialog::UpdateState() {
+void LauncherFrame::UpdateState() {
     bool any = false;
     for (size_t i = 0; i < VERSIONS.size(); ++i) {
         const bool installed = PortInstalled(VERSIONS[i]);
@@ -259,16 +395,16 @@ void LauncherDialog::UpdateState() {
     monitorLabel_->Enable(v.monitor);
     monitor_->Enable(v.monitor);
     play_->Enable(any && found);
-    Layout();
+    play_->GetParent()->Layout();
 }
 
-void LauncherDialog::Browse() {
+void LauncherFrame::Browse() {
     wxDirDialog dialog(this, "Choose the folder with the game's files", folder_->GetValue(),
                        wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if (dialog.ShowModal() == wxID_OK) folder_->SetValue(dialog.GetPath());  // raises wxEVT_TEXT
 }
 
-void LauncherDialog::Play() {
+void LauncherFrame::Play() {
     Save();
     LaunchOptions options;
     options.gameDir = wxFileName(folder_->GetValue()).GetFullPath();
@@ -277,6 +413,7 @@ void LauncherDialog::Play() {
     options.biosKeys = biosKeys_->GetValue();
     options.originalBugs = originalBugs_->GetValue();
     options.monitor = MONITORS[wxMax(0, monitor_->GetSelection())];
+    options.keys = keys::Argument(bindings_, Selected().family == Family::Dos ? keys::DOS : keys::AMIGA);
     wxString error;
     if (!Launch(Selected(), options, error)) {
         wxMessageBox(error, APP_TITLE, wxOK | wxICON_ERROR, this);
@@ -285,7 +422,7 @@ void LauncherDialog::Play() {
     Close();
 }
 
-void LauncherDialog::Save() {
+void LauncherFrame::Save() {
     settings::SetString("Launcher", "Version", Selected().key);
     // A folder left at its default is stored empty, so it follows the launcher if it moves.
     for (Family f : {Family::Dos, Family::Amiga}) {
@@ -301,7 +438,93 @@ void LauncherDialog::Save() {
     settings::SaveWindowPosition("Launcher", this);
 }
 
-void LauncherDialog::About() {
+void LauncherFrame::Preferences() {
+    wxDialog dialog(this, wxID_ANY, "Preferences");
+    auto* all = new wxBoxSizer(wxVERTICAL);
+    auto* topmost = new wxCheckBox(&dialog, wxID_ANY, "Always on &top");
+    topmost->SetValue(topmost_);
+    topmost->SetToolTip("Keep the launcher above other windows.");
+    all->Add(topmost, 0, wxALL, dialog.FromDIP(12));
+    all->Add(dialog.CreateStdDialogButtonSizer(wxOK | wxCANCEL), 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM,
+             dialog.FromDIP(12));
+    dialog.SetSizerAndFit(all);
+    dialog.SetMinSize(wxSize(dialog.FromDIP(300), -1));
+    dialog.Fit();
+    dialog.CentreOnParent();
+    topmost->SetFocus();
+    if (dialog.ShowModal() != wxID_OK) return;
+    if (topmost->GetValue() != topmost_) SetTopmost(topmost->GetValue());
+}
+
+void LauncherFrame::SetTopmost(bool on) {
+    topmost_ = on;
+    const long style = GetWindowStyleFlag();
+    SetWindowStyleFlag(on ? style | wxSTAY_ON_TOP : style & ~wxSTAY_ON_TOP);
+    settings::SetInt("Preferences", "AlwaysOnTop", on ? 1 : 0);
+}
+
+// The window takes the size of the page shown (the book on its own would take the largest page's).
+void LauncherFrame::FitPage() {
+    SetClientSize(book_->GetCurrentPage()->GetBestSize());
+}
+
+void LauncherFrame::OpenKeys() {
+    if (book_->GetSelection() == PAGE_KEYS) return;
+    edited_ = bindings_;
+    ShowEditedKeys();
+    book_->ChangeSelection(PAGE_KEYS);
+    FitPage();
+    GetMenuBar()->Enable(ID_KEY_BINDINGS, false);
+    SetDefaultItem(book_->GetPage(PAGE_KEYS)->FindWindow(wxID_APPLY));
+    keyButtons_.front()->SetFocus();
+}
+
+void LauncherFrame::CloseKeys() {
+    book_->ChangeSelection(PAGE_MAIN);
+    FitPage();
+    GetMenuBar()->Enable(ID_KEY_BINDINGS, true);
+    SetDefaultItem(play_);
+    UpdateState();
+    play_->SetFocus();
+}
+
+void LauncherFrame::ShowEditedKeys() {
+    for (int i = 0; i < keys::ACTION_COUNT; ++i) {
+        const wxString name = keys::Name(edited_[i]);
+        // Buttons treat '&' as a mnemonic marker.
+        wxString label = name;
+        label.Replace("&", "&&");
+        keyButtons_[i]->SetLabel(label);
+        keyButtons_[i]->SetToolTip(wxString::Format("%s: %s. Click to change it.", keys::ACTIONS[i].label, name));
+        // A key that differs from the game's own stands out.
+        wxFont font = keyButtons_[i]->GetParent()->GetFont();
+        if (edited_[i] != keys::ACTIONS[i].def) font.MakeBold();
+        keyButtons_[i]->SetFont(font);
+    }
+    book_->GetPage(PAGE_KEYS)->Layout();
+}
+
+void LauncherFrame::ChangeKey(int action) {
+    const keys::Action& a = keys::ACTIONS[action];
+    const int key = keys::AskKey(this, a.label);
+    if (key < 0 || key == edited_[action]) return;
+    if (key != 0) {
+        // Actions of different versions can share a key.
+        for (int other = 0; other < keys::ACTION_COUNT; ++other) {
+            const keys::Action& o = keys::ACTIONS[other];
+            if (other == action || edited_[other] != key || !(o.versions & a.versions)) continue;
+            const wxString question = wxString::Format(
+                "%s is already the key for %s.\n\nUse it for %s instead? %s will have no key.", keys::Name(key),
+                o.label, a.label, o.label);
+            if (wxMessageBox(question, "Key Bindings", wxYES_NO | wxICON_QUESTION, this) != wxYES) return;
+            edited_[other] = 0;
+        }
+    }
+    edited_[action] = key;
+    ShowEditedKeys();
+}
+
+void LauncherFrame::About() {
     const wxString title = wxString("About ") + APP_TITLE;
     const wxString heading = wxString(APP_TITLE) + " " + APP_VERSION_TEXT;
     const wxString blurb = "The launcher for the SDL3 port of Test Drive (1987).";

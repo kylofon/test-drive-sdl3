@@ -47,7 +47,8 @@ u8   host_kbd_shift_flags(void); /* AH=02h: bit0 right shift, bit1 left shift, b
 void host_set_held_keys(bool on);
 bool host_held_keys(void);
 /* True while the key with this XT scan code is down. Supports A (0x1E), Z (0x2C) and the cursor /
- * keypad block 0x47..0x51 (arrows and keypad digits both count). */
+ * keypad block 0x47..0x51 (arrows and keypad digits both count). While driving, A, Z and the arrows are the
+ * keys bound to their actions (keybind.h). */
 bool host_xt_key_down(u8 xt_scan);
 
 /* ---- Joystick: first connected gamepad. Axes -32768..32767, buttons bit0 = A, bit1 = B. */

@@ -1,10 +1,12 @@
 /* Test Drive (1987), Amiga release — SDL3 port, entry point.
  *
- * usage: tdport-amiga [--game-dir DIR] [--scale N] [--original-bugs] [--check]
+ * usage: tdport-amiga [--game-dir DIR] [--scale N] [--original-bugs] [--keys NAME=CODE,...] [--check]
  *   --game-dir       the Amiga disk image (.adf), a folder holding it, or a folder with the files of the disk
  *                    (td, Cars/, Pics/, ...); default: "Game Amiga" next to the working directory
  *   --scale          initial window scale (default 3)
  *   --original-bugs  keep the original's bugs instead of the port's fixes (port/amiga/README.md)
+ *   --keys           key bindings while driving, "name=code,..." for the actions not on their default keys (the
+ *                    launcher's Game settings > Key Bindings; ../keybind.c)
  *   --check          load and verify td, unpack every Pckd file of the disk, print a summary and exit (no window)
  */
 #define SDL_MAIN_HANDLED
@@ -19,6 +21,7 @@
 #include "amem.h"
 #include "aport.h"
 #include "asymbols.h"
+#include "../keybind.h"
 #include "platform/platform.h"
 
 bool g_original_bugs;
@@ -80,13 +83,21 @@ int main(int argc, char **argv)
     const char *dir = "Game Amiga";
     int scale = 3;
     bool check_only = false;
+    kb_init(KB_AMIGA);
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "--game-dir") && i + 1 < argc) dir = argv[++i];
         else if (!strcmp(argv[i], "--scale") && i + 1 < argc) scale = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--original-bugs")) g_original_bugs = true;
         else if (!strcmp(argv[i], "--check")) check_only = true;
+        else if (!strcmp(argv[i], "--keys") && i + 1 < argc) {
+            if (!kb_parse(argv[++i])) {
+                fprintf(stderr, "bad --keys list: %s\n", argv[i]);
+                return 2;
+            }
+        }
         else {
-            fprintf(stderr, "usage: %s [--game-dir DIR] [--scale N] [--original-bugs] [--check]\n", argv[0]);
+            fprintf(stderr, "usage: %s [--game-dir DIR] [--scale N] [--original-bugs] [--keys NAME=CODE,...] [--check]\n",
+                    argv[0]);
             return 2;
         }
     }

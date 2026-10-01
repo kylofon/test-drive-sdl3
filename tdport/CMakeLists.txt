@@ -58,7 +58,8 @@ if(TDPORT_HERCULES)
 endif()
 if(TDPORT_AMIGA)
     file(GLOB_RECURSE TD_AMIGA_SOURCES CONFIGURE_DEPENDS src/amiga/*.c)
-    add_executable(tdport-amiga ${TD_AMIGA_SOURCES})
+    # keybind.c (the key bindings) is shared with the DOS builds.
+    add_executable(tdport-amiga ${TD_AMIGA_SOURCES} src/keybind.c)
     tdport_setup(tdport-amiga)
 endif()
 

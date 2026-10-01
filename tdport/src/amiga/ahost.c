@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../keybind.h"
+
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
@@ -253,6 +255,11 @@ static u16 qualifier(SDL_Keymod m, u8 code)
     return q;
 }
 
+/* The raw key of each hot key's default key (keybind.h; 0 = a driving key or not an Amiga action). */
+static const u8 BINDING_KEYS[KB_COUNT] = {
+    [KB_PAUSE] = 0x19, [KB_GEARBOX] = 0x22, [KB_GATE] = 0x18, [KB_MUSIC] = 0x37, [KB_SOUND] = 0x21,
+};
+
 static void process_events(void)
 {
     SDL_Event ev;
@@ -272,6 +279,16 @@ static void process_events(void)
             u8 code = amiga_raw_key(ev.key.scancode);
             if (code == 0xFF || !key_handler) break;
             u16 q = qualifier(ev.key.mod, code);
+            if (kb_active() && ev.type == SDL_EVENT_KEY_DOWN) {   /* PORT: key bindings while driving */
+                bool drop;
+                int a = kb_lookup((u16)(kb_key(ev.key.scancode) | kb_mods(ev.key.mod)), &drop);
+                if (a >= 0) {
+                    /* the game's own key for a hot key; a driving key is read as the joystick */
+                    if (BINDING_KEYS[a]) key_handler(BINDING_KEYS[a], ev.key.repeat ? IEQUALIFIER_REPEAT : 0);
+                    break;
+                }
+                if (drop) break;
+            }
             if (ev.key.repeat) q |= IEQUALIFIER_REPEAT;
             key_handler(ev.type == SDL_EVENT_KEY_UP ? (u8)(code | 0x80) : code, q);
             break;
@@ -295,11 +312,12 @@ void ahost_joystick(bool *up, bool *down, bool *left, bool *right, bool *fire)
 {
     process_events();
     const bool *ks = SDL_GetKeyboardState(NULL);
-    bool u = ks[SDL_SCANCODE_UP] || ks[SDL_SCANCODE_KP_8] || ks[SDL_SCANCODE_KP_7] || ks[SDL_SCANCODE_KP_9];
-    bool d = ks[SDL_SCANCODE_DOWN] || ks[SDL_SCANCODE_KP_2] || ks[SDL_SCANCODE_KP_1] || ks[SDL_SCANCODE_KP_3];
-    bool l = ks[SDL_SCANCODE_LEFT] || ks[SDL_SCANCODE_KP_4] || ks[SDL_SCANCODE_KP_7] || ks[SDL_SCANCODE_KP_1];
-    bool r = ks[SDL_SCANCODE_RIGHT] || ks[SDL_SCANCODE_KP_6] || ks[SDL_SCANCODE_KP_9] || ks[SDL_SCANCODE_KP_3];
-    bool f = ks[SDL_SCANCODE_SPACE] || ks[SDL_SCANCODE_RCTRL] || ks[SDL_SCANCODE_KP_0];
+    /* The arrows and Space are the keys of their actions (keybind.h); the keypad and Right Ctrl keep their job. */
+    bool u = kb_held(KB_ACCELERATE) || ks[SDL_SCANCODE_KP_8] || ks[SDL_SCANCODE_KP_7] || ks[SDL_SCANCODE_KP_9];
+    bool d = kb_held(KB_BRAKE) || ks[SDL_SCANCODE_KP_2] || ks[SDL_SCANCODE_KP_1] || ks[SDL_SCANCODE_KP_3];
+    bool l = kb_held(KB_STEER_LEFT) || ks[SDL_SCANCODE_KP_4] || ks[SDL_SCANCODE_KP_7] || ks[SDL_SCANCODE_KP_1];
+    bool r = kb_held(KB_STEER_RIGHT) || ks[SDL_SCANCODE_KP_6] || ks[SDL_SCANCODE_KP_9] || ks[SDL_SCANCODE_KP_3];
+    bool f = kb_held(KB_FIRE) || ks[SDL_SCANCODE_RCTRL] || ks[SDL_SCANCODE_KP_0];
     if (gamepad) {
         const s16 dead = 12000;
         s16 ax = SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX);

@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "keybind.h"
+
 #define AUDIO_RATE 44100
 #define AUDIO_AMPLITUDE 5000
 
@@ -258,16 +260,18 @@ bool host_xt_key_down(u8 xt)
      * game maps to fire + direction through the key buffer. */
     bool num = (SDL_GetModState() & SDL_KMOD_NUM) != 0;
 #define KP(sc) (!num && ks[sc])
+    /* PORT: A, Z and the arrows are the keys of their actions (keybind.h); Home, PgUp, End, PgDn and the keypad
+     * keep their job. */
     switch (xt) {
-    case 0x1E: return ks[SDL_SCANCODE_A];
-    case 0x2C: return ks[SDL_SCANCODE_Z];
+    case 0x1E: return kb_held(KB_SHIFT_UP);
+    case 0x2C: return kb_held(KB_SHIFT_DOWN);
     case 0x47: return ks[SDL_SCANCODE_HOME]     || KP(SDL_SCANCODE_KP_7);
-    case 0x48: return ks[SDL_SCANCODE_UP]       || KP(SDL_SCANCODE_KP_8);
+    case 0x48: return kb_held(KB_ACCELERATE)    || KP(SDL_SCANCODE_KP_8);
     case 0x49: return ks[SDL_SCANCODE_PAGEUP]   || KP(SDL_SCANCODE_KP_9);
-    case 0x4B: return ks[SDL_SCANCODE_LEFT]     || KP(SDL_SCANCODE_KP_4);
-    case 0x4D: return ks[SDL_SCANCODE_RIGHT]    || KP(SDL_SCANCODE_KP_6);
+    case 0x4B: return kb_held(KB_STEER_LEFT)    || KP(SDL_SCANCODE_KP_4);
+    case 0x4D: return kb_held(KB_STEER_RIGHT)   || KP(SDL_SCANCODE_KP_6);
     case 0x4F: return ks[SDL_SCANCODE_END]      || KP(SDL_SCANCODE_KP_1);
-    case 0x50: return ks[SDL_SCANCODE_DOWN]     || KP(SDL_SCANCODE_KP_2);
+    case 0x50: return kb_held(KB_BRAKE)         || KP(SDL_SCANCODE_KP_2);
     case 0x51: return ks[SDL_SCANCODE_PAGEDOWN] || KP(SDL_SCANCODE_KP_3);
 #undef KP
     default:   return false;
@@ -343,6 +347,14 @@ static u16 bios_key(SDL_Keycode k, SDL_Scancode sc, SDL_Keymod mod)
     return 0;
 }
 
+/* The BIOS key word of each action's default key (keybind.h; 0 = not a DOS action). */
+static const u16 BINDING_KEYS[KB_COUNT] = {
+    [KB_ACCELERATE] = 0x4800, [KB_BRAKE] = 0x5000, [KB_STEER_LEFT] = 0x4B00, [KB_STEER_RIGHT] = 0x4D00,
+    [KB_SHIFT_UP] = 0x1E61,   [KB_SHIFT_DOWN] = 0x2C7A,
+    [KB_PAUSE] = 0x1970,      [KB_GEARBOX] = 0x2064,   [KB_GATE] = 0x186F,
+    [KB_SOUND_OFF] = 0x1011,  [KB_SOUND_ON] = 0x1F13,  [KB_JOYSTICK] = 0x240A, [KB_KEYBOARD] = 0x250B,
+};
+
 static void process_events(void)
 {
     SDL_Event ev;
@@ -357,6 +369,12 @@ static void process_events(void)
                 if (!ev.key.repeat)
                     SDL_SetWindowFullscreen(window, !(SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN));
                 break;
+            }
+            if (kb_active()) {                      /* PORT: key bindings while driving */
+                bool drop;
+                int a = kb_lookup((u16)(kb_key(ev.key.scancode) | kb_mods(ev.key.mod)), &drop);
+                if (a >= 0) kbd_push(BINDING_KEYS[a]);
+                if (a >= 0 || drop) break;
             }
             u16 key = bios_key(ev.key.key, ev.key.scancode, ev.key.mod);
             if (key) kbd_push(key);

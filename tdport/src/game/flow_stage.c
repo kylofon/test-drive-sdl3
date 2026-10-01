@@ -5,6 +5,7 @@
 
 #include "flow.h"
 #include "../host.h"
+#include "../keybind.h"
 #include "../platform/gfx.h"
 #include "../platform/input.h"
 #include "../platform/res.h"
@@ -231,6 +232,7 @@ int run_stage(void)
     blit_copy_own(far_rd(DGROUP, DS_spr_roof));
 #endif
     DSW(DS_g_stageTime) = 0;
+    kb_set_active(true);                                  /* PORT: key bindings while driving */
     for (;;) {
         host_frame_begin();                               /* PORT: ticks (and the sim ISR) advance here; paced
                                                              to the emulated original frame rate */
@@ -281,6 +283,7 @@ int run_stage(void)
         reset_car_state();
         snd_set_loop(far_make(DGROUP, DS_SONG_INGAME));
     }
+    kb_set_active(false);
     snd_stop_all();
     /* the three descriptors are offsets into the code-segment pool (push cs; push [DS:08B2]) — LIFO */
     gfx_free_buffer(far_make(CODE_SEG, DSW(DS_buf_desc_c)));

@@ -1,74 +1,60 @@
-# Test Drive (1987) — SDL3 port
+# Test Drive (1987) — SDL3
 
-A faithful C reimplementation of the EGA version of Accolade / Distinctive Software's *Test Drive* (1987),
-running natively on SDL3. The CGA and Hercules modes of the original release can be built as separate
-executables. It is not an emulator - the original data is not redistributed, and you need to get it yourself.
+A faithful native port of Accolade / Distinctive Software's *Test Drive* (1987): the DOS release in EGA, CGA and
+Hercules, and the Amiga release. Not an emulator. The original game files are not included.
+
+## Features
+
+* The DOS EGA, CGA and Hercules versions and the Amiga version, each its own executable.
+* The original's 8 fps drawing speed while driving, so timing matches a 1987 PC.
+* Driving keys read while held, not only through key repeat.
+* Key bindings for the driving and game keys.
+* Fixes to crashes and original bugs (see `CHANGELOG.md`; the Amiga bugs can be kept with `--original-bugs`).
+* A launcher to pick the version, game folder, options and keys.
 
 ## How to play (Windows)
 
-You need the files of the original DOS *Test Drive*. They are not included.
-
-1. Open the [latest release](https://github.com/kylofon/test-drive-sdl3/releases/latest) and download
-   `tdport-…-win64.zip` (the one without `cga` or `herc` in its name).
-2. Put your original game files in a folder named `Game`.
-3. Open the zip. Copy everything inside its `tdport` folder into the folder that holds `Game`, so that
-   `tdport.exe` sits next to `Game`:
+1. Put your original DOS game files in a folder named `Game`, and/or the Amiga disk image (`.adf`) in a folder
+   named `Game Amiga`.
+2. Place the program files next to them:
 
    ```text
    Test Drive\
-   ├── Game\             <- your original game files (TDEGA.EXE, CARS.TXT, SCORES, ...)
-   ├── tdport.exe
-   ├── SDL3.dll
-   ├── libiconv-2.dll
-   └── (the other files from the zip)
+   ├── Game\              <- DOS game files (TDEGA.EXE, TDCGA.EXE, CARS.TXT, SCORES, ...)
+   ├── Game Amiga\        <- the Amiga disk image (.adf), or the files from it
+   ├── Test Drive.exe     <- the launcher
+   ├── tdport.exe, tdport-cga.exe, tdport-herc.exe, tdport-amiga.exe
+   └── SDL3.dll and the other DLLs
    ```
 
-4. Double-click `tdport.exe`.
+3. Run `Test Drive.exe`, pick a version and options and press **Play**.
 
-Keep the folder somewhere you can save files, such as Documents or the Desktop, not Program Files. The game
-saves its high scores in `Game`. If Windows says "Windows protected your PC", click **More info**, then
-**Run anyway**. Press Alt+Enter for fullscreen. The keys are listed under [Controls](#controls-from-the-original).
-
-The `cga` and `herc` zips are the CGA and Hercules versions. They work the same way, with `tdport-cga.exe` or
-`tdport-herc.exe`, but need `TDCGA.EXE` and the `*.CMP` files in `Game`.
+* The folder must be writable (high scores are saved in `Game`, and beside the Amiga disk image).
+* If Windows says "Windows protected your PC", click **More info**, then **Run anyway**.
+* Alt+Enter: full screen.
+* Launcher settings: `%APPDATA%\Test Drive Launcher\settings.ini`.
 
 ## Requirements
 
-* Your game files in a folder. The port needs `TDEGA.EXE`, `CARS.TXT`, `SCORES`, `TDSND.SND`, the `*.PES`
-  archives and the car `*.BIN` / `*.SS` files. By default the port looks in `Game` under the working directory.
-  The CGA and Hercules builds need `TDCGA.EXE` and the `*.CMP` archives instead of `TDEGA.EXE` and `*.PES`.
-* CMake 3.24+, a C11 compiler and SDL 3. 
+* EGA: `TDEGA.EXE` and the `*.PES` archives. CGA and Hercules: `TDCGA.EXE` and the `*.CMP` archives. All three
+  also need `CARS.TXT`, `SCORES`, `TDSND.SND` and the car `*.BIN` / `*.SS` files.
+* Amiga: the disk image (`.adf`), or the files extracted from it (`td`, `Cars/`, `Pics/`, ...).
+* To build: CMake 3.24+, C11, SDL 3; the launcher needs C++17 and wxWidgets 3.2.
 
 ## Build
 
-From the repository root, in Git Bash or an MSYS2 MinGW64 shell:
+In Git Bash or an MSYS2 MinGW64 shell:
 
 ```bash
 export PATH="/c/msys64/mingw64/bin:$PATH"
-cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release
+cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release \
+      -DTDPORT_CGA=ON -DTDPORT_HERCULES=ON -DTDPORT_AMIGA=ON -DTDPORT_LAUNCHER=ON
 cmake --build tdport/build
 ```
 
-This builds `tdport.exe` (EGA). The other graphics modes are opt-in CMake options. Each one adds an executable
-that ports `TDCGA.EXE`:
-
-| Option | Executable | Mode |
-|---|---|---|
-| `-DTDPORT_CGA=ON` | `tdport-cga.exe` | CGA, 4 colours (`TD.EXE` menu choice 1) |
-| `-DTDPORT_HERCULES=ON` | `tdport-herc.exe` | Hercules monochrome (`TD.EXE` menu choice 3, `tdcga herc`) |
-| `-DTDPORT_AMIGA=ON` | `tdport-amiga.exe` | The Amiga release (`td`); in progress, see [`port/amiga/README.md`](port/amiga/README.md) |
-| `-DTDPORT_LAUNCHER=ON` | `Test Drive.exe` | The launcher (needs wxWidgets 3.2, see [Launcher](#launcher)) |
-
-```bash
-cmake -S tdport -B tdport/build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release -DTDPORT_CGA=ON -DTDPORT_HERCULES=ON
-cmake --build tdport/build
-```
-
-The build copies `SDL3.dll` next to the executables. The MSYS2 `SDL3.dll` also needs `libiconv-2.dll`, so the
-build copies it from `C:\msys64\mingw64\bin` too. To run the port on another PC, keep both DLLs next to the `.exe`.
-
-In your own build setup, compile the sources with `TD_CGA=1` (CGA) or `TD_CGA=1 TD_HERC=1` (Hercules)
-defined, using `src/platform/gfx_cga.c` instead of `src/platform/gfx.c`.
+* Without options only `tdport.exe` (EGA) is built. `TDPORT_CGA`, `TDPORT_HERCULES`, `TDPORT_AMIGA` and
+  `TDPORT_LAUNCHER` add `tdport-cga.exe`, `tdport-herc.exe`, `tdport-amiga.exe` and `Test Drive.exe`.
+* The MSYS2 `SDL3.dll` also needs `libiconv-2.dll` from `C:\msys64\mingw64\bin`; the build copies both.
 
 ## Run
 
@@ -76,78 +62,37 @@ defined, using `src/platform/gfx_cga.c` instead of `src/platform/gfx.c`.
 ./tdport/build/tdport.exe --game-dir Game
 ```
 
-`tdport-cga.exe` and `tdport-herc.exe` take the same options.
-
 | Option | Meaning |
 |---|---|
-| `--game-dir DIR` | Folder with the original game files (default `Game`) |
-| `--scale N` | Initial window size as a multiple of 320×240 (default 3) |
-| `--frame-rate FPS` | Emulated drawing speed of the original PC while driving (default 8, `0` = unpaced; see below) |
-| `--bios-keys` | Original keyboard behaviour for driving: keys act only through key repeat (see below) |
-| `--check` | Verify that `TDEGA.EXE` (`TDCGA.EXE` for CGA/Hercules) loads, then exit without opening a window |
-| `--monitor COLOUR` | Hercules build only: phosphor colour, `green` (default), `amber` or `white` |
+| `--game-dir DIR` | Game files folder (default `Game`; Amiga: `Game Amiga`, the `.adf` or a folder) |
+| `--scale N` | Window size, × 320×240 (default 3) |
+| `--frame-rate FPS` | Drawing speed while driving (default 8, 0 = unpaced). DOS only |
+| `--bios-keys` | Driving keys only through key repeat, as the original. DOS only |
+| `--monitor COLOUR` | Phosphor colour: `green` (default), `amber` or `white`. Hercules only |
+| `--original-bugs` | Keep the original's bugs instead of the fixes. Amiga only |
+| `--keys NAME=CODE,...` | Key bindings (the launcher's Game settings > Key Bindings) |
+| `--check` | Check that the game executable loads, then exit |
 
-`tdport-amiga.exe` reads the Amiga disk image (`.adf`) directly, or the files extracted from it (`td`, `Cars/`,
-`Pics/`, ...; `tools/adf.py`). `--game-dir` (default `Game Amiga`) is the `.adf` itself, a folder holding it, or
-the folder with the extracted files. It also takes `--scale`, `--check` and `--original-bugs` (keep the
-original's bugs instead of the port's fixes). The whole game is ported: title, car selection, the drive, the gas
-station, results, high scores and the ending. High scores are saved beside the disk image, which is never
-written to.
+## Controls
 
-Alt+Enter toggles fullscreen. The window keeps the 4:3 aspect of the original monitor. The Hercules build
-shows the card's 640×300 picture.
-
-## Launcher
-
-`Test Drive.exe` is a small Windows program for players. You choose a version (EGA, CGA, Hercules or Amiga), the
-game folder, window size, frame rate, keyboard handling, Hercules monitor colour and, for the Amiga, the
-original bugs, then
-**Play**. It starts the matching `tdport` executable from its own folder with those options. Versions whose
-executable isn't there are greyed out. See [`launcher/README.md`](launcher/README.md).
-
-## Third-party content
-
-The Amiga port draws text with a recreation of the Amiga's `topaz.font`, which lives in the Kickstart ROM and
-is not on the game disk:
-
-> The FontStruction "Amiga Topaz" (https://fontstruct.com/fontstructions/show/675155) by Patrick H. Lauke is
-> licensed under a Creative Commons Attribution license (http://creativecommons.org/licenses/by/3.0/).
-
-`tools/gen_font8.py` rasterises it to the 8x8 cells in `tdport/src/amiga/font8.c` (the only change made to it);
-the font archive and its licence are in `licenses/amiga-topaz/`.
-
-## Controls (from the original)
-
-* Arrow keys / numeric keypad: steer, accelerate, brake and shift through the gear gate, as in the original.
-* Esc: quit the current drive or menu.
-* Ctrl-J / Ctrl-K: joystick / keyboard control. A connected gamepad acts as the joystick (left stick or
-  D-pad, A = fire).
-* Ctrl-Q / Ctrl-S: sound off / on.
-
-
-## Changes from original
-
-* **Held-key driving:** arrows / keypad and A / Z are read while held, not only through key repeat
-  (`--bios-keys` restores the original).
-* **Frame rate:** the driving loop is paced to 8 fps, so frame-counted behaviour (gear-shift panel, traffic
-  randomness, crash animation) matches a 1987 PC (`--frame-rate`).
-* **Removed:** copy protection and the TD.EXE launcher password (TDCGA.EXE never asked for it).
-* **Graphics modes:** one executable per mode instead of the `TD.EXE` menu (see Build).
-* **Missing SCORES:** starts with an empty table instead of exiting.
-* **Extended-ASCII keys:** ignored instead of crashing.
+* Arrows / keypad: steer, gas, brake and shift through the gear gate.
+* A / Z: shift up / down (DOS). Space: fire, held to shift with Up / Down (Amiga).
+* P pause, D gear box always shown, O gate shifting with the joystick. Esc: leave.
+* Ctrl-J joystick, Ctrl-K keyboard, Ctrl-Q / Ctrl-S sound off / on (DOS). M music, S sound effects (Amiga).
+* A gamepad acts as the joystick (left stick or D-pad, A = fire).
+* The launcher's Game settings > Key Bindings changes the driving and game keys.
 
 ## Layout
 
-See `tdport/PORTING.md` for the architecture and porting rules. In short:
-* `tdport/src/mem.*` emulates the real-mode address space the game ran in.
-* `tdport/src/host.*` wraps SDL3.
-* `tdport/src/platform/` holds the graphics layers (EGA `gfx.c`, CGA/Hercules `gfx_cga.c`), timer/sound,
-  input and resource layers.
-* `tdport/src/game/` holds game flow, scene rendering and simulation, shared by all builds.
-* `launcher/` holds the wxWidgets launcher.
+* `tdport/src/` — the DOS port (`tdport/PORTING.md`); `tdport/src/amiga/` — the Amiga port.
+* `launcher/` — the launcher (`launcher/README.md`).
+* `port/`, `tools/`, `FORMATS.md` — reverse-engineering specs, tools and file formats (`port/amiga/README.md`
+  for the Amiga release).
 
-Reverse-engineering tools, specs and file formats are in `tools/`, `port/` and `FORMATS.md`. `port/cga/`
-documents TDCGA.EXE and how it differs from TDEGA.EXE.
+## License
+
+MIT (`LICENSE`). The Amiga text uses the CC BY "Amiga Topaz" font by Patrick H. Lauke (`licenses/amiga-topaz/`).
+*Test Drive* is © Accolade; its files are not included.
 
 ## Support
 

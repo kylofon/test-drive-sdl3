@@ -13,6 +13,7 @@
 #include "../ahost.h"
 #include "../amem.h"
 #include "../asymbols.h"
+#include "../../keybind.h"
 #include "../paula.h"
 #include "../platform/audio.h"
 #include "../platform/blit.h"
@@ -142,7 +143,9 @@ GAME:
     SETD32(D_g_totalScore, 0);
     SETD16(D_g_inGame, 1);
     SETD16(D_g_selectedCar, D16(D_demo_mode) ? -1 : car);
+    kb_set_active(true);                                /* PORT: key bindings while driving */
     r = run_game(car);
+    kb_set_active(false);
     SETD16(D_g_inGame, 0);
     /* overlay_unload(stub 0x1C900): nothing to do */
     if (quit_requested()) goto EXIT;

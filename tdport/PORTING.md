@@ -22,7 +22,8 @@ game/scene*.c       scene_render spec: projection, road/object drawing, cockpit,
 game/sim*.c         simulation spec: stage setup 0x4792, driving ISR 0x3B1F and everything it runs (sim agent)
 ```
 
-Only `host.c` and `main.c` include SDL. Game and platform code talks to the host through `host.h`.
+Only `host.c`, `main.c` and `keybind.c` (the key bindings, shared with the Amiga host) include SDL. Game and
+platform code talks to the host through `host.h`.
 
 ## Build variants (`build.h`)
 

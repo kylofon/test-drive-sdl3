@@ -45,6 +45,7 @@ struct LaunchOptions {
     bool biosKeys = false;  // --bios-keys
     wxString monitor;       // --monitor: green, amber or white
     bool originalBugs = false;  // --original-bugs: keep the original's bugs
+    wxString keys;          // --keys: the key bindings not on their defaults (keys.h), empty for none
 };
 
 // Starts the version from the launcher's folder. On failure returns false and
