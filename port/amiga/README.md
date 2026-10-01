@@ -246,7 +246,9 @@ Amiga text is not in this dump. Deferred: to be decided later.
    12 Hz and the results' frames/12 are real seconds) and the NTSC Paula clock 3579545 Hz (the game's own
    constant 0x369E99). The evidence: frames/12 shown as seconds, the NTSC Paula constant, the per-tick
    torque/drag constants equal to DOS's (12.5 Hz), 200 lines being the NTSC full height, an American developer.
-   `dos.library Delay` stays 1/50 s (it is not VBL-based). Every VBL count in the specs is converted at 60 Hz.
+   `dos.library Delay` stays 1/50 s (it is not VBL-based). Every VBL count in the specs is converted at 60 Hz,
+   except the song player: the songs' tempo matches PAL captures, so its server runs at 50 Hz (it skips every
+   sixth VBL).
 2. **Original bugs** are fixed, with `--original-bugs` to restore them (see above).
 3. **Credits**: deferred.
 

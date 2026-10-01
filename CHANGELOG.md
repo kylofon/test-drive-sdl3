@@ -4,6 +4,7 @@
 
 - The Amiga version (`tdport-amiga.exe`): the whole game, run from the disk image (`.adf`) directly.
 - Amiga: the original's bugs are fixed by default; `--original-bugs` keeps them.
+- Amiga: the music plays at the original (PAL, 50 Hz) tempo; it was 20% fast.
 - Launcher (`Test Drive.exe`): pick the version, game folder and options, then Play.
 - Launcher: menus (File > Preferences with Always on top, Game settings, About).
 - Launcher: Game settings > Key Bindings; the game applies them while driving (`--keys`).
